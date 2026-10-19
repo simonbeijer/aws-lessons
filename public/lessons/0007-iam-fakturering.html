@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IAM-åtkomst till fakturering</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 7 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 7</p>
+<h1>IAM-åtkomst till fakturering</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Varför en IAM user får Access Denied i Billing tills root user har slagit på åtkomsten.
+</div>
+
+<section class="explain">
+<h2>Vad är Billing?</h2>
+
+<p>Billing är AWS sidor om pengar: fakturor, krediter och budgetar. Den heter Billing and Cost Management och nås via kontonamnet uppe till höger i konsolen. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/control-access-billing.html#ControllingAccessWebsite-Activate">AWS: Activating access to the Billing console</a>)</span></p>
+
+<p>Som standard kan ingen IAM user öppna Billing. Den får Access Denied, ett felmeddelande som betyder att du saknar behörighet. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/control-access-billing.html#grantaccess">AWS: Granting access to your billing information</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför räcker inte AdministratorAccess?</h2>
+
+<p>För att Billing har två lås, och en policy öppnar bara det ena. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/control-access-billing.html#grantaccess">AWS: Granting access to your billing information</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Lås 1: Activate IAM Access</h3>
+    <p>En inställning för hela kontot. Bara root user kan slå på den, och det görs en gång.</p>
+  </div>
+  <div>
+    <h3>Lås 2: en policy</h3>
+    <p>Policyn måste tillåta Billing. AdministratorAccess gör det, eftersom den tillåter allt.</p>
+  </div>
+</div>
+
+<p>Är lås 1 av får även en IAM user med AdministratorAccess Access Denied. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/control-access-billing.html#ControllingAccessWebsite-Activate">AWS: Activating access to the Billing console</a>, <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html#root-user-tasks">AWS: Tasks that require root user credentials</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Var slår root på inställningen?</h2>
+
+<p>På sidan Account i Billing. Root user klickar på kontonamnet och väljer Account. Där finns avsnittet IAM User and Role Access to Billing Information (role är en annan sorts identitet, som kommer i en senare lektion). <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_billing.html">AWS: Grant access to the billing console</a>)</span></p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Som root user: Edit, markera Activate IAM Access, Update. Sidan: <code class="copyable">https://console.aws.amazon.com/billing/home#/account</code></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du är IAM user med AdministratorAccess och får Access Denied i Billing. Varför?</p>
+  <div class="options">
+    <button class="opt" data-why="AdministratorAccess tillåter allt, även Billing, så det är inställningen som saknas.">Policyn gäller inte för sidorna i Billing</button>
+    <button class="opt" data-correct data-why="Utan inställningen kommer ingen IAM user in i Billing, oavsett policy.">Root har inte aktiverat Activate IAM Access</button>
+    <button class="opt" data-why="MFA skyddar inloggningen men styr inte vad du får se i Billing.">Din IAM user saknar MFA på inloggningen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vem kan slå på Activate IAM Access?</p>
+  <div class="options">
+    <button class="opt" data-why="AdministratorAccess räcker inte, eftersom inställningen bara kan ändras av root user.">Alla IAM users med policyn AdministratorAccess</button>
+    <button class="opt" data-why="Gruppen ger behörighet, men inställningen kan bara ändras av root user.">Medlemmarna i gruppen som heter admins</button>
+    <button class="opt" data-correct data-why="Att slå på IAM-åtkomst till Billing är en av sakerna som bara root user kan göra.">Bara root user, kontots första inloggning</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 6: inställningen är på. En ny IAM user ligger inte i någon grupp. Kommer den in i Billing?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Lås 2 är stängt: utan grupp eller policy har den ingen behörighet alls.">Nej, den saknar en policy som tillåter Billing</button>
+    <button class="opt" data-why="Inställningen öppnar bara lås 1, så användaren behöver också en policy.">Ja, då räcker inställningen för varje IAM user</button>
+    <button class="opt" data-why="Ingen hamnar i en grupp av sig själv, utan du lägger in varje ny användare.">Ja, nya IAM users läggs automatiskt i admins</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Som standard får alla IAM users Access Denied i Billing, även med AdministratorAccess.</li>
+    <li>Billing har två lås: inställningen Activate IAM Access och en policy som tillåter Billing. Båda måste vara öppna.</li>
+    <li>Bara root user kan slå på Activate IAM Access, en gång, under Account i Billing.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/control-access-billing.html">AWS Billing: Overview of managing access permissions</a>.</p>
+<p>Om stegen i konsolen: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_billing.html">AWS IAM: Grant access to the billing console</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0006-iam-group.html">Förra: IAM group</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0008-region.html">Nästa: Region</a>
+</nav>
+
+</main>
+</body>
+</html>

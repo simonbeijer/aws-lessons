@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Block Public Access</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 13 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 13</p>
+<h1>Block Public Access</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att S3 blockerar publik åtkomst som standard, och vad det betyder att stänga av spärren.
+</div>
+
+<section class="explain">
+<h2>Vad är Block Public Access?</h2>
+
+<p>Block Public Access är en spärr i S3 som stoppar publik åtkomst. Publik betyder att vem som helst på internet kan läsa dina objekt, utan att logga in. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html">AWS: Blocking public access</a>)</span></p>
+
+<p>Spärren är på för varje ny bucket. Du ser den som rutan Block all public access när du skapar en bucket, och senare under fliken Permissions i bucketen. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html#block-public-access-static-site">AWS: Edit Block Public Access settings</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad spärren stoppar</h2>
+
+<p>Spärren stoppar publik åtkomst även när en policy tillåter den. En bucket policy är en policy som sitter på bucketen i stället för på en IAM user. Med spärren på går en bucket policy som ger alla läsrätt inte ens att spara. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html#access-control-block-public-access-options">AWS: Block public access settings</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad betyder det att stänga av spärren?</h2>
+
+<p>Att bucketen får bli publik, inte att den blir det. Objekten blir publika först när en bucket policy ger alla rätt att läsa dem. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html">AWS: Permissions for website access</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Spärren på</h3>
+    <p>Ingen publik åtkomst, vad policyn än säger.</p>
+  </div>
+  <div>
+    <h3>Spärren av</h3>
+    <p>Policyn bestämmer. Ger den alla läsrätt är objekten publika.</p>
+  </div>
+</div>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Är bucketen publik kan vem som helst på internet läsa objekten. AWS rekommenderar att spärren är på. Stäng bara av den för en bucket som ska vara publik, till exempel en webbsida, och lägg aldrig hemliga filer där. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html#block-public-access-static-site">AWS: Edit Block Public Access settings</a>)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du skapar en ny bucket och laddar upp en fil. Kan vem som helst på internet läsa den?</p>
+  <div class="options">
+    <button class="opt" data-why="Nya buckets och objekt tillåter inte publik åtkomst från början.">Ja, allt i S3 är publikt direkt</button>
+    <button class="opt" data-correct data-why="Block Public Access är på för varje ny bucket, så ingen utanför kan läsa filen.">Nej, spärren är på för nya buckets</button>
+    <button class="opt" data-why="Att känna till namnet räcker inte; spärren stoppar publik åtkomst.">Ja, för den som vet bucketens namn</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du stänger av Block all public access men gör inget mer. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Spärren av betyder bara att bucketen får bli publik; en policy måste också ge läsrätt.">Alla på internet kan läsa objekten</button>
+    <button class="opt" data-why="Ingenting händer av sig självt senare; en policy måste ge läsrätt.">Objekten blir publika efter en timme</button>
+    <button class="opt" data-correct data-why="Objekten blir publika först när en bucket policy ger alla rätt att läsa dem.">Inget, en policy måste ge läsrätt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 12: vad är ett objekt i S3?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Ett objekt är filen plus metadata, uppgifter som beskriver filen.">Filen plus metadata som beskriver den</button>
+    <button class="opt" data-why="Behållaren är bucketen, inte objektet.">Behållaren som du lägger filerna i</button>
+    <button class="opt" data-why="Namnet är objektets key; objektet är filen plus metadata.">Bara namnet på filen, som index.html</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Block Public Access är en spärr som stoppar publik åtkomst. Den är på för varje ny bucket.</li>
+    <li>Spärren går före policyer. Med spärren på hjälper det inte att en bucket policy ger alla läsrätt.</li>
+    <li>Att stänga av spärren betyder att bucketen får bli publik. Den blir publik först när en bucket policy ger alla rätt att läsa.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html">Amazon S3: Blocking public access to your Amazon S3 storage</a>.</p>
+<p>Om att stänga av spärren för en webbsida: <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html">Amazon S3: Setting permissions for website access</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0012-s3-bucket-objekt.html">Förra: S3 bucket och objekt</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0014-static-website-hosting.html">Nästa: Static website hosting</a>
+</nav>
+
+</main>
+</body>
+</html>

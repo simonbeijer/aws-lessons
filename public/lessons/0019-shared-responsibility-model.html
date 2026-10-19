@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shared Responsibility Model</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 19 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 19</p>
+<h1>Shared Responsibility Model</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad AWS ansvarar för och vad du ansvarar för, med S3 och Amplify som exempel.
+</div>
+
+<section class="explain">
+<h2>Vad är Shared Responsibility Model?</h2>
+
+<p>Shared Responsibility Model är AWS beskrivning av hur säkerheten delas mellan AWS och dig. AWS ansvarar för säkerheten <em>av</em> molnet, du för säkerheten <em>i</em> molnet. <span class="src">(<a href="https://aws.amazon.com/compliance/shared-responsibility-model/">AWS: Shared Responsibility Model</a>)</span></p>
+
+<p>Säkerheten av molnet är infrastrukturen, alltså datacenter, maskiner och nätverk som alla AWS-tjänster körs på. Hur mycket som är ditt beror på vilken tjänst du använder. <span class="src">(<a href="https://aws.amazon.com/compliance/shared-responsibility-model/">AWS: Shared Responsibility Model</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad du ansvarar för i S3</h2>
+
+<p>I S3 ansvarar du för din data och för vem som får komma åt den. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/security.html">AWS: Security in Amazon S3</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-bpa">Block Public Access</button>
+    <button class="chip" data-target="p-policy">Bucket policy</button>
+    <button class="chip" data-target="p-data">Dina filer</button>
+  </div>
+  <div class="picker-panel" id="p-bpa"><p>AWS låter spärren vara på från början. Stänger du av den är det ditt val.</p></div>
+  <div class="picker-panel" id="p-policy"><p>Du skriver vem som får läsa. Med <code>Principal</code> <code>"*"</code> kan alla läsa allt i bucketen.</p></div>
+  <div class="picker-panel" id="p-data"><p>Laddar du upp personuppgifter i en publik bucket är det ditt ansvar, inte AWS. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/security.html">AWS: Security in Amazon S3</a>)</span></p></div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Var gränsen går i Amplify</h2>
+
+<p>Gränsen går vid det du lägger in: kod, inställningar och data är ditt. Maskinen som bygger appen är AWS ansvar. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/security.html">AWS: Security in Amplify</a>, <a href="https://docs.aws.amazon.com/amplify/latest/userguide/data-protection.html">AWS: Data protection</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>AWS</h3>
+    <p>Datacenter, maskiner och nätverk. Maskinen som kör bygget.</p>
+  </div>
+  <div>
+    <h3>Du</h3>
+    <p>Din kod och data. Vem som får komma åt dem.</p>
+  </div>
+</div>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Hamnar ett lösenord i din kod eller byggets logg är det ditt ansvar. AWS varnar för att det du skriver in kan hamna i loggar. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/data-protection.html">AWS: Data protection</a>)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du laddar upp en fil med personuppgifter till en publik bucket. Vems ansvar är det?</p>
+  <div class="options">
+    <button class="opt" data-why="AWS skyddar infrastrukturen, inte vad du lägger i den.">AWS, eftersom filen ligger hos AWS</button>
+    <button class="opt" data-why="Ansvaret är delat, men din data och åtkomsten till den är ditt ansvar.">Båda två, eftersom ansvaret är delat</button>
+    <button class="opt" data-correct data-why="Din data och vem som får läsa den är säkerhet i molnet, alltså ditt ansvar.">Ditt, eftersom filen är din data</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Amplify bygger din app på en maskin hos AWS. Vem ansvarar för maskinen?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Maskinen är infrastruktur, alltså säkerhet av molnet och AWS ansvar.">AWS, den hör till deras infrastruktur</button>
+    <button class="opt" data-why="Koden är din, men maskinen som kör bygget är AWS infrastruktur.">Du, eftersom maskinen bygger din kod</button>
+    <button class="opt" data-why="GitHub har din kod, men maskinen som bygger finns hos AWS.">GitHub, eftersom koden finns där först</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 13: hur ser Block Public Access ut i en ny bucket?</p>
+  <div class="options">
+    <button class="opt" data-why="Spärren är på från början; du måste själv stänga av den.">Spärren är avstängd tills du ändrar</button>
+    <button class="opt" data-correct data-why="Nya buckets blockerar publik åtkomst tills du själv ändrar det.">Spärren är på, publik läsning stoppas</button>
+    <button class="opt" data-why="Spärren finns i alla buckets, även utan static website hosting.">Spärren finns bara vid website hosting</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>AWS ansvarar för säkerheten av molnet: datacenter, maskiner och nätverk som tjänsterna körs på.</li>
+    <li>Du ansvarar för säkerheten i molnet: din data och vem som får komma åt den, till exempel Block Public Access och bucket policy.</li>
+    <li>I Amplify är byggmaskinen AWS ansvar. Din kod, dina inställningar och det som hamnar i loggen är ditt.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://aws.amazon.com/compliance/shared-responsibility-model/">AWS: Shared Responsibility Model</a>.</p>
+<p>För S3: <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/security.html">AWS S3: Security in Amazon S3</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0018-service-role.html">Förra: Service role (IAM role)</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0020-vpc.html">Nästa: VPC</a>
+</nav>
+
+</main>
+</body>
+</html>

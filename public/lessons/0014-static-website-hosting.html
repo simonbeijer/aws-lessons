@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Static website hosting</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 14 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 14</p>
+<h1>Static website hosting</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Hur en bucket blir webbserver, och varför du först får 403 Forbidden.
+</div>
+
+<section class="explain">
+<h2>Hur blir en bucket en webbserver?</h2>
+
+<p>Du slår på Static website hosting, en inställning längst ned under fliken Properties i bucketen. Då skickar S3 bucketens objekt till webbläsare som ber om dem. Det är vad en webbserver gör. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/EnableWebsiteHosting.html">AWS: Enabling website hosting</a>)</span></p>
+
+<p>Static betyder att filerna skickas precis som de ligger: HTML, CSS, JavaScript och bilder. Ingen kod körs hos S3. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html">AWS: Hosting a static website</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Endpoint och index document</h2>
+
+<p>Endpoint är bucketens webbadress, och index document är dess startsida. Klicka för mer. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteEndpoints.html">AWS: Website endpoints</a>, <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/IndexDocumentSupport.html">AWS: Index document</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-endpoint">Endpoint</button>
+    <button class="chip" data-target="p-index">Index document</button>
+  </div>
+  <div class="picker-panel" id="p-endpoint"><p>Sidans webbadress. Den syns under Static website hosting som Bucket website endpoint. I <code>eu-north-1</code>, med ditt bucketnamn först: <code>http://bucketnamn.s3-website.eu-north-1.amazonaws.com</code>. Bara http, inte https.</p></div>
+  <div class="picker-panel" id="p-index"><p>Filen S3 visar när adressen inte nämner någon fil, oftast <code>index.html</code>. Objektets key måste heta exakt så, med samma små och stora bokstäver.</p></div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Varför får du 403 Forbidden?</h2>
+
+<p>För att ingen ännu har fått rätt att läsa objekten. 403 Forbidden är felkoden en webbserver svarar med när du inte får se sidan. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html">AWS: Permissions for website access</a>)</span></p>
+
+<p>Endpointen visar bara objekt som alla får läsa. Att Block Public Access är av räcker inte. En bucket policy som ger alla läsrätt löser det. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteEndpoints.html#WebsiteRestEndpointDiff">AWS: Website endpoint</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>403 Forbidden</h3>
+    <p>Du får inte läsa filen.</p>
+  </div>
+  <div>
+    <h3>404 Not Found</h3>
+    <p>Filen finns inte, till exempel fel namn.</p>
+  </div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du har slagit på Static website hosting och öppnar endpointen. Du får 403 Forbidden. Varför?</p>
+  <div class="options">
+    <button class="opt" data-why="Saknas filen blir det 404 Not Found, inte 403.">Filen index.html finns inte i din bucket</button>
+    <button class="opt" data-correct data-why="Endpointen visar bara objekt som alla får läsa, och ingen bucket policy ger läsrätt än.">Ingen har fått rätt att läsa objekten</button>
+    <button class="opt" data-why="Endpointen använder alltid http; https stöds inte där.">Adressen måste börja med https i stället</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du skriver in endpointen utan något filnamn efter. Vilken fil visar S3?</p>
+  <div class="options">
+    <button class="opt" data-why="S3 väljer inte den senaste filen; den visar index document.">Den fil du laddade upp allra senast</button>
+    <button class="opt" data-why="På endpointen visas startsidan, inte en lista över objekten.">En lista över alla objekt i bucketen</button>
+    <button class="opt" data-correct data-why="Index document är filen S3 visar när adressen inte nämner någon fil.">Filen som du angav som index document</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 13: varför måste Block all public access vara av för en publik webbsida?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Spärren går före policyer, så med den på blir objekten aldrig publika.">Annars stoppas publik läsning helt</button>
+    <button class="opt" data-why="Endpointen skapas oavsett spärren; spärren stoppar publik läsning.">Annars skapas ingen endpoint alls</button>
+    <button class="opt" data-why="Spärren gäller vem som får läsa, inte uppladdning av filer.">Annars stoppas uppladdning av filer</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Static website hosting, under Properties, gör bucketen till webbserver. S3 skickar filerna precis som de ligger.</li>
+    <li>Bucketen får en endpoint, en http-adress. Utan filnamn i adressen visar S3 index document, oftast <code>index.html</code>.</li>
+    <li>Du får 403 Forbidden tills någon ger alla rätt att läsa objekten. Det gör en bucket policy, nästa lektion.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html">Amazon S3: Hosting a static website using Amazon S3</a>.</p>
+<p>Om 403 och läsrätt: <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html">Amazon S3: Setting permissions for website access</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0013-block-public-access.html">Förra: Block Public Access</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0015-bucket-policy.html">Nästa: Bucket policy</a>
+</nav>
+
+</main>
+</body>
+</html>

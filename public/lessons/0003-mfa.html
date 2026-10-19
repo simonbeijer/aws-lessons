@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MFA</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 3 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 3</p>
+<h1>MFA</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad MFA är, och varför både root user och din IAM user ska ha det.
+</div>
+
+<section class="explain">
+<h2>Vad är MFA?</h2>
+
+<p>MFA (multi-factor authentication) betyder att du loggar in med två saker: ditt lösenord och en kod från en MFA-enhet. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html">AWS: Multi-factor authentication in IAM</a>)</span></p>
+
+<p>MFA-enheten är oftast en authenticator-app i mobilen, en app som visar en sexsiffrig kod. Koden byts var 30:e sekund. Den som bara har ditt lösenord kommer alltså inte in. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_enable_virtual.html">AWS: Assign a virtual MFA device</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför MFA på root user?</h2>
+
+<p>För att root kan göra allt i kontot. Därför kräver AWS MFA på root user. Har du inte lagt till det, måste du göra det inom 35 dagar från första inloggningsförsöket i konsolen. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/root-user-best-practices.html#ru-bp-mfa">AWS: Root user best practices</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför MFA på IAM user också?</h2>
+
+<p>För att MFA på root bara skyddar root. Din IAM user har eget lösenord och egen MFA. Utan MFA räcker dess lösenord för att komma in. AWS rekommenderar MFA för både root och IAM users. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html">AWS: Multi-factor authentication in IAM</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Root user</h3>
+    <p>E-post och lösenord + egen MFA-enhet. <span class="tag bad">Kan göra allt</span></p>
+  </div>
+  <div>
+    <h3>IAM user</h3>
+    <p>Användarnamn och lösenord + egen MFA-enhet. <span class="tag good">Till vardags</span></p>
+  </div>
+</div>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Lägg båda i samma authenticator-app, som två poster med olika namn. De flesta appar klarar flera. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_enable_virtual.html">AWS</a>)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad behöver du för att logga in när MFA är på?</p>
+  <div class="options">
+    <button class="opt" data-why="Lösenordet räcker inte; MFA kräver också en kod från MFA-enheten.">Bara lösenordet, som du gjort förut</button>
+    <button class="opt" data-correct data-why="MFA betyder två saker: lösenordet och en kod från din MFA-enhet.">Lösenordet och en kod från mobilen</button>
+    <button class="opt" data-why="Koden ersätter inte lösenordet; du behöver båda.">Bara koden från mobilen, inget mer</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Root user har MFA. Din IAM user har det inte. Är IAM user skyddad?</p>
+  <div class="options">
+    <button class="opt" data-why="MFA på root skyddar bara root; IAM user har egen MFA.">Ja, MFA på root skyddar hela kontot</button>
+    <button class="opt" data-why="Inget i AWS kopplar IAM users MFA till root; varje inloggning har sin egen.">Ja, om root user alltid är utloggad</button>
+    <button class="opt" data-correct data-why="IAM user har eget lösenord och egen MFA, så den behöver en egen MFA-enhet.">Nej, IAM user behöver en egen MFA</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 2: när ska du logga in som root user?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Root kan göra allt, så den används bara för uppgifter som kräver root.">När en uppgift kräver just root user</button>
+    <button class="opt" data-why="Till vardags loggar du in som IAM user, inte som root.">Varje gång du ska jobba i konsolen</button>
+    <button class="opt" data-why="Root används bara när en uppgift kräver det, inte för vanliga ändringar.">När du vill ändra något i kontot</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>MFA betyder att du loggar in med lösenord och en kod från en MFA-enhet, oftast en authenticator-app i mobilen.</li>
+    <li>Root user kan göra allt, och AWS kräver MFA på root.</li>
+    <li>MFA på root skyddar bara root. Din IAM user behöver en egen MFA-enhet.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html">AWS IAM: Multi-factor authentication in IAM</a>.</p>
+<p>Om authenticator-appen: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_enable_virtual.html">AWS IAM: Assign a virtual MFA device</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0002-root-user.html">Förra: Root user</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0004-iam-user.html">Nästa: IAM user</a>
+</nav>
+
+</main>
+</body>
+</html>

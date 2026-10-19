@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bygge (build)</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 16 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 16</p>
+<h1>Bygge (build)</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att React-kod byggs till HTML, CSS och JavaScript i mappen <code>dist/</code> innan en webbläsare kan visa den.
+</div>
+
+<section class="explain">
+<h2>Vad är ett bygge?</h2>
+
+<p>Ett bygge gör om koden du skriver, källkoden, till färdiga filer som en webbläsare kan visa: HTML, CSS och JavaScript. <span class="src">(<a href="https://vite.dev/guide/build">Vite: Building for production</a>)</span></p>
+
+<p>React är ett JavaScript-bibliotek för att bygga webbsidor. React-kod skrivs i JSX, HTML-liknande kod inne i JavaScript, i filer som <code>App.jsx</code>. JSX görs om till vanlig JavaScript. Det sköter bygget. <span class="src">(<a href="https://react.dev/learn/writing-markup-with-jsx">React: Writing markup with JSX</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Var hamnar filerna?</h2>
+
+<p>I mappen <code>dist/</code>. Det gäller projekt som använder Vite, ett byggverktyg för bland annat React. Bygget startar med kommandot nedan, i projektmappen. npm är verktyget som kör projektets kommandon, här <code>build</code>. <span class="src">(<a href="https://vite.dev/guide/static-deploy">Vite: Deploying a static site</a>)</span></p>
+
+<pre>npm run build</pre>
+
+<div class="two-col">
+  <div>
+    <h3>src/</h3>
+    <p>Källkoden du skriver och ändrar, till exempel <code>App.jsx</code>.</p>
+  </div>
+  <div>
+    <h3>dist/</h3>
+    <p>Det färdiga resultatet. Bygget skapar filerna, du ändrar inget här.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad som publiceras</h2>
+
+<p>Bara innehållet i <code>dist/</code> publiceras. Som i Static website hosting skickas filerna precis som de ligger, så de måste redan vara färdiga. <span class="src">(<a href="https://vite.dev/guide/static-deploy">Vite: Deploying a static site</a>)</span></p>
+
+<p>En AWS-tjänst som bygger åt dig behöver veta var de färdiga filerna ligger. I AWS Amplify heter inställningen <code>baseDirectory</code>: mappen där de färdiga filerna finns. För Vite är det <code>dist</code>. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/yml-specification-syntax.html">AWS: Build specification reference</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad gör <code>npm run build</code> i ett Vite-projekt?</p>
+  <div class="options">
+    <button class="opt" data-why="Bygget laddar inte upp något; det skapar färdiga filer på din dator.">Laddar upp din kod direkt till AWS</button>
+    <button class="opt" data-why="Källkoden i src/ ändras inte; bygget skapar nya filer i dist/.">Skriver om dina filer i mappen src/</button>
+    <button class="opt" data-correct data-why="Bygget gör om källkoden till HTML, CSS och JavaScript i dist/.">Gör om källkoden till filer i dist/</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vilken mapp ska publiceras för att webbläsaren ska kunna visa appen?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="dist/ innehåller de färdiga filerna som webbläsaren kan visa.">dist/, med de färdiga byggda filerna</button>
+    <button class="opt" data-why="src/ är källkoden; den måste byggas innan en webbläsare kan visa den.">src/, med källkoden skriven i JSX</button>
+    <button class="opt" data-why="Bara resultatet av bygget, dist/, publiceras.">Hela projektet, precis som det ligger</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 14: vad betyder static i Static website hosting?</p>
+  <div class="options">
+    <button class="opt" data-why="Static handlar om hur filerna skickas, inte om att sidan aldrig får ändras.">Sidan kan inte ändras i efterhand</button>
+    <button class="opt" data-correct data-why="S3 skickar filerna precis som de ligger, och ingen kod körs hos S3.">Filerna skickas precis som de ligger</button>
+    <button class="opt" data-why="Ingen kod körs hos S3; filerna skickas som de ligger.">S3 kör koden innan sidan skickas</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett bygge gör om källkoden, till exempel React-kod i JSX, till HTML, CSS och JavaScript som en webbläsare kan visa.</li>
+    <li>I ett Vite-projekt startar <code>npm run build</code> bygget, och de färdiga filerna hamnar i <code>dist/</code>.</li>
+    <li>Det är <code>dist/</code> som publiceras, inte källkoden. I AWS Amplify pekar <code>baseDirectory: dist</code> ut mappen.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://vite.dev/guide/static-deploy">Vite: Deploying a static site</a>.</p>
+<p>Om byggsettings i Amplify: <a href="https://docs.aws.amazon.com/amplify/latest/userguide/yml-specification-syntax.html">AWS Amplify Hosting: Build specification reference</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0015-bucket-policy.html">Förra: Bucket policy</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0017-amplify-hosting.html">Nästa: Amplify Hosting</a>
+</nav>
+
+</main>
+</body>
+</html>

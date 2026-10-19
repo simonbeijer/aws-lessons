@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CloudWatch-larm</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 10 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 10</p>
+<h1>CloudWatch-larm</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad ett CloudWatch-larm är och hur det reagerar på beräknad kostnad.
+</div>
+
+<section class="explain">
+<h2>Vad är ett CloudWatch-larm?</h2>
+
+<p>Ett larm i CloudWatch, AWS tjänst för att övervaka dina resurser. Larmet bevakar ett mätvärde (metric), en siffra som AWS mäter gång på gång, och reagerar när värdet går över en gräns du sätter. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html#cloudwatch-monitoring-overview">AWS: What is CloudWatch?</a>)</span></p>
+
+<p>Fakturalarmet bevakar mätvärdet <code>EstimatedCharges</code>: månadens beräknade kostnad i USD, uträknad flera gånger per dygn. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html">AWS: Create a billing alarm</a>)</span></p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Slå först på Receive CloudWatch Billing Alerts under Billing Preferences i Billing-konsolen. Mätvärdet syns efter cirka 15 minuter, och bara i <code>us-east-1</code>. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html#turning_on_billing_metrics">AWS: Enabling billing alerts</a>)</span></p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vilka lägen har larmet?</h2>
+
+<p>Tre. Larmet skickar en notis bara när det byter läge. Klicka på ett läge. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarm-evaluation.html#alarm-states">AWS: Metric alarm states</a>, <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html">AWS: Using CloudWatch alarms</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="s-ok">OK</button>
+    <button class="chip" data-target="s-alarm">ALARM</button>
+    <button class="chip" data-target="s-insuf">INSUFFICIENT_DATA</button>
+  </div>
+  <div class="picker-panel" id="s-ok"><p><span class="tag good">Lugnt</span> Kostnaden är under din gräns.</p></div>
+  <div class="picker-panel" id="s-alarm"><p><span class="tag bad">Över gränsen</span> Kostnaden är över din gräns. Larmet skickar en notis via SNS, AWS tjänst för notiser (nästa lektion).</p></div>
+  <div class="picker-panel" id="s-insuf"><p><span class="tag note">För lite data</span> Larmet har just startat, eller har inte fått tillräckligt med data än. Det är normalt för ett nytt larm.</p></div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Hur reagerar larmet på kostnaden?</h2>
+
+<p>Larmet går till ALARM när den beräknade kostnaden är över gränsen. Det räknar aldrig med prognos. Är kostnaden redan över gränsen när du skapar larmet, går det till ALARM direkt. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html">AWS: Create a billing alarm</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Fakturalarm</h3>
+    <p>Bara kostnaden hittills. Ingen prognos.</p>
+  </div>
+  <div>
+    <h3>Monthly cost budget</h3>
+    <p>Kostnaden hittills och prognos för månaden.</p>
+  </div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du skapar ett fakturalarm med gränsen 5 USD. Månaden har redan kostat 7 USD. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Larmet väntar inte på en ny månad; kostnaden är redan över gränsen.">Larmet väntar på nästa månad</button>
+    <button class="opt" data-correct data-why="Är kostnaden redan över gränsen när larmet skapas, går det till ALARM direkt.">Larmet går direkt till ALARM</button>
+    <button class="opt" data-why="OK betyder under gränsen, och 7 USD är över 5 USD.">Larmet stannar i läget OK</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Ditt nya fakturalarm visar INSUFFICIENT_DATA. Vad betyder det?</p>
+  <div class="options">
+    <button class="opt" data-why="Över gränsen heter ALARM; INSUFFICIENT_DATA betyder för lite data.">Kostnaden har redan gått över din gräns</button>
+    <button class="opt" data-why="Det är normalt för ett nytt larm, som inte har fått tillräckligt med data än.">Larmet är trasigt och måste göras om</button>
+    <button class="opt" data-correct data-why="Larmet har just startat eller har för lite data, vilket är normalt för ett nytt larm.">Larmet har inte fått tillräckligt med data</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 8: du står i <code>eu-north-1</code> och hittar inget Billing-mätvärde i CloudWatch. Vad gör du?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="AWS sparar kontots kostnadsdata bara i us-east-1, så där finns mätvärdet.">Byter region till us-east-1 och letar igen</button>
+    <button class="opt" data-why="AWS skapar kostnadsmätvärdet själv, men bara i us-east-1.">Skapar själv ett nytt mätvärde för kostnaden</button>
+    <button class="opt" data-why="Att vänta hjälper inte; kostnadsdatan finns bara i us-east-1.">Väntar en vecka tills datan dyker upp</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett CloudWatch-larm bevakar ett mätvärde och reagerar när det går över en gräns. Fakturalarmet bevakar <code>EstimatedCharges</code>, månadens beräknade kostnad, som finns i <code>us-east-1</code> när du har slagit på billing alerts.</li>
+    <li>Larmet har tre lägen: OK, ALARM och INSUFFICIENT_DATA. Det skickar en notis via SNS när det byter till ALARM.</li>
+    <li>Larmet reagerar bara på kostnaden hittills, aldrig på prognos. Är kostnaden redan över gränsen går det till ALARM direkt.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html">AWS CloudWatch: Create a billing alarm to monitor your estimated AWS charges</a>.</p>
+<p>Om lägena: <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarm-evaluation.html#alarm-states">AWS CloudWatch: Alarm evaluation</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0009-aws-budgets.html">Förra: AWS Budgets</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0011-sns.html">Nästa: SNS</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Route table</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 25 av 47 · V40</span>
+</nav>
+
+<p class="lesson-no">Lektion 25</p>
+<h1>Route table</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att raden <code>0.0.0.0/0 → igw</code> gör ett subnät publikt, och att subnätets namn bara är en etikett.
+</div>
+
+<section class="explain">
+<h2>Vad är en route table?</h2>
+
+<p>En route table är en lista med regler som säger vart trafiken från ett subnät skickas. Varje regel kallas route och är en rad med två delar: Destination, vilka adresser trafiken ska till, och Target, vart den skickas. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/RouteTables.html">AWS: Route table concepts</a>)</span></p>
+
+<p>Varje subnät är kopplat till exakt en route table. En route table kan ha flera subnät. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/subnet-route-tables.html">AWS: Subnet route tables</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vilken rad gör ett subnät publikt?</h2>
+
+<p>Raden <code>0.0.0.0/0 → igw-...</code> gör subnätet publikt. <code>0.0.0.0/0</code> betyder alla adresser, och <code>igw-...</code> är Internet Gatewayns ID. Raden säger: skicka trafiken till internet. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html#subnet-types">AWS: Subnet types</a>)</span></p>
+
+<p>Raden <code>local</code> finns i alla route tables och håller trafik till VPC:ns egna adresser kvar i VPC:n. En adress i VPC:n passar på båda raderna. Då vinner <code>local</code>, eftersom raden med minst intervall alltid vinner. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/route-tables-priority.html">AWS: Route priority</a>)</span></p>
+
+<p>Klicka för att jämföra två av kursens route tables:</p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="rt-pub">v40-rtb-public</button>
+    <button class="chip" data-target="rt-priv">v40-rtb-private1-eu-north-1a</button>
+  </div>
+  <div class="picker-panel" id="rt-pub">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Destination</th><th>Target</th></tr>
+        <tr><td><code>10.0.0.0/16</code></td><td><code>local</code></td></tr>
+        <tr><td><code>0.0.0.0/0</code></td><td><code>igw-...</code></td></tr>
+      </table>
+    </div>
+    <p>Kopplad till public1 och public2. De är publika.</p>
+  </div>
+  <div class="picker-panel" id="rt-priv">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Destination</th><th>Target</th></tr>
+        <tr><td><code>10.0.0.0/16</code></td><td><code>local</code></td></tr>
+      </table>
+    </div>
+    <p>Kopplad till private1. Raden till internet saknas, så subnätet är privat.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad gör subnätets namn?</h2>
+
+<p>Ingenting. Namnet är bara en etikett. Kopplar du <code>private1</code> till <code>v40-rtb-public</code> blir det publikt, fast namnet säger private. Bara route tablen avgör. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html#subnet-types">AWS: Subnet types</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad gör raden <code>0.0.0.0/0 → igw-...</code> i en route table?</p>
+  <div class="options">
+    <button class="opt" data-why="Det gör raden local. Raden 0.0.0.0/0 → igw skickar trafiken till internet.">Håller trafiken kvar i VPC:n</button>
+    <button class="opt" data-why="Zonen väljs när subnätet skapas. Raden 0.0.0.0/0 → igw skickar trafiken till internet.">Placerar subnätet i rätt zon</button>
+    <button class="opt" data-correct data-why="0.0.0.0/0 betyder alla adresser, och igw är Internet Gateway. Raden gör subnätet publikt.">Skickar trafik ut på internet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Subnätet <code>private1</code> kopplas till <code>v40-rtb-public</code>. Vad blir det?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Route tablen har raden 0.0.0.0/0 → igw, och den avgör. Namnet är bara en etikett.">Publikt, för route tablen avgör</button>
+    <button class="opt" data-why="Namnet är bara en etikett. Route tablen har raden till internet, så subnätet blir publikt.">Privat, för namnet säger private</button>
+    <button class="opt" data-why="Zonen avgör inte. Route tablen har raden till internet, så subnätet blir publikt.">Privat, för zonen avgör sådant</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 21: raden <code>local</code> har destinationen <code>10.0.0.0/16</code>. Hur många adresser täcker den?</p>
+  <div class="options">
+    <button class="opt" data-why="4 096 är ett /20, som kursens subnät. Ett /16 rymmer 65 536 adresser.">4 096 adresser</button>
+    <button class="opt" data-correct data-why="Med /16 är de två första talen låsta, och resten ger 65 536 adresser: hela VPC:n.">65 536 adresser</button>
+    <button class="opt" data-why="1 024 är för få. Ett /16 rymmer 65 536 adresser, hela kursens VPC.">1 024 adresser</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En route table är en lista med rader. Varje rad har Destination (vilka adresser) och Target (vart trafiken skickas). Varje subnät är kopplat till exakt en route table.</li>
+    <li>Raden <code>0.0.0.0/0 → igw-...</code> gör subnätet publikt. Saknas den är subnätet privat. Raden <code>local</code> håller trafiken inom VPC:n.</li>
+    <li>Subnätets namn är bara en etikett. Route tablen avgör om det är publikt eller privat.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/subnet-route-tables.html">AWS VPC: Subnet route tables</a>.</p>
+<p>Om publikt och privat subnät: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html#subnet-types">AWS VPC: Subnet types</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0024-internet-gateway.html">Förra: Internet Gateway</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0026-vpc-endpoint-s3.html">Nästa: VPC endpoint (S3 Gateway)</a>
+</nav>
+
+</main>
+</body>
+</html>

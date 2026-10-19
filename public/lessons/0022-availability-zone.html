@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Availability Zone</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 22 av 47 · V40</span>
+</nav>
+
+<p class="lesson-no">Lektion 22</p>
+<h1>Availability Zone</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad en zon är, hur den skiljer sig från en region, och varför kursens nätverk byggs i två zoner.
+</div>
+
+<section class="explain">
+<h2>Vad är en Availability Zone?</h2>
+
+<p>En Availability Zone, kort zon, är ett eller flera datacenter inne i en region. Varje zon har egen ström och eget nätverk, i egna byggnader. <span class="src">(<a href="https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html#concepts-availability-zones">AWS: Availability Zones</a>)</span></p>
+
+<p>En brand eller översvämning drabbar därför bara en zon. Zonerna i samma region är kopplade till varandra med snabba nätverk. <span class="src">(<a href="https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html#concepts-availability-zones">AWS: Availability Zones</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Zon eller region?</h2>
+
+<p>En zon är en del av en region. Varje region har minst tre zoner. Zonens kod är regionens kod plus en bokstav: <code>eu-north-1a</code>, <code>eu-north-1b</code> och så vidare. <span class="src">(<a href="https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-availability-zones.html">AWS: Availability Zones</a>)</span></p>
+
+<p>Din VPC hör till regionen och sträcker sig över alla dess zoner. Ett subnät, en mindre bit av VPC:ns adressintervall, ligger i exakt en zon. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html#subnet-basics">AWS: Subnet basics</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Region</h3>
+    <p>En plats, till exempel Stockholm. Koden är <code>eu-north-1</code>.</p>
+  </div>
+  <div>
+    <h3>Zon</h3>
+    <p>Datacenter inne i regionen. Koden är <code>eu-north-1a</code>.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Varför två zoner?</h2>
+
+<p>Två zoner gör att det du bygger fortsätter fungera om en zon går ner. AWS råder dig att lägga det du bygger i flera zoner. <span class="src">(<a href="https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html#concepts-availability-zones">AWS: Availability Zones</a>)</span></p>
+
+<p>Kursens nätverk får därför subnät i både <code>eu-north-1a</code> och <code>eu-north-1b</code>.</p>
+
+<p>Det finns ett skäl till. RDS är en databas som AWS driver åt dig, och den kommer senare i kursen. RDS kräver subnät i minst två zoner, även om databasen bara står i en. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.Subnets">AWS: Working with DB subnet groups</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad är <code>eu-north-1b</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="En region har ingen bokstav sist. Bokstaven visar att det är en zon.">En egen region nära Stockholm</button>
+    <button class="opt" data-correct data-why="Zonens kod är regionens kod plus en bokstav.">En zon i regionen eu-north-1</button>
+    <button class="opt" data-why="Ett subnät ligger i en zon, men koden är zonens namn.">Ett subnät som kursen skapar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Varför byggs kursens nätverk i två zoner?</p>
+  <div class="options">
+    <button class="opt" data-why="Zonerna delar inte på kostnaden. Skälet är att en zon kan gå ner.">Så att zonerna kan dela lika på kostnaden</button>
+    <button class="opt" data-why="Båda zonerna ligger i samma region, eu-north-1.">Så att nätverket kan finnas i två regioner</button>
+    <button class="opt" data-correct data-why="Går en zon ner fungerar det som står i den andra.">Så att allt fungerar trots en trasig zon</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 8: kursen bygger i <code>eu-north-1</code>. Vad är det?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="eu-north-1 är koden för regionen Europe (Stockholm), som har minst tre zoner.">En region med flera zoner</button>
+    <button class="opt" data-why="En zon har en bokstav sist, till exempel eu-north-1a.">En av zonerna i Stockholm</button>
+    <button class="opt" data-why="Det är en hel region, med minst tre zoner och flera datacenter.">Ett datacenter i en region</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En Availability Zone är ett eller flera datacenter i en region, med egen ström och eget nätverk.</li>
+    <li>En region har minst tre zoner. Zonens kod är regionens kod plus en bokstav, till exempel <code>eu-north-1a</code>. En VPC täcker hela regionen, ett subnät ligger i en zon.</li>
+    <li>Kursen bygger i två zoner så att allt klarar att en zon går ner, och för att RDS kräver subnät i minst två zoner.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html">AWS: Regions and Availability Zones</a>.</p>
+<p>Om zonernas koder: <a href="https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-availability-zones.html">AWS: Availability Zones</a>.</p>
+<p>Om RDS och två zoner: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html">AWS RDS: Working with a DB instance in a VPC</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0021-cidr.html">Förra: CIDR</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0023-subnat.html">Nästa: Subnät</a>
+</nav>
+
+</main>
+</body>
+</html>

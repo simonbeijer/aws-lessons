@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Region</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 8 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 8</p>
+<h1>Region</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad en region är, varför kursen använder <code>eu-north-1</code>, och varför fakturalarm görs i <code>us-east-1</code>.
+</div>
+
+<section class="explain">
+<h2>Vad är en region?</h2>
+
+<p>En region är en plats där AWS har datacenter, till exempel Stockholm. Varje region har ett namn och en kod: Europe (Stockholm) har koden <code>eu-north-1</code>. <span class="src">(<a href="https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions.html#available-regions">AWS: Available AWS Regions</a>)</span></p>
+
+<p>Det mesta du skapar hör till en region. Konsolen visar bara det som finns i regionen du har valt, och AWS kopierar inget till andra regioner av sig själv. <span class="src">(<a href="https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html#concepts-regions">AWS: Regions</a>)</span></p>
+
+<p>Du byter region i menyraden överst i konsolen. Vissa tjänster, som IAM, har ingen region. <span class="src">(<a href="https://docs.aws.amazon.com/awsconsolehelpdocs/latest/gsg/select-region.html">AWS: Choosing your Region</a>)</span></p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Syns inte något du har skapat: kontrollera regionen först.</p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Varför eu-north-1?</h2>
+
+<p>Den ligger i Stockholm, nära dig. AWS råder dig att välja en region nära användarna, eftersom svaren då går snabbare. Lagar kan också kräva att data finns i Europa. <span class="src">(<a href="https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions.html">AWS: AWS Regions</a>)</span></p>
+
+<div class="box note">
+  <span class="box-title">Ej bekräftat</span>
+  <p>Kursmaterialet säger inte varför. Skälen ovan är AWS allmänna råd.</p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Varför us-east-1 för fakturalarm?</h2>
+
+<p>För att AWS sparar kontots kostnadsdata bara i US East (N. Virginia), <code>us-east-1</code>. Ett fakturalarm säger till när den beräknade kostnaden går över en gräns, och det läser just den datan. Datan gäller kontots kostnad i alla regioner. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html">AWS: Create a billing alarm</a>)</span></p>
+
+<p>Larmet byggs i CloudWatch, en tjänst som kommer i en senare lektion. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html#creating_billing_alarm_with_wizard">AWS: Create a billing alarm</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>eu-north-1</h3>
+    <p>Allt du bygger i kursen.</p>
+  </div>
+  <div>
+    <h3>us-east-1</h3>
+    <p>Bara fakturalarmet. Byt dit, skapa larmet, byt tillbaka.</p>
+  </div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du skapade något i <code>eu-north-1</code>. Nu står konsolen på <code>us-east-1</code>. Varför syns det inte?</p>
+  <div class="options">
+    <button class="opt" data-why="Inget raderas när du byter region; konsolen visar bara den region du har valt.">AWS raderar det när du byter region</button>
+    <button class="opt" data-correct data-why="Det du skapar hör till en region, och konsolen visar bara den valda regionen.">Konsolen visar bara den region du valt</button>
+    <button class="opt" data-why="AWS kopierar inget till andra regioner av sig själv, så det finns bara i eu-north-1.">AWS kopierar dit det efter några timmar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Varför skapas fakturalarmet i <code>us-east-1</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Larmet kostar inte mindre där; det handlar om var kostnadsdatan finns.">Larmen kostar mindre i den regionen</button>
+    <button class="opt" data-why="Kostnadsdatan gäller alla regioner, även eu-north-1.">Där räknas bara kostnaden inom USA</button>
+    <button class="opt" data-correct data-why="AWS sparar kostnadsdatan för hela kontot bara i us-east-1.">Bara där finns datan om kostnaden</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 7: du är IAM user och får Access Denied i Billing. Hjälper det att byta region?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Inställningen gäller hela kontot, så regionen spelar ingen roll.">Nej, root slår på Activate IAM Access</button>
+    <button class="opt" data-why="Billing styrs av Activate IAM Access och en policy, inte av regionen.">Ja, byt till us-east-1 och försök igen</button>
+    <button class="opt" data-why="Billing styrs av Activate IAM Access och en policy, inte av regionen.">Ja, byt till eu-north-1 och försök igen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En region är en plats där AWS har datacenter, med ett namn och en kod. Det du skapar hör till en region, och konsolen visar bara den region du har valt.</li>
+    <li>Kursen använder <code>eu-north-1</code>, Europe (Stockholm). AWS råd är en region nära användarna.</li>
+    <li>Fakturalarm görs i <code>us-east-1</code>, eftersom kostnadsdatan för hela kontot bara finns där.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html">AWS: Regions and Availability Zones</a>.</p>
+<p>Om us-east-1: <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html">AWS CloudWatch: Create a billing alarm</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0007-iam-fakturering.html">Förra: IAM-åtkomst till fakturering</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0009-aws-budgets.html">Nästa: AWS Budgets</a>
+</nav>
+
+</main>
+</body>
+</html>

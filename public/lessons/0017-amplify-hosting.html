@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amplify Hosting</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 17 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 17</p>
+<h1>Amplify Hosting</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Hur Amplify Hosting bygger och publicerar din app av sig själv varje gång du kör <code>git push</code>.
+</div>
+
+<section class="explain">
+<h2>Vad är Amplify Hosting?</h2>
+
+<p>Amplify Hosting är en AWS-tjänst som hämtar din kod från ett Git-repo, bygger den och publicerar den på en webbadress. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html">AWS: Welcome to Amplify Hosting</a>)</span></p>
+
+<p>Ett Git-repo är en mapp med kod och alla sparade ändringar, här på GitHub. Amplify kopplas till en gren (branch), en egen linje av ändringar i repot, oftast <code>main</code>. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/getting-started-next.html">AWS: Connect a Git repository</a>)</span></p>
+
+<p>Amplify GitHub App installeras på GitHub och ger Amplify läsrätt till de repon du väljer. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/setting-up-GitHub-access.html">AWS: Amplify access to GitHub</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad händer vid git push?</h2>
+
+<p>Varje ändring som når den kopplade grenen startar ett nytt bygge och en ny publicering. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/build-settings-configuration.html">AWS: Build configuration</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-commit">1. Commit</button>
+    <button class="chip" data-target="p-push">2. git push</button>
+    <button class="chip" data-target="p-build">3. Bygge</button>
+    <button class="chip" data-target="p-deploy">4. Publicering</button>
+  </div>
+  <div class="picker-panel" id="p-commit"><p>En commit är en sparad ändring i Git, på din dator.</p></div>
+  <div class="picker-panel" id="p-push"><p><code>git push</code> skickar dina commits till repot på GitHub. Grenen <code>main</code> har nu ny kod.</p></div>
+  <div class="picker-panel" id="p-build"><p>Amplify kör <code>npm run build</code> på en maskin hos AWS. Byggkommandot hittar Amplify själv. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/build-settings-configuration.html">AWS: Build configuration</a>)</span></p></div>
+  <div class="picker-panel" id="p-deploy"><p>Filerna i <code>dist/</code> läggs ut på webbadressen. Den gamla versionen byts först när allt är klart. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html">AWS: Atomic deployments</a>)</span></p></div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Var appen hamnar</h2>
+
+<p>Appen hamnar på en adress med grenens namn först: <code>https://main.d1a2b3c4.amplifyapp.com</code>. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/getting-started-next.html#next-steps">AWS: Default domain</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>S3 static website</h3>
+    <p>Du bygger och laddar upp själv. Bara HTTP.</p>
+  </div>
+  <div>
+    <h3>Amplify Hosting</h3>
+    <p>Amplify bygger vid varje push. HTTPS.</p>
+  </div>
+</div>
+
+<p>Konsolen ber också om en service role, behörighet för Amplify i ditt konto. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/getting-started-next.html#step-2a-confirm-build-settings-for-the-front-end">AWS: Confirm the build settings</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad startar ett nytt bygge i Amplify Hosting?</p>
+  <div class="options">
+    <button class="opt" data-why="Ett lokalt bygge stannar på din dator; Amplify märker det inte.">Att du kör npm run build på din dator</button>
+    <button class="opt" data-correct data-why="Varje ändring som når den kopplade grenen startar ett bygge.">Att du pushar kod till grenen du kopplat</button>
+    <button class="opt" data-why="En commit ligger bara på din dator tills du pushar den.">Att du gör en ny commit på din dator</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vilken åtkomst ger Amplify GitHub App?</p>
+  <div class="options">
+    <button class="opt" data-why="Amplify får bara läsa, och bara de repon du valt.">Full rätt till hela ditt GitHub-konto</button>
+    <button class="opt" data-why="Amplify får bara läsa koden, inte ändra eller pusha.">Rätt att pusha ny kod till dina repon</button>
+    <button class="opt" data-correct data-why="Appen ger läsrätt, och du väljer vilka repon den gäller.">Läsrätt till bara de repon du väljer</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 16: vilken mapp publiceras efter bygget i ett Vite-projekt?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Bygget lägger de färdiga filerna i dist/, och det är dem som publiceras.">dist/, med de färdiga filerna</button>
+    <button class="opt" data-why="src/ är källkoden; den måste byggas först.">src/, med källkoden i JSX</button>
+    <button class="opt" data-why="Bara resultatet av bygget, dist/, publiceras.">Hela repot, som det ligger</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Amplify Hosting hämtar koden från en gren i ditt Git-repo, bygger den och publicerar den. Amplify GitHub App ger läsrätt till de repon du väljer.</li>
+    <li>Varje <code>git push</code> till den kopplade grenen startar ett nytt bygge och en ny publicering. Du gör inget i AWS-konsolen.</li>
+    <li>Appen hamnar på en HTTPS-adress som slutar på <code>amplifyapp.com</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html">AWS Amplify Hosting: Welcome to AWS Amplify Hosting</a>.</p>
+<p>Om automatiska byggen: <a href="https://docs.aws.amazon.com/amplify/latest/userguide/build-settings-configuration.html">AWS Amplify Hosting: Managing the build configuration</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0016-bygge.html">Förra: Bygge (build)</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0018-service-role.html">Nästa: Service role (IAM role)</a>
+</nav>
+
+</main>
+</body>
+</html>

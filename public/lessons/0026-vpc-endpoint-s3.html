@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VPC endpoint (S3 Gateway)</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 26 av 47 · V40</span>
+</nav>
+
+<p class="lesson-no">Lektion 26</p>
+<h1>VPC endpoint (S3 Gateway)</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Varför den privata route tablen har en rad för S3, och att gateway-endpointen inte kostar något.
+</div>
+
+<section class="explain">
+<h2>Vad är en VPC endpoint?</h2>
+
+<p>En VPC endpoint är en väg från din VPC direkt till en AWS-tjänst, utan Internet Gateway. Kursens VPC får en gateway endpoint för S3, tjänsten som lagrar filer som objekt i buckets. En gateway endpoint är den sort som trafiken når via en rad i route tablen. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html">AWS: Gateway endpoints</a>, <a href="https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html">AWS: Gateway endpoints for Amazon S3</a>)</span></p>
+
+<p>Den fungerar bara mot S3 i samma region som VPC:n, alltså <code>eu-north-1</code>. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html#gateway-endpoint-considerations-s3">AWS: Gateway endpoints for Amazon S3</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför har den privata route tablen en rad för S3?</h2>
+
+<p>Raden skickar trafik till S3 via endpointen. Utan den når de privata subnäten inte S3 alls, eftersom de saknar raden till internet. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html#gateway-endpoint-overview">AWS: Gateway endpoints, Overview</a>)</span></p>
+
+<div class="table-wrap">
+  <table>
+    <tr><th>Destination</th><th>Target</th></tr>
+    <tr><td><code>10.0.0.0/16</code></td><td><code>local</code></td></tr>
+    <tr><td><code>pl-...</code></td><td><code>vpce-...</code></td></tr>
+  </table>
+</div>
+
+<p><code>pl-...</code> är en prefix list: en lista med S3:s adresser i regionen, som AWS håller uppdaterad. <code>vpce-...</code> är endpointens ID. AWS lägger in raden själv, och du kan inte ändra den. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/working-with-aws-managed-prefix-lists.html">AWS: AWS-managed prefix lists</a>, <a href="https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html#gateway-endpoint-routing">AWS: Gateway endpoints, Routing</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad kostar den?</h2>
+
+<p>Ingenting. Gateway endpoints har ingen avgift. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html">AWS: Gateway endpoints</a>)</span></p>
+
+<p>Det finns en annan sort, interface endpoint, som kostar. Kursen använder den inte. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html">AWS: Gateway endpoints for Amazon S3</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Raden <code>pl-... → vpce-...</code> finns i den privata route tablen. Vad gör den?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="pl-... är S3:s adresser och vpce-... är endpointen. Trafik till S3 går den vägen.">Leder trafik till S3 via endpointen</button>
+    <button class="opt" data-why="Raden till internet är 0.0.0.0/0 → igw-..., och den saknas här. Raden skickar trafik till S3.">Skickar all trafik ut till internet</button>
+    <button class="opt" data-why="Det gör raden local. Raden pl-... → vpce-... skickar trafik till S3.">Håller trafiken kvar inne i VPC:n</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad kostar kursens gateway endpoint för S3?</p>
+  <div class="options">
+    <button class="opt" data-why="Gateway endpoints har ingen avgift alls, varken per timme eller per gigabyte.">Ett pris per timme medan den finns</button>
+    <button class="opt" data-why="Gateway endpoints har ingen avgift alls, varken per gigabyte eller per timme.">Ett pris per gigabyte du skickar ut</button>
+    <button class="opt" data-correct data-why="Gateway endpoints har ingen avgift. Det är interface endpoints som kostar.">Inget alls, för den är helt gratis</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 12: vad är en bucket i S3?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är en key. En bucket är behållaren som objekten ligger i.">Namnet på ett objekt i din behållare</button>
+    <button class="opt" data-correct data-why="En bucket är behållaren. Varje objekt du laddar upp läggs i en bucket.">En behållare som dina objekt ligger i</button>
+    <button class="opt" data-why="Det är ett objekt. En bucket är behållaren som objekten ligger i.">En fil plus uppgifter om själva filen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En VPC endpoint är en väg från VPC:n direkt till en AWS-tjänst, utan Internet Gateway. Kursens gateway endpoint går till S3 i samma region.</li>
+    <li>Raden <code>pl-... → vpce-...</code> i den privata route tablen skickar S3-trafik till endpointen. Utan den når de privata subnäten inte S3.</li>
+    <li>En gateway endpoint kostar ingenting.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html">AWS PrivateLink: Gateway endpoints</a>.</p>
+<p>Om S3: <a href="https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html">AWS PrivateLink: Gateway endpoints for Amazon S3</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0025-route-table.html">Förra: Route table</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0027-nat-gateway.html">Nästa: NAT Gateway</a>
+</nav>
+
+</main>
+</body>
+</html>

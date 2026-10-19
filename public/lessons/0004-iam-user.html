@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IAM user</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 4 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 4</p>
+<h1>IAM user</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad en IAM user är, och hur den skiljer sig från root user.
+</div>
+
+<section class="explain">
+<h2>Vad är en IAM user?</h2>
+
+<p>En IAM user är en egen inloggning som du skapar inne i ditt AWS-konto. Den har ett namn och egna inloggningsuppgifter, till exempel ett lösenord. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html">AWS: IAM users</a>)</span></p>
+
+<p>IAM (Identity and Access Management) är AWS-tjänsten där du bestämmer vem som får logga in och vad de får göra. Du hittar den genom att söka på IAM i konsolen. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html">AWS: What is IAM?</a>)</span></p>
+
+<p>En IAM user hör till ett enda konto. Allt den gör faktureras det kontot. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html#id_users_accounts">AWS: IAM users and accounts</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur loggar den in?</h2>
+
+<p>Med kontonumret, sitt användarnamn och sitt lösenord. Kontonumret är tolv siffror och syns i menyn uppe till höger i konsolen. Root user loggar i stället in med kontots e-postadress. <span class="src">(<a href="https://docs.aws.amazon.com/signin/latest/userguide/introduction-to-iam-user-sign-in-tutorial.html">AWS: Sign in as an IAM user</a>)</span></p>
+
+<p>Kontot har också en egen inloggningsadress där kontonumret redan är ifyllt. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/console.html">AWS: Sign in to the console</a>)</span></p>
+<p><code class="copyable">https://123456789012.signin.aws.amazon.com/console</code></p>
+
+<div class="two-col">
+  <div>
+    <h3>Root user</h3>
+    <p>Kontots e-post och lösenord. <span class="tag bad">Kan göra allt</span></p>
+  </div>
+  <div>
+    <h3>IAM user</h3>
+    <p>Kontonummer, användarnamn och lösenord. <span class="tag good">Till vardags</span></p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad får den göra?</h2>
+
+<p>Från början ingenting. En ny IAM user får inte göra något förrän du ger den behörighet, alltså rätt att göra vissa saker. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html#id_users_perms">AWS: IAM users and permissions</a>)</span></p>
+
+<p>Även med full behörighet är den inte root user. Uppgifter som kräver root, som att låta IAM users se fakturering, kan den inte göra. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html">AWS: IAM users</a>, <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html#root-user-tasks">AWS: Tasks that require root</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du har just skapat en IAM user. Vad får den göra?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="En ny IAM user har ingen behörighet förrän du ger den det.">Ingenting innan du ger behörighet</button>
+    <button class="opt" data-why="En IAM user är aldrig root; en ny IAM user får inte göra något alls.">Allt, precis likadant som root</button>
+    <button class="opt" data-why="En ny IAM user har ingen behörighet, inte ens att se fakturor.">Bara läsa fakturor och tjänster</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad behöver du för att logga in som IAM user?</p>
+  <div class="options">
+    <button class="opt" data-why="E-postadressen hör till root user, inte till en IAM user.">Kontots e-postadress och lösenordet</button>
+    <button class="opt" data-why="Koden från MFA kommer utöver lösenordet, den ersätter det inte.">Kontonumret och sexsiffriga koden</button>
+    <button class="opt" data-correct data-why="En IAM user loggar in med kontonummer, användarnamn och lösenord.">Kontonumret, namnet och lösenordet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 3: root user har MFA. Är din IAM user då skyddad av den?</p>
+  <div class="options">
+    <button class="opt" data-why="MFA på root skyddar bara root; IAM user har egen MFA.">Ja, MFA på root skyddar alla</button>
+    <button class="opt" data-correct data-why="Varje inloggning har sin egen MFA, så IAM user behöver en egen.">Nej, den behöver en egen MFA</button>
+    <button class="opt" data-why="Inget i AWS kopplar IAM users MFA till root.">Ja, om root alltid är utloggad</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En IAM user är en egen inloggning som du skapar i ditt AWS-konto, i tjänsten IAM.</li>
+    <li>Den loggar in med kontonummer, användarnamn och lösenord. Root user loggar in med kontots e-postadress.</li>
+    <li>En ny IAM user får inte göra något förrän du ger den behörighet. Även med full behörighet kan den inte göra det som kräver root.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html">AWS IAM: IAM users</a>.</p>
+<p>Om inloggningen: <a href="https://docs.aws.amazon.com/signin/latest/userguide/introduction-to-iam-user-sign-in-tutorial.html">AWS Sign-In: Sign in as an IAM user</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0003-mfa.html">Förra: MFA</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0005-iam-policy.html">Nästa: IAM policy</a>
+</nav>
+
+</main>
+</body>
+</html>

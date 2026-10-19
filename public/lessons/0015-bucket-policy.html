@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bucket policy</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 15 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 15</p>
+<h1>Bucket policy</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad <code>Principal</code>, <code>Action</code> och <code>Resource</code> betyder i en bucket policy som gör filerna publikt läsbara.
+</div>
+
+<section class="explain">
+<h2>Vad är en bucket policy?</h2>
+
+<p>En bucket policy är en policy som sitter på en bucket i stället för på en IAM user. Den skrivs i samma JSON-format som AdministratorAccess. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html">AWS: Bucket policies</a>)</span></p>
+
+<p>En policy på en IAM user gäller den användaren. En bucket policy måste själv säga vem den gäller. Det står i <code>Principal</code>. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html">AWS: Principal</a>)</span></p>
+
+<p>Den finns i bucketen under fliken Permissions. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html#bucket-policy-static-site">AWS: Add a bucket policy</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Policyn som gör filerna publika</h2>
+
+<p>Policyn nedan ger alla rätt att läsa bucketens objekt. <code>Version</code>, <code>Statement</code> och <code>Effect</code> känner du igen från lektion 5. Klicka på resten. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html#bucket-policy-static-site">AWS: Add a bucket policy</a>)</span></p>
+
+<pre>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadGetObject",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::v39-fornamn-efternamn/*"
+    }
+  ]
+}</pre>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-sid">Sid</button>
+    <button class="chip" data-target="p-principal">Principal</button>
+    <button class="chip" data-target="p-action">Action</button>
+    <button class="chip" data-target="p-resource">Resource</button>
+  </div>
+  <div class="picker-panel" id="p-sid"><p>Ett valfritt namn på regeln. Det ändrar inget. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_sid.html">AWS: Sid</a>)</span></p></div>
+  <div class="picker-panel" id="p-principal"><p>Vem regeln gäller. <code>*</code> betyder alla, även den som inte är inloggad i AWS. Det gör filerna publika. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/security_iam_service-with-iam.html#s3-anonymous-permissions">AWS: Grant anonymous permissions</a>)</span></p></div>
+  <div class="picker-panel" id="p-action"><p>Vad som tillåts. <code>s3:GetObject</code> betyder läsa ett objekt i S3. Att lista bucketen, ladda upp eller ta bort ger policyn inte. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-actions">AWS: Policy actions for S3</a>)</span></p></div>
+  <div class="picker-panel" id="p-resource"><p>Vilka resurser regeln gäller. Värdet är ett ARN, AWS sätt att peka ut en resurs exakt. Efter <code>arn:aws:s3:::</code> står ditt bucketnamn. <code>/*</code> betyder alla objekt i bucketen. Utan <code>/*</code> pekar ARN:et på bucketen, inte på objekten. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference-arns.html">AWS: ARNs</a>, <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/security_iam_service-with-iam.html#using-with-s3-actions-related-to-objects">AWS: Object operations</a>)</span></p></div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad publik läsning innebär</h2>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Vem som helst på internet kan läsa alla objekt i bucketen. Lägg bara filer där som alla får se. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html#bucket-policy-static-site">AWS: Add a bucket policy</a>)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad betyder <code>"Principal": "*"</code> i bucket-policyn?</p>
+  <div class="options">
+    <button class="opt" data-why="* begränsar inte till ditt konto; det betyder alla.">Bara IAM users i ditt eget konto</button>
+    <button class="opt" data-correct data-why="* i Principal betyder alla, även den som inte är inloggad i AWS.">Alla, även de som inte loggat in</button>
+    <button class="opt" data-why="Principal säger vem regeln gäller, inte vilka filer.">Alla filer som ligger i din bucket</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad tillåter <code>"Action": "s3:GetObject"</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Uppladdning är en annan handling; GetObject betyder läsa.">Att ladda upp objekt i S3</button>
+    <button class="opt" data-why="Att lista bucketen är en annan handling; GetObject betyder läsa.">Att lista alla objekt i S3</button>
+    <button class="opt" data-correct data-why="GetObject betyder att läsa ett objekt, och inget annat.">Att läsa ett objekt i S3</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 5: AdministratorAccess har <code>"Resource": "*"</code>. Vad betyder det?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="* i Resource betyder att regeln gäller alla resurser.">Regeln gäller alla resurser</button>
+    <button class="opt" data-why="Vem regeln gäller står i Principal, inte i Resource.">Regeln gäller alla personer</button>
+    <button class="opt" data-why="* betyder alla resurser, inte bara buckets i S3.">Regeln gäller bara buckets</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En bucket policy sitter på bucketen och säger själv vem den gäller, i <code>Principal</code>.</li>
+    <li><code>"Principal": "*"</code> betyder alla. <code>"Action": "s3:GetObject"</code> betyder läsa objekt, inget annat. Alla på internet kan alltså läsa allt i bucketen.</li>
+    <li><code>Resource</code> är bucketens ARN med <code>/*</code>, alltså alla objekt i bucketen. Byt bucketnamnet mot ditt eget.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html">Amazon S3: Bucket policies for Amazon S3</a>.</p>
+<p>Om policyn för publik läsning: <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html">Amazon S3: Setting permissions for website access</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0014-static-website-hosting.html">Förra: Static website hosting</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0016-bygge.html">Nästa: Bygge (build)</a>
+</nav>
+
+</main>
+</body>
+</html>

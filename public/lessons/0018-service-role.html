@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service role (IAM role)</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 18 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 18</p>
+<h1>Service role (IAM role)</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad en IAM role är, hur den skiljer sig från en IAM user, och att en service role är en roll som en AWS-tjänst använder åt dig.
+</div>
+
+<section class="explain">
+<h2>Vad är en IAM role?</h2>
+
+<p>En IAM role är en identitet i ditt konto som har behörigheter, men inget eget lösenord. Behörigheten ges med policyer, precis som för en IAM user. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html">AWS: IAM roles</a>)</span></p>
+
+<p>Den som behöver rollen tar på sig den (assume). Då får den tillfälliga inloggningsuppgifter som slutar gälla efter en tid. Rollerna finns under Roles i IAM-konsolen. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html#id_roles_terms-and-concepts">AWS: Roles terms and concepts</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Role eller IAM user?</h2>
+
+<p>En IAM user hör till en person. En role kan tas på av vem som helst som får göra det. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html">AWS: IAM roles</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>IAM user</h3>
+    <p>En person. Eget lösenord som gäller tills det byts.</p>
+  </div>
+  <div>
+    <h3>IAM role</h3>
+    <p>Alla som får ta på sig den. Tillfälliga uppgifter.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad är en service role?</h2>
+
+<p>En service role är en roll som en AWS-tjänst tar på sig för att göra saker åt dig. Amplify använder den för att skapa backend, alltså de delar av appen som körs hos AWS. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html">AWS: Role for an AWS service</a>, <a href="https://docs.aws.amazon.com/amplify/latest/userguide/amplify-service-role.html">AWS: Amplify service role</a>)</span></p>
+
+<p>Varje roll har två sorters policyer: <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html#id_roles_terms-and-concepts">AWS: Roles terms and concepts</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-trust">Trust policy</button>
+    <button class="chip" data-target="p-perm">Permissions policy</button>
+  </div>
+  <div class="picker-panel" id="p-trust"><p>Säger vem som får ta på sig rollen. Här står tjänsten, till exempel Amplify, under <code>Principal</code>.</p></div>
+  <div class="picker-panel" id="p-perm"><p>Säger vad rollen får göra, med <code>Effect</code>, <code>Action</code> och <code>Resource</code> som i lektion 5.</p></div>
+</div>
+
+<p>Väljer du Create and use a new service role skapar Amplify rollen åt dig. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/getting-started-next.html#step-2a-confirm-build-settings-for-the-front-end">AWS: Confirm the build settings</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad skiljer en IAM role från en IAM user?</p>
+  <div class="options">
+    <button class="opt" data-why="En roll får behörigheter med policyer, precis som en IAM user.">Rollen kan inte ha någon behörighet</button>
+    <button class="opt" data-correct data-why="En roll har inget lösenord; den som tar på sig rollen får tillfälliga uppgifter.">Rollen har inget eget fast lösenord</button>
+    <button class="opt" data-why="Det är root user som loggar in med kontots e-post.">Rollen loggar in med kontots e-post</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad säger trust policy i en service role?</p>
+  <div class="options">
+    <button class="opt" data-why="Det säger permissions policy, inte trust policy.">Vad rollen får göra i ditt konto</button>
+    <button class="opt" data-why="En roll har inget lösenord, bara tillfälliga uppgifter.">Vad rollen ska ha för ett lösenord</button>
+    <button class="opt" data-correct data-why="Trust policy anger vem, till exempel Amplify, som får ta på sig rollen.">Vilka som får ta på sig rollen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 5: vad är en IAM policy?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="En policy är ett JSON-dokument som säger vad någon får göra.">Ett dokument om vad någon får göra</button>
+    <button class="opt" data-why="Det är en IAM user; en policy är ett dokument.">En inloggning med namn och lösenord</button>
+    <button class="opt" data-why="Det är en IAM group; en policy är ett dokument.">En samling IAM users med samma rätt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En IAM role är en identitet med behörigheter men utan eget lösenord. Den som tar på sig rollen får tillfälliga inloggningsuppgifter.</li>
+    <li>En IAM user hör till en person och har ett fast lösenord. En role tas på av den som får göra det.</li>
+    <li>En service role är en roll som en AWS-tjänst, som Amplify, tar på sig för att göra saker åt dig. Trust policy säger vem, permissions policy säger vad.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html">AWS IAM: IAM roles</a>.</p>
+<p>Om service roles: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html">AWS IAM: Create a role to delegate permissions to an AWS service</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0017-amplify-hosting.html">Förra: Amplify Hosting</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0019-shared-responsibility-model.html">Nästa: Shared Responsibility Model</a>
+</nav>
+
+</main>
+</body>
+</html>

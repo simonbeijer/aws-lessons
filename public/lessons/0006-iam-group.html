@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IAM group</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 6 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 6</p>
+<h1>IAM group</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Varför du ger behörighet till en grupp i stället för till varje användare.
+</div>
+
+<section class="explain">
+<h2>Vad är en IAM group?</h2>
+
+<p>En IAM group är en samling IAM users. Du kopplar en policy till gruppen, och alla användare i gruppen får behörigheten i den. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups.html">AWS: IAM user groups</a>)</span></p>
+
+<p>I IAM heter de User groups och ligger i vänstermenyn. Du ger gruppen ett namn, till exempel <code class="copyable">admins</code>, och kopplar AdministratorAccess till den. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups_create.html">AWS: Create IAM groups</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför en grupp?</h2>
+
+<p>För att du bara ändrar på ett ställe. Ändrar du gruppens behörighet gäller det direkt för alla i gruppen. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups_create.html">AWS: Create IAM groups</a>)</span></p>
+
+<p>En ny användare lägger du i gruppen, så får den samma behörighet som de andra. Byter någon uppgift flyttar du den till en annan grupp. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups.html">AWS: IAM user groups</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Policy på varje användare</h3>
+    <p>Tre användare ger tre kopplingar. En ändring måste göras tre gånger.</p>
+  </div>
+  <div>
+    <h3>Policy på gruppen</h3>
+    <p>Tre användare i en grupp ger en koppling. En ändring görs en gång. <span class="tag good">Gör så här</span></p>
+  </div>
+</div>
+
+<p>AWS rekommenderar samma sak: koppla policyer till grupper och lägg användarna i grupperna. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_change-permissions.html#users_change_permissions-add-console">AWS: Adding permissions to a user</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad en grupp inte är</h2>
+
+<p>En grupp är ingen inloggning. Du loggar alltid in som en IAM user, och gruppen ger bara behörighet. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups.html">AWS: IAM user groups</a>)</span></p>
+
+<p>En grupp är inte heller automatisk. Ingen hamnar i en grupp av sig själv: du lägger in varje ny användare. En användare kan vara med i flera grupper. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups.html">AWS: IAM user groups</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Gruppen <code>admins</code> har fem användare. Du ändrar gruppens policy. Vilka påverkas?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Behörigheten sitter på gruppen, så ändringen gäller direkt för alla som är med i den.">Alla fem, ändringen gäller dem direkt</button>
+    <button class="opt" data-why="Ändringen gäller alla i gruppen, även de som redan var med.">Bara användare du lägger till sedan</button>
+    <button class="opt" data-why="Ändringen gäller direkt; ingen behöver logga in på nytt.">Ingen, förrän de loggar in igen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Kan du logga in som gruppen <code>admins</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="En grupp har inget lösenord. Den ger bara behörighet.">Ja, med gruppens namn och ett lösenord</button>
+    <button class="opt" data-why="Inte ens root kan göra en grupp till en inloggning.">Ja, om root user har godkänt detta</button>
+    <button class="opt" data-correct data-why="En grupp är ingen inloggning; du loggar in som en IAM user i gruppen.">Nej, bara som IAM user i gruppen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 5: vad kopplar du till gruppen <code>admins</code> för att den ska få full behörighet?</p>
+  <div class="options">
+    <button class="opt" data-why="E-post och lösenord är root users inloggning, ingen behörighet.">Root users e-postadress och lösenord</button>
+    <button class="opt" data-correct data-why="Behörighet ges med en policy, och AdministratorAccess tillåter allt.">Policyn AdministratorAccess från AWS IAM</button>
+    <button class="opt" data-why="MFA-koden skyddar inloggningen men ger ingen behörighet.">Den sexsiffriga koden från MFA-appen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En IAM group är en samling IAM users. Policyn du kopplar till gruppen gäller alla användare i den.</li>
+    <li>Ge behörighet till gruppen, inte till varje användare. Då ändrar du på ett ställe, och nya användare läggs bara in i gruppen.</li>
+    <li>En grupp är ingen inloggning. Du loggar in som IAM user och får behörighet genom gruppen.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups.html">AWS IAM: IAM user groups</a>.</p>
+<p>Om att skapa grupper: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups_create.html">AWS IAM: Create IAM groups</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0005-iam-policy.html">Förra: IAM policy</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0007-iam-fakturering.html">Nästa: IAM-åtkomst till fakturering</a>
+</nav>
+
+</main>
+</body>
+</html>

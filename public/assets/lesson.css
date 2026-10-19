@@ -1,0 +1,277 @@
+/* Delad stil för alla lektioner. Färgernas betydelse står i NOTES.md under "Färger". */
+
+:root {
+  --bg: #fbfaf7;
+  --surface: #ffffff;
+  --text: #1f2328;
+  --muted: #5b6370;
+  --border: #e3e0d8;
+  --code-bg: #f3f1ec;
+
+  /* Blå: länkar, knappar, markering av rubriker och "du är här". */
+  --accent: #1d5fd1;
+  --accent-bg: #eaf1fd;
+  /* Grön: rätt svar i quiz, rekommendation ("gör så här"). */
+  --good: #187a3d;
+  --good-bg: #e8f5ec;
+  /* Röd: fel svar i quiz, varning (något kan gå förlorat eller kosta pengar). */
+  --bad: #b42318;
+  --bad-bg: #fdecea;
+  /* Gul: oklart, eller inte bekräftat i AWS dokumentation. */
+  --note: #9a5b00;
+  --note-bg: #fdf4e3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15171a;
+    --surface: #1d2024;
+    --text: #e6e6e3;
+    --muted: #a3a9b2;
+    --border: #33373d;
+    --code-bg: #262a30;
+    --accent: #7aa7f5;
+    --accent-bg: #1c2a40;
+    --good: #6cc98d;
+    --good-bg: #17301f;
+    --bad: #f28b82;
+    --bad-bg: #3a1d1b;
+    --note: #f0b65a;
+    --note-bg: #362a14;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.75;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 16px 64px;
+}
+
+/* Navigering överst och nederst */
+.topnav, .bottomnav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 15px;
+}
+.topnav { margin-bottom: 28px; color: var(--muted); }
+.bottomnav {
+  margin-top: 48px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.bottomnav .disabled { color: var(--muted); }
+
+a { color: var(--accent); text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+.lesson-no {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0;
+}
+
+h1 {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 4px 0 20px;
+}
+
+h2 {
+  font-size: 1.3rem;
+  line-height: 1.3;
+  margin: 72px 0 20px;
+  padding-left: 12px;
+  border-left: 4px solid var(--accent);
+}
+
+h3 { font-size: 1.05rem; margin: 36px 0 12px; }
+
+p, ul, ol { margin: 0 0 24px; }
+li { margin-bottom: 10px; }
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  background: var(--code-bg);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* Rutan "Vad du ska veta" */
+.goal {
+  background: var(--accent-bg);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+.goal strong { display: block; margin-bottom: 4px; }
+
+/* Rutor med fast betydelse */
+.box {
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 32px 0;
+  border-left: 5px solid;
+}
+.box > :last-child { margin-bottom: 0; }
+.box .box-title { font-weight: 700; display: block; margin-bottom: 4px; }
+.box.good { background: var(--good-bg); border-color: var(--good); }
+.box.bad  { background: var(--bad-bg);  border-color: var(--bad); }
+.box.note { background: var(--note-bg); border-color: var(--note); }
+
+/* Källhänvisning vid påståendet */
+.src {
+  font-size: 0.8em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.src a { color: var(--muted); }
+
+/* Tabeller */
+.table-wrap { overflow-x: auto; margin: 16px 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  background: var(--surface);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+th { font-size: 14px; color: var(--muted); font-weight: 600; }
+
+.tag {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.tag.good { background: var(--good-bg); color: var(--good); }
+.tag.bad  { background: var(--bad-bg);  color: var(--bad); }
+.tag.note { background: var(--note-bg); color: var(--note); }
+
+/* Klickbara scenarier: välj en knapp, se svaret */
+.picker {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 32px 0;
+}
+.picker-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.picker-panel { display: none; }
+.picker-panel.active { display: block; }
+.picker-panel > :last-child { margin-bottom: 0; }
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+.chip {
+  font-size: 15px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.two-col > div {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--bg);
+}
+.two-col h3 { margin-top: 0; font-size: 1rem; }
+.two-col p { margin-bottom: 0; font-size: 16px; }
+@media (max-width: 560px) { .two-col { grid-template-columns: 1fr; } }
+
+/* Quiz */
+.quiz-q {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 24px 0;
+}
+.quiz-q .q { font-weight: 600; margin-bottom: 12px; }
+.quiz-q .options { display: grid; gap: 8px; }
+.quiz-q .opt {
+  text-align: left;
+  font-size: 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+.quiz-q .opt:hover { border-color: var(--accent); }
+.quiz-q .opt.right { border-color: var(--good); background: var(--good-bg); }
+.quiz-q .opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.quiz-q .feedback { margin: 12px 0 0; font-size: 16px; }
+.quiz-q .feedback:empty { display: none; }
+.quiz-q .feedback.right strong { color: var(--good); }
+.quiz-q .feedback.wrong strong { color: var(--bad); }
+
+/* Kopiera-knapp (läggs till av lesson.js på pre och .copyable) */
+.copy-wrap { position: relative; }
+pre {
+  background: var(--code-bg);
+  border-radius: 8px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-size: 15px;
+}
+pre code { background: none; padding: 0; }
+.copy-btn {
+  font-size: 13px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.copy-wrap > .copy-btn { position: absolute; top: 8px; right: 8px; margin: 0; }
+.copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* Sammanfattning och slut */
+.summary {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+.summary ul { margin-bottom: 0; }
+.ask { color: var(--muted); font-size: 16px; }

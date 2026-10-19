@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Publik och privat IP-adress</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 28 av 47 · V40</span>
+</nav>
+
+<p class="lesson-no">Lektion 28</p>
+<h1>Publik och privat IP-adress</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Skillnaden mellan publik och privat IP-adress, och varför auto-assign public IPv4 slås på i de publika subnäten.
+</div>
+
+<section class="explain">
+<h2>Vad skiljer publik från privat IP-adress?</h2>
+
+<p>En privat adress kan bara nås inifrån VPC:n. En publik adress kan nås från internet. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-instance-addressing.html">AWS: Instance IP addressing</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Privat</h3>
+    <p>Varje server får en, från subnätets intervall, till exempel <code>10.0.3.25</code>. Servrar i VPC:n pratar med varandra via den.</p>
+  </div>
+  <div>
+    <h3>Publik</h3>
+    <p>Kommer från AWS lager av publika adresser, inte från ditt intervall.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Varför slås auto-assign public IPv4 på?</h2>
+
+<p>Den slås på så att varje ny server i subnätet får en publik adress automatiskt. IPv4 är adresser med fyra tal. I en egen VPC är inställningen avstängd från början, och utan publik adress når ingen servern, trots raden till Internet Gatewayn. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/subnet-public-ip.html">AWS: Modify the IP addressing attributes of your subnet</a>)</span></p>
+
+<p>Du kan också välja publik adress när du startar en server. Det valet gäller före subnätets, men glöms lätt. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-instance-addressing.html#concepts-public-addresses">AWS: Public IPv4 addresses</a>)</span></p>
+
+<p>De privata subnäten saknar raden till Internet Gatewayn. Där gör en publik adress ingen nytta. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">AWS: Internet gateway</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Kostar en publik adress?</h2>
+
+<p>Ja. AWS tar 0,005 USD per timme för varje publik IPv4-adress, även när den inte används. Det blir ungefär 3,65 USD i månaden. Privata adresser kostar inget. <span class="src">(<a href="https://aws.amazon.com/vpc/pricing/">AWS: Amazon VPC pricing</a>, <a href="https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html#pricing">AWS: Pricing for Amazon VPC</a>)</span></p>
+
+<p>Med Free plan betalar du ändå aldrig själv: kostnaden räknas av mot krediterna. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html">AWS: Choosing a plan</a>)</span></p>
+
+<div class="box note">
+  <span class="box-title">Ej bekräftat</span>
+  <p>AWS lovar Free Tier 750 gratis timmar publik IPv4 i månaden, men säger inte om det gäller Free plan.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vilken adress kan nås från internet?</p>
+  <div class="options">
+    <button class="opt" data-why="Den privata adressen kan bara nås inifrån VPC:n.">Den privata, från ditt subnät</button>
+    <button class="opt" data-correct data-why="Den publika adressen kommer från AWS lager och kan nås från internet.">Den publika, från AWS lager</button>
+    <button class="opt" data-why="Bara den publika kan nås från internet. Den privata nås bara inifrån VPC:n.">Båda, om subnätet är publikt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Varför slås auto-assign public IPv4 på i de publika subnäten?</p>
+  <div class="options">
+    <button class="opt" data-why="Raden till internet ligger i route tablen. Inställningen ger servrarna publika adresser.">Så att subnätet når hela internet</button>
+    <button class="opt" data-why="Privat adress får varje server ändå. Inställningen ger servrarna publika adresser.">Så att servrar får privat adress</button>
+    <button class="opt" data-correct data-why="Varje ny server i subnätet får då en publik adress, så att den kan nås från internet.">Så att servrar får publik adress</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 24: vad är en Internet Gateway?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Den kopplas till VPC:n och släpper trafik till och från internet.">Dörren mellan VPC:n och internet</button>
+    <button class="opt" data-why="Det är ett subnät. Internet Gatewayn är dörren mellan VPC:n och internet.">En bit av VPC:ns adressintervall</button>
+    <button class="opt" data-why="Det är en route table. Internet Gatewayn är dörren mellan VPC:n och internet.">Listan med regler för trafiken</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En privat adress kommer från subnätets intervall och nås bara inifrån VPC:n. En publik adress kommer från AWS och nås från internet.</li>
+    <li>Auto-assign public IPv4 ger varje ny server i subnätet en publik adress. Den är avstängd från början i en egen VPC, så den slås på i de publika subnäten.</li>
+    <li>En publik IPv4-adress kostar 0,005 USD per timme, även oanvänd. Med Free plan räknas det av mot krediterna, och du betalar aldrig själv.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-instance-addressing.html">Amazon EC2: Instance IP addressing</a>.</p>
+<p>Om priset: <a href="https://aws.amazon.com/vpc/pricing/">Amazon VPC pricing</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0027-nat-gateway.html">Förra: NAT Gateway</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0029-ec2-instans.html">Nästa: EC2-instans</a>
+</nav>
+
+</main>
+</body>
+</html>

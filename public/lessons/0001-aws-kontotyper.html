@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS kontotyper</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 1 av 18 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 1</p>
+<h1>AWS kontotyper (Free plan och Paid plan)</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vilken registrering och vilken plan du ska välja när du skapar ditt AWS-konto, och vad som skiljer Free plan från Paid plan.
+</div>
+
+<section class="explain">
+<h2>Vad skiljer Free plan från Paid plan?</h2>
+
+<p>Free plan kan aldrig kosta pengar, men kontot stängs efter sex månader eller när krediterna är slut. Paid plan stängs inte, och du betalar det du använder utöver krediterna. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html">AWS: Choosing a plan</a>)</span></p>
+
+<p>Båda planerna får 100 USD i krediter, alltså rabatt på AWS-fakturan, och kan tjäna in 100 USD till. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html">AWS: Choosing a plan</a>)</span></p>
+
+<p>Free plan ger bara utvalda tjänster. Paid plan ger alla. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html">AWS: Choosing a plan</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vilken registrering ska du använda?</h2>
+
+<p>Använd Sign up for AWS (advanced). Med Sign up for AWS (new) kan du inte skapa en IAM user (en egen inloggning i ditt konto) som loggar in i konsolen, AWS webbsida. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html">AWS: Create an IAM user</a>, <a href="https://docs.aws.amazon.com/accounts/latest/reference/sign-up-for-aws.html#compare-access-management">AWS: Compare sign-up options</a>)</span></p>
+
+<p>Advanced ber om e-post, kontonamn och lösenord. New ber dig logga in med Google, GitHub, Apple eller Amazon. <span class="src">(<a href="https://docs.aws.amazon.com/accounts/latest/reference/getting-started.html">AWS: Sign up (advanced)</a>, <a href="https://docs.aws.amazon.com/accounts/latest/reference/sign-in-new.html">AWS: Sign up (new)</a>)</span></p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Advanced: <code class="copyable">https://signin.aws.amazon.com/signup?request_type=register</code></p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vilken plan ska du välja?</h2>
+
+<p>Välj Free plan. Den kostar inget, och sex månader räcker för en kurs som slutar 11 december. Saknas en tjänst: uppgradera till Paid plan i konsolen. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html#freeplan-upgrade">AWS: Upgrade your free plan</a>)</span></p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Free plan blir Paid plan automatiskt om du skapar en AWS Organization (en grupp av konton), till exempel genom att slå på IAM Identity Center. Krediterna försvinner då direkt. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html">AWS: Choosing a plan</a>, <a href="https://docs.aws.amazon.com/singlesignon/latest/userguide/enable-identity-center.html">AWS: Enable IAM Identity Center</a>)</span></p>
+</div>
+
+<div class="box note">
+  <span class="box-title">Ej bekräftat</span>
+  <p>AWS listar inte tydligt om varje tjänst kursen använder ingår i Free plan.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du vill skapa en IAM user som loggar in i konsolen. Vilken registrering fungerar?</p>
+  <div class="options">
+    <button class="opt" data-why="New ber om en Google-, GitHub-, Apple- eller Amazon-inloggning, och där kan IAM users inte logga in i konsolen.">Den som ber om Google eller GitHub</button>
+    <button class="opt" data-correct data-why="Det är Sign up for AWS (advanced), där IAM users kan få inloggning i konsolen.">Den som ber om e-post och lösenord</button>
+    <button class="opt" data-why="Med Sign up for AWS (new) kan IAM users bara användas programmatiskt, inte i konsolen.">Båda två fungerar lika bra för det</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad händer när ditt Free plan-konto har funnits i sex månader?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Free plan slutar efter sex månader och kontot stängs, om du inte har uppgraderat till Paid plan.">Kontot stängs, och du låses ute</button>
+    <button class="opt" data-why="Tiden gör inte kontot till Paid plan; när sex månader har gått stängs kontot i stället.">Kontot får Paid plan och kostar</button>
+    <button class="opt" data-why="Free plan har en gräns på sex månader; efter det stängs kontot.">Kontot finns kvar och är gratis</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Vad gör ett Free plan-konto till Paid plan automatiskt?</p>
+  <div class="options">
+    <button class="opt" data-why="Att skapa IAM users byter inte plan.">Du skapar IAM users med inloggning</button>
+    <button class="opt" data-why="Att använda S3 byter inte plan; Free plan kan inte kosta pengar.">Du använder Amazon S3 för bilderna</button>
+    <button class="opt" data-correct data-why="En AWS Organization uppgraderar kontot till Paid plan, och krediterna försvinner direkt.">Du skapar en egen AWS Organization</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Free plan kostar aldrig pengar men stängs efter sex månader eller när krediterna är slut. Paid plan stängs inte, och du betalar det som går över krediterna.</li>
+    <li>Registrera dig med Sign up for AWS (advanced). Med Sign up for AWS (new) kan en IAM user inte logga in i konsolen.</li>
+    <li>Välj Free plan. Skapa ingen AWS Organization, då blir kontot Paid plan.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html">AWS Billing: Choosing a plan</a>.</p>
+<p>Om registreringen: <a href="https://docs.aws.amazon.com/accounts/latest/reference/sign-up-for-aws.html">AWS Account Management: Compare sign-up options</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <span class="disabled">Ingen förra lektion</span>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0002-root-user.html">Nästa: Root user</a>
+</nav>
+
+</main>
+</body>
+</html>

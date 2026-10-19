@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subnät</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 23 av 47 · V40</span>
+</nav>
+
+<p class="lesson-no">Lektion 23</p>
+<h1>Subnät</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att ett subnät är en bit av VPC:ns adressintervall och ligger i exakt en zon.
+</div>
+
+<section class="explain">
+<h2>Vad är ett subnät?</h2>
+
+<p>Ett subnät är en bit av VPC:ns adressintervall. Det skrivs som CIDR, och hela biten måste rymmas inom VPC:ns intervall. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html">AWS: Subnet CIDR blocks</a>)</span></p>
+
+<p>Har VPC:n <code>10.0.0.0/16</code> kan ett subnät vara <code>10.0.0.0/20</code>. Två subnät i samma VPC får inte överlappa, alltså inte dela på någon adress. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html">AWS: Subnet CIDR blocks</a>)</span></p>
+
+<p>Det du bygger i AWS, till exempel en server, placerar du i ett subnät. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html">AWS: Subnets for your VPC</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Var ligger ett subnät?</h2>
+
+<p>Ett subnät ligger i exakt en zon. Det kan inte sträcka sig över flera zoner. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html#subnet-basics">AWS: Subnet basics</a>)</span></p>
+
+<p>VPC:n täcker hela regionen, men varje subnät står i en av dess zoner. Vill du bygga i två zoner behöver du därför minst ett subnät i varje zon.</p>
+</section>
+
+<section class="explain">
+<h2>Kursens fyra subnät</h2>
+
+<p>Kursens VPC, <code>10.0.0.0/16</code>, delas i fyra subnät: två i <code>eu-north-1a</code> och två i <code>eu-north-1b</code>. Klicka för att se dem:</p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="s-pub1">public1</button>
+    <button class="chip" data-target="s-pub2">public2</button>
+    <button class="chip" data-target="s-priv1">private1</button>
+    <button class="chip" data-target="s-priv2">private2</button>
+  </div>
+  <div class="picker-panel" id="s-pub1"><p><code>v40-subnet-public1-eu-north-1a</code>: <code>10.0.0.0/20</code> i zon <code>eu-north-1a</code>.</p></div>
+  <div class="picker-panel" id="s-pub2"><p><code>v40-subnet-public2-eu-north-1b</code>: <code>10.0.16.0/20</code> i zon <code>eu-north-1b</code>.</p></div>
+  <div class="picker-panel" id="s-priv1"><p><code>v40-subnet-private1-eu-north-1a</code>: <code>10.0.128.0/20</code> i zon <code>eu-north-1a</code>.</p></div>
+  <div class="picker-panel" id="s-priv2"><p><code>v40-subnet-private2-eu-north-1b</code>: <code>10.0.144.0/20</code> i zon <code>eu-north-1b</code>.</p></div>
+</div>
+
+<p>Namnen säger publikt och privat. Vad som gör ett subnät publikt tar kommande lektioner om Internet Gateway och route table upp.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Din VPC har <code>10.0.0.0/16</code>. Vilket subnät kan du skapa i den?</p>
+  <div class="options">
+    <button class="opt" data-why="10.1 ligger utanför VPC:ns intervall, som bara rymmer adresser som börjar på 10.0.">10.1.16.0/20</button>
+    <button class="opt" data-why="11.0 ligger utanför VPC:ns intervall, som bara rymmer adresser som börjar på 10.0.">11.0.16.0/20</button>
+    <button class="opt" data-correct data-why="Hela biten ligger inom 10.0.0.0/16, och subnätet måste rymmas där.">10.0.16.0/20</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Kan ett subnät ligga i både <code>eu-north-1a</code> och <code>eu-north-1b</code>?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Ett subnät ligger i exakt en zon. Två zoner kräver minst två subnät.">Nej, bara i exakt en zon</button>
+    <button class="opt" data-why="Det är VPC:n som täcker regionens alla zoner. Ett subnät ligger i en zon.">Ja, i varje zon i regionen</button>
+    <button class="opt" data-why="Det går inte att välja två zoner. Ett subnät ligger i exakt en zon.">Ja, om du väljer båda två</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 21: subnätet <code>10.0.0.0/20</code> slutar på <code>10.0.15.255</code>. Var börjar nästa <code>/20</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="10.0.15.0 ligger inne i det första subnätet, och subnät får inte överlappa.">10.0.15.0</button>
+    <button class="opt" data-correct data-why="Nästa bit börjar direkt där förra slutade: 10.0.16.0.">10.0.16.0</button>
+    <button class="opt" data-why="Då hoppar du över adresser. Nästa bit börjar direkt efter 10.0.15.255.">10.0.20.0</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett subnät är en bit av VPC:ns adressintervall, skriven som CIDR. Subnät i samma VPC får inte överlappa.</li>
+    <li>Ett subnät ligger i exakt en zon. För att bygga i två zoner behövs minst ett subnät i varje.</li>
+    <li>Kursens VPC har fyra <code>/20</code>-subnät, två i varje zon. Vad som gör ett subnät publikt kommer i nästa lektioner.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html">AWS VPC: Subnets for your VPC</a>.</p>
+<p>Om subnätens adressintervall: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html">AWS VPC: Subnet CIDR blocks</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0022-availability-zone.html">Förra: Availability Zone</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0024-internet-gateway.html">Nästa: Internet Gateway</a>
+</nav>
+
+</main>
+</body>
+</html>

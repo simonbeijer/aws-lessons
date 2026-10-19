@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CIDR</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 21 av 47 · V40</span>
+</nav>
+
+<p class="lesson-no">Lektion 21</p>
+<h1>CIDR</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Hur <code>10.0.0.0/16</code> och <code>/20</code> anger ett adressintervall, och att AWS reserverar fem adresser i varje subnät.
+</div>
+
+<section class="explain">
+<h2>Vad betyder 10.0.0.0/16?</h2>
+
+<p>Det är ett adressintervall skrivet som CIDR: en startadress och ett tal efter snedstrecket. Talet säger hur stor del av adressen som är låst, alltså lika för alla adresser i intervallet. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html">AWS: VPC CIDR blocks</a>)</span></p>
+
+<p>En IP-adress består av fyra tal. Med <code>/16</code> är de två första låsta. <code>10.0.0.0/16</code> betyder alltså alla adresser från <code>10.0.0.0</code> till <code>10.0.255.255</code>. Det är 65 536 adresser. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html">AWS: VPC CIDR blocks</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad betyder /20?</h2>
+
+<p><code>/20</code> är ett mindre intervall än <code>/16</code>: 4 096 adresser. Ju större tal efter snedstrecket, desto färre adresser. Varje steg uppåt halverar antalet. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html">AWS: Subnet CIDR blocks</a>)</span></p>
+
+<p>Så delas VPC:ns intervall upp i subnät. Ett subnät är en mindre bit av VPC:ns adressintervall. Det tar en egen lektion upp. Klicka för att se bitarna:</p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-16">10.0.0.0/16</button>
+    <button class="chip" data-target="p-20a">10.0.0.0/20</button>
+    <button class="chip" data-target="p-20b">10.0.16.0/20</button>
+  </div>
+  <div class="picker-panel" id="p-16"><p>Hela VPC:n: <code>10.0.0.0</code> till <code>10.0.255.255</code>. 65 536 adresser.</p></div>
+  <div class="picker-panel" id="p-20a"><p>Första biten: <code>10.0.0.0</code> till <code>10.0.15.255</code>. 4 096 adresser.</p></div>
+  <div class="picker-panel" id="p-20b"><p>Nästa bit börjar där förra slutade: <code>10.0.16.0</code> till <code>10.0.31.255</code>.</p></div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vilka fem adresser reserverar AWS?</h2>
+
+<p>AWS reserverar de fyra första och den sista adressen i varje subnät. AWS använder dem för att nätverket ska fungera, och du kan inte ge dem till en maskin. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html#subnet-sizing-ipv4">AWS: Subnet sizing for IPv4</a>)</span></p>
+
+<p>I <code>10.0.0.0/20</code> är det <code>10.0.0.0</code> till <code>10.0.0.3</code> och <code>10.0.15.255</code>. Av 4 096 adresser kan du använda 4 091.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vilket av de här intervallen rymmer flest adresser?</p>
+  <div class="options">
+    <button class="opt" data-why="Ett större tal efter snedstrecket ger färre adresser. /28 rymmer bara 16.">10.0.0.0/28</button>
+    <button class="opt" data-correct data-why="Lägst tal efter snedstrecket ger flest adresser: 65 536.">10.0.0.0/16</button>
+    <button class="opt" data-why="/20 rymmer 4 096 adresser, färre än /16 som rymmer 65 536.">10.0.0.0/20</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Ett subnät har <code>/20</code>. Hur många adresser kan du ge till maskiner?</p>
+  <div class="options">
+    <button class="opt" data-why="/20 rymmer 4 096, men AWS reserverar fem av dem.">4 096 adresser</button>
+    <button class="opt" data-why="AWS reserverar fem adresser per subnät, inte sexton.">4 080 adresser</button>
+    <button class="opt" data-correct data-why="4 096 minus de fem som AWS reserverar blir 4 091.">4 091 adresser</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 20: du skapar en VPC med <code>10.0.0.0/16</code> i <code>eu-north-1</code>. Var finns den?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="En VPC hör till regionen där du skapade den.">Bara i regionen du valde</button>
+    <button class="opt" data-why="En VPC hör till en region, inte till alla regioner.">I alla regioner i kontot</button>
+    <button class="opt" data-why="VPC:n hör till din region. Den delas inte med andra kunder.">Hos alla kunder i regionen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>CIDR skriver ett adressintervall som startadress och ett tal efter snedstrecket.</li>
+    <li><code>10.0.0.0/16</code> rymmer 65 536 adresser. Större tal ger mindre intervall: <code>/20</code> rymmer 4 096.</li>
+    <li>AWS reserverar de fyra första och den sista adressen i varje subnät. Ett <code>/20</code> ger därför 4 091 användbara.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html">AWS VPC: Subnet CIDR blocks</a>.</p>
+<p>Om VPC:ns intervall: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html">AWS VPC: VPC CIDR blocks</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0020-vpc.html">Förra: VPC</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0022-availability-zone.html">Nästa: Availability Zone</a>
+</nav>
+
+</main>
+</body>
+</html>

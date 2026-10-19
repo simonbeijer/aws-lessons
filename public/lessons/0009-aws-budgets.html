@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS Budgets</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 9 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 9</p>
+<h1>AWS Budgets</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad en budget gör, och skillnaden mellan Zero spend budget och Monthly cost budget.
+</div>
+
+<section class="explain">
+<h2>Vad gör en budget?</h2>
+
+<p>En budget mejlar dig när kontots kostnad når en gräns du har satt. Den finns i Billing and Cost Management. <span class="src">(<a href="https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html">AWS: Managing your costs with AWS Budgets</a>)</span></p>
+
+<p>Siffrorna uppdateras upp till tre gånger per dygn, så mejlet kan komma timmar efter kostnaden. <span class="src">(<a href="https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html">AWS: Managing your costs with AWS Budgets</a>)</span></p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>En budget stoppar inget. Det du har igång fortsätter kosta, även efter mejlet. <span class="src">(<a href="https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html">AWS: Managing your costs with AWS Budgets</a>)</span></p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad är Zero spend budget?</h2>
+
+<p>En mall, alltså en budget med färdiga inställningar, som mejlar så fort kontot börjar kosta pengar: när du går över det AWS ger gratis (Free Tier). Du anger bara namn och e-post, ingen summa. <span class="src">(<a href="https://docs.aws.amazon.com/cost-management/latest/userguide/budget-templates.html">AWS: Using a budget template</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad är Monthly cost budget?</h2>
+
+<p>En mall som mejlar när månadens kostnad når, eller väntas nå, en summa du väljer, till exempel 10 USD. Den varnar både för faktisk kostnad, det du redan har förbrukat, och för prognos, AWS gissning om hela månaden. <span class="src">(<a href="https://docs.aws.amazon.com/cost-management/latest/userguide/budget-templates.html">AWS: Using a budget template</a>)</span></p>
+
+<p>Prognosen kräver cirka fem veckors data, så på ett nytt konto varnar den inte än. <span class="src">(<a href="https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-best-practices.html#budgets-best-practices-alerts">AWS: Setting budget alerts</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Zero spend budget</h3>
+    <p>Ingen summa. Mejlar vid första kostnaden.</p>
+  </div>
+  <div>
+    <h3>Monthly cost budget</h3>
+    <p>Din summa per månad. Mejlar när du når den.</p>
+  </div>
+</div>
+
+<div class="box note">
+  <span class="box-title">Ej bekräftat</span>
+  <p>Kursmaterialet säger att mallen varnar vid 85 % och 100 % faktisk kostnad och 100 % prognos. AWS docs listar inte siffrorna.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Din månadsbudget är 10 USD, och kostnaden når 10 USD. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="En budget stoppar inget; den skickar bara ett mejl.">AWS stänger av allt som kostar pengar</button>
+    <button class="opt" data-correct data-why="En budget mejlar dig, men det du har igång fortsätter kosta.">Du får ett mejl, och allt fortsätter</button>
+    <button class="opt" data-why="En budget hindrar dig inte från att skapa något; den mejlar bara.">AWS hindrar dig från att skapa mer</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du vill få ett mejl så fort kontot börjar kosta något. Vilken mall väljer du?</p>
+  <div class="options">
+    <button class="opt" data-why="Monthly cost budget mejlar först när kostnaden når summan du har valt.">Monthly cost budget på 10 USD</button>
+    <button class="opt" data-why="Det är en budget som mejlar vid första kostnaden, och den skapar du själv.">Ingen, AWS mejlar dig det ändå</button>
+    <button class="opt" data-correct data-why="Zero spend budget mejlar när kontot går över det som är gratis.">Zero spend budget, utan en summa</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 7: du är IAM user och får Access Denied när du öppnar Budgets. Vad är troligast?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Budgets ligger i Billing, och dit kommer ingen IAM user förrän root har slagit på åtkomsten.">Root har inte slagit på IAM-åtkomst</button>
+    <button class="opt" data-why="Att kontot saknar kostnader stänger inte sidan; budgeten visar bara 0 USD.">Kontot har inte kostat något alls</button>
+    <button class="opt" data-why="Att du saknar budgetar ger inte Access Denied; felet gäller åtkomsten till Billing.">Du har inte skapat någon budget</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En budget mejlar dig när kostnaden når en gräns. Den stoppar inget, och mejlet kan komma timmar efter kostnaden.</li>
+    <li>Zero spend budget har ingen summa och mejlar så fort kontot går över det som är gratis.</li>
+    <li>Monthly cost budget mejlar när månadens kostnad når, eller väntas nå, din summa: både faktisk kostnad och prognos.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html">AWS Cost Management: Managing your costs with AWS Budgets</a>.</p>
+<p>Om mallarna: <a href="https://docs.aws.amazon.com/cost-management/latest/userguide/budget-templates.html">AWS Cost Management: Using a budget template (simplified)</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0008-region.html">Förra: Region</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0010-cloudwatch-larm.html">Nästa: CloudWatch-larm</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Internet Gateway</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 24 av 47 · V40</span>
+</nav>
+
+<p class="lesson-no">Lektion 24</p>
+<h1>Internet Gateway</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en Internet Gateway är dörren mellan VPC:n och internet.
+</div>
+
+<section class="explain">
+<h2>Vad är en Internet Gateway?</h2>
+
+<p>En Internet Gateway är dörren mellan din VPC och internet. Utan den är VPC:n ett stängt nätverk: inget i den når internet, och internet når inte in. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">AWS: Internet gateway</a>)</span></p>
+
+<p>Dörren går åt båda håll. En server i VPC:n kan hämta saker från internet, och din dator kan ansluta till servern. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">AWS: Internet gateway</a>)</span></p>
+
+<p>Den kostar ingenting. AWS sköter den och ser till att den inte går sönder eller blir en flaskhals. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">AWS: Internet gateway</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur kopplas den till VPC:n?</h2>
+
+<p>Du skapar en Internet Gateway och kopplar den till en VPC. I konsolen står det då Attached. En VPC kan ha en Internet Gateway kopplad åt gången. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/amazon-vpc-limits.html#vpc-limits-gateways">AWS: VPC quotas</a>)</span></p>
+
+<p>Default VPC har redan en. En egen VPC har ingen förrän du kopplar en. Kursens heter <code>v40-igw</code> och är kopplad till <code>v40-vpc</code>. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html#vpc-igw-internet-access">AWS: Internet gateway basics</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Utan Internet Gateway</h3>
+    <p>VPC:n är stängd. Ingen trafik går till eller från internet.</p>
+  </div>
+  <div>
+    <h3>Med Internet Gateway</h3>
+    <p>VPC:n har en dörr. Subnät med en väg dit når internet.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Räcker det med dörren?</h2>
+
+<p>Nej. Ett subnät använder dörren först när dess route table, listan som säger vart trafiken ska, har en rad som pekar på Internet Gateway. Subnät utan den raden når inte internet, fast dörren finns. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html#vpc-igw-internet-access">AWS: Internet gateway basics</a>)</span></p>
+
+<p>Route table är nästa lektion.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad gör en Internet Gateway?</p>
+  <div class="options">
+    <button class="opt" data-why="Adresserna kommer från VPC:ns och subnätens CIDR. Internet Gateway är dörren ut.">Den delar ut adresser i VPC:n</button>
+    <button class="opt" data-correct data-why="Den är dörren mellan VPC:n och internet, åt båda håll.">Den öppnar din VPC mot internet</button>
+    <button class="opt" data-why="Zonerna är redan kopplade till varandra. Internet Gateway är dörren till internet.">Den kopplar ihop zoner i VPC:n</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Din VPC har en Internet Gateway, men ett subnät når ändå inte internet. Vad saknas?</p>
+  <div class="options">
+    <button class="opt" data-why="Zonen spelar ingen roll. Det som saknas är en rad i subnätets route table.">Ett subnät i en annan zon</button>
+    <button class="opt" data-why="En VPC kan bara ha en Internet Gateway åt gången. Det som saknas är en rad i route tablen.">En gateway till i din VPC</button>
+    <button class="opt" data-correct data-why="Subnätet når internet först när dess route table har en rad som pekar på Internet Gateway.">En rad i dess route table</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 20: vad är en VPC?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="En VPC är ditt eget avgränsade nätverk, och den hör till en region.">Ditt eget nätverk i en region</button>
+    <button class="opt" data-why="Det är en Availability Zone. En VPC är ditt eget nätverk i en region.">Ett datacenter i en av zonerna</button>
+    <button class="opt" data-why="Det är ett subnät. En VPC är hela nätverket och täcker regionen.">En adressbit inom en enda zon</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En Internet Gateway är dörren mellan VPC:n och internet, åt båda håll. Den kostar ingenting.</li>
+    <li>Den kopplas till en VPC, en åt gången. Default VPC har redan en, en egen VPC har ingen förrän du kopplar en. Kursens heter <code>v40-igw</code>.</li>
+    <li>Dörren räcker inte. Subnätets route table måste ha en rad som pekar på den.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">AWS VPC: Enable internet access for a VPC using an internet gateway</a>.</p>
+<p>Om en Internet Gateway per VPC: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/amazon-vpc-limits.html">AWS VPC: Amazon VPC quotas</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0023-subnat.html">Förra: Subnät</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0025-route-table.html">Nästa: Route table</a>
+</nav>
+
+</main>
+</body>
+</html>

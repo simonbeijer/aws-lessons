@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IAM policy</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 5 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 5</p>
+<h1>IAM policy</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en IAM policy är ett dokument som säger vad någon får göra, till exempel <code>AdministratorAccess</code>.
+</div>
+
+<section class="explain">
+<h2>Vad är en IAM policy?</h2>
+
+<p>En IAM policy är ett dokument som säger vad någon får göra i AWS. Kopplar du en policy till en IAM user får den behörigheten i dokumentet. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html">AWS: Policies and permissions in IAM</a>)</span></p>
+
+<p>Utan policy får en ny IAM user inte göra något. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html#id_users_perms">AWS: IAM users and permissions</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur ser AdministratorAccess ut?</h2>
+
+<p>Som ett kort JSON-dokument med en enda regel: tillåt allt. JSON är ett textformat med namn och värden. <span class="src">(<a href="https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AdministratorAccess.html">AWS: AdministratorAccess</a>)</span></p>
+
+<pre>{
+  "Version" : "2012-10-17",
+  "Statement" : [
+    {
+      "Effect" : "Allow",
+      "Action" : "*",
+      "Resource" : "*"
+    }
+  ]
+}</pre>
+
+<p>Klicka på ett namn för att se vad det betyder. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html#policies-introduction">AWS: JSON policy document structure</a>, <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_version.html">AWS: Version</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-version">Version</button>
+    <button class="chip" data-target="p-statement">Statement</button>
+    <button class="chip" data-target="p-effect">Effect</button>
+    <button class="chip" data-target="p-action">Action</button>
+    <button class="chip" data-target="p-resource">Resource</button>
+  </div>
+  <div class="picker-panel" id="p-version"><p>Vilken version av policyspråket som används. Använd alltid den nuvarande, <code>2012-10-17</code>.</p></div>
+  <div class="picker-panel" id="p-statement"><p>Listan med regler. Varje regel står inom <code>{ }</code>.</p></div>
+  <div class="picker-panel" id="p-effect"><p><code>Allow</code> betyder tillåt. Det andra värdet är <code>Deny</code>, neka.</p></div>
+  <div class="picker-panel" id="p-action"><p>Vilka handlingar regeln gäller, till exempel att skapa en IAM user. <code>*</code> betyder alla handlingar.</p></div>
+  <div class="picker-panel" id="p-resource"><p>Vilka resurser regeln gäller. En resurs är något du har skapat i AWS, till exempel en IAM user. <code>*</code> betyder alla resurser.</p></div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vem har skrivit den?</h2>
+
+<p>AWS. AdministratorAccess är en AWS managed policy: AWS skapar och sköter den, och du kan inte ändra den. Du hittar den i IAM, under Policies i vänstermenyn. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#aws-managed-policies">AWS: AWS managed policies</a>, <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_manage-attach-detach.html">AWS: Adding IAM identity permissions</a>)</span></p>
+
+<p>Du kan också skriva egna policyer som bara ger det som behövs. AWS rekommenderar AdministratorAccess bara för kontots administratör. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#aws-managed-policies">AWS: AWS managed policies</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad är en IAM policy?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är en IAM user. En policy säger vad en IAM user får göra.">En egen inloggning med ett namn och lösenord</button>
+    <button class="opt" data-why="Det är koden från MFA. En policy säger vad någon får göra.">En sexsiffrig kod som din MFA-app visar upp</button>
+    <button class="opt" data-correct data-why="En policy är ett dokument som säger vad den som har policyn får göra.">Ett dokument som säger vad någon får göra</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad betyder <code>"Action" : "*"</code> i AdministratorAccess?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="* betyder alla, så alla handlingar i alla AWS-tjänster tillåts.">Alla handlingar i alla tjänster tillåts</button>
+    <button class="opt" data-why="* begränsar inte till IAM; det betyder alla handlingar.">Bara handlingar i tjänsten IAM tillåts</button>
+    <button class="opt" data-why="Effect är Allow, så handlingarna tillåts, de förbjuds inte.">Alla handlingar förbjuds tills du ändrar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 4: din IAM user har AdministratorAccess. Kan den göra allt som root kan?</p>
+  <div class="options">
+    <button class="opt" data-why="En policy gör aldrig en IAM user till root user.">Ja, policyn gör den till en root user</button>
+    <button class="opt" data-correct data-why="Även med full behörighet är den inte root, så uppgifter som kräver root kan den inte göra.">Nej, det som kräver root kan den inte</button>
+    <button class="opt" data-why="Det spelar ingen roll om root är inloggad; en IAM user blir aldrig root.">Ja, men bara när root user är inloggad</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En IAM policy är ett dokument som säger vad någon får göra. Kopplar du den till en IAM user får den behörigheten.</li>
+    <li>AdministratorAccess säger <code>Allow</code> på alla handlingar (<code>Action</code>) och alla resurser (<code>Resource</code>). Det ger full tillgång.</li>
+    <li>AdministratorAccess är en AWS managed policy. AWS har skrivit den och du kan inte ändra den.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html">AWS IAM: Policies and permissions in IAM</a>.</p>
+<p>Om AdministratorAccess: <a href="https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AdministratorAccess.html">AWS Managed Policy Reference: AdministratorAccess</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0004-iam-user.html">Förra: IAM user</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0006-iam-group.html">Nästa: IAM group</a>
+</nav>
+
+</main>
+</body>
+</html>

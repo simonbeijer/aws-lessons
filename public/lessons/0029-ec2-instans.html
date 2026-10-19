@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EC2-instans</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 29 av 47 · V40</span>
+</nav>
+
+<p class="lesson-no">Lektion 29</p>
+<h1>EC2-instans</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en EC2-instans är en virtuell server, och vilka val du gör när du startar den.
+</div>
+
+<section class="explain">
+<h2>Vad är en EC2-instans?</h2>
+
+<p>En EC2-instans är en virtuell server: en dator i AWS datacenter som du hyr och styr över internet. EC2 är AWS tjänst för servrar, och en instans är en server du har startat. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html">AWS: What is Amazon EC2?</a>)</span></p>
+
+<p>Virtuell betyder att servern delar en fysisk maskin med andra, men beter sig som en egen dator. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-launch-parameters.html#liw-advanced-details">AWS: Advanced details, Tenancy</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vilka val gör du när du startar den?</h2>
+
+<p>Du gör ett val per del i guiden Launch instances i EC2-konsolen. Alla utom key pair har ett förvalt värde. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-launch-parameters.html">AWS: Instance configuration parameters</a>)</span></p>
+
+<div class="table-wrap">
+  <table>
+    <tr><th>Del i guiden</th><th>Vad du väljer</th></tr>
+    <tr><td>Application and OS Images</td><td>AMI: avbilden servern startar från, t.ex. Amazon Linux 2023.</td></tr>
+    <tr><td>Instance type</td><td>Storleken: processor och minne, t.ex. <code>t3.micro</code>.</td></tr>
+    <tr><td>Key pair</td><td>Nyckel för inloggning, om du inte loggar in på annat sätt.</td></tr>
+    <tr><td>Network settings</td><td>VPC, subnät, publik IP och security group: brandväggen som släpper in trafik.</td></tr>
+    <tr><td>Configure storage</td><td>Disken, en EBS-volym, t.ex. 8 GiB.</td></tr>
+    <tr><td>Advanced details</td><td>Bl.a. user data: ett skript som körs vid första start.</td></tr>
+  </table>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad kostar en instans?</h2>
+
+<p>Du betalar per sekund medan instansen körs, minst 60 sekunder. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html#ec2-pricing">AWS: Pricing for Amazon EC2</a>)</span></p>
+
+<p>Med Free plan räknas kostnaden av mot krediterna. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html">AWS: Choosing a plan</a>)</span></p>
+
+<div class="box note">
+  <span class="box-title">Ej bekräftat</span>
+  <p>AWS märker <code>t3.micro</code> som Free tier eligible för nya konton, men säger inte om den drar krediter. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-free-tier-usage.html">AWS: Track your Free Tier usage</a>)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad är en EC2-instans?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är en S3 bucket. En EC2-instans är en virtuell server.">En disk som lagrar filer i en bucket</button>
+    <button class="opt" data-why="Det är en VPC. En EC2-instans är en virtuell server.">Ett nätverk som du bygger i en region</button>
+    <button class="opt" data-correct data-why="En instans är en server du startat i EC2, AWS tjänst för servrar.">En virtuell server som du hyr i AWS</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad bestämmer du med instanstypen?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Instanstypen anger storleken, t.ex. t3.micro.">Serverns storlek: processor och minne</button>
+    <button class="opt" data-why="Operativsystemet kommer från AMI:n, inte från instanstypen.">Serverns system: Linux eller Windows</button>
+    <button class="opt" data-why="Disken väljer du under Configure storage, inte med instanstypen.">Serverns disk: storlek och disktyp</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 28: varför behöver en webbserver en publik IP-adress?</p>
+  <div class="options">
+    <button class="opt" data-why="Det räcker med den privata adressen. Den publika behövs för att nås från internet.">Så att den når servrar i VPC:n</button>
+    <button class="opt" data-correct data-why="En privat adress nås bara inifrån VPC:n. Den publika nås från internet.">Så att den kan nås från internet</button>
+    <button class="opt" data-why="Platsen i subnätet ger den privata adressen. Den publika behövs för internet.">Så att den får plats i subnätet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En EC2-instans är en virtuell server: en dator i AWS datacenter som du hyr och styr över internet.</li>
+    <li>När du startar den väljer du AMI, instanstyp, key pair, nätverk med security group, disk och vid behov user data.</li>
+    <li>Du betalar per sekund medan den körs. Med Free plan räknas det av mot krediterna.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html">Amazon EC2: What is Amazon EC2?</a>.</p>
+<p>Om valen: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-launch-parameters.html">Amazon EC2: Reference for instance configuration parameters</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0028-publik-privat-ip.html">Förra: Publik och privat IP-adress</a>
+  <a href="../index.html">Alla lektioner</a>
+  <span class="disabled">Nästa lektion: AMI</span>
+</nav>
+
+</main>
+</body>
+</html>

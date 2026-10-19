@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SNS</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 11 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 11</p>
+<h1>SNS</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Hur SNS skickar e-post när ett larm går, och varför prenumerationen måste bekräftas.
+</div>
+
+<section class="explain">
+<h2>Vad är SNS?</h2>
+
+<p>SNS (Simple Notification Service) är AWS tjänst för att skicka meddelanden. Den som skickar lägger meddelandet i ett topic, en namngiven kanal i SNS. SNS skickar det vidare till alla som prenumererar på topicet, till exempel en e-postadress. <span class="src">(<a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html">AWS: What is Amazon SNS?</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur når larmet din e-post?</h2>
+
+<p>Larmet skickar en notis till ett topic, och topicet mejlar dig via en prenumeration. Klicka på ett led. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html#creating_billing_alarm_with_wizard">AWS: Create a billing alarm</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="l-larm">1. Larmet</button>
+    <button class="chip" data-target="l-topic">2. Topic</button>
+    <button class="chip" data-target="l-sub">3. Prenumeration</button>
+  </div>
+  <div class="picker-panel" id="l-larm"><p>När du skapar larmet väljer du under Notification ett topic, eller gör ett nytt med Create new topic. När larmet går till ALARM skickar det en notis till topicet.</p></div>
+  <div class="picker-panel" id="l-topic"><p>Topicet tar emot notisen och skickar den vidare till alla som prenumererar.</p></div>
+  <div class="picker-panel" id="l-sub"><p>En prenumeration (subscription) är kopplingen mellan topicet och en mottagare, här din e-postadress. Den skapas när du skriver in adressen.</p></div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Varför måste prenumerationen bekräftas?</h2>
+
+<p>För att skydda mot spam. Vem som helst kan skriva in en adress, så ägaren av adressen måste själv säga ja. <span class="src">(<a href="https://aws.amazon.com/sns/faqs/">AWS: SNS FAQ</a>)</span></p>
+
+<p>SNS mejlar först en länk, Confirm subscription. Tills du klickar på den står prenumerationen som PendingConfirmation och får inga notiser. <span class="src">(<a href="https://docs.aws.amazon.com/sns/latest/dg/sns-email-notifications.html">AWS: Email subscriptions</a>)</span></p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Länken gäller i 2 dygn. SNS raderar obekräftade prenumerationer efter 48 timmar. <span class="src">(<a href="https://docs.aws.amazon.com/sns/latest/api/API_Subscribe.html">AWS: Subscribe</a>, <a href="https://docs.aws.amazon.com/sns/latest/dg/sns-email-notifications.html">AWS: Email subscriptions</a>)</span></p>
+</div>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Hittar du inget mejl: kolla skräpposten.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du har skapat larmet med din e-postadress men aldrig klickat på något mejl. Larmet går till ALARM. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Bekräftelsen är inte frivillig; utan den får adressen inga notiser.">SNS mejlar ändå, bekräftelsen är frivillig</button>
+    <button class="opt" data-correct data-why="En obekräftad prenumeration står som PendingConfirmation och får inga notiser.">Inget mejl, adressen har inte bekräftats</button>
+    <button class="opt" data-why="SNS kan inte bekräfta åt dig; ägaren av adressen måste själv klicka på länken.">SNS bekräftar adressen själv, mejlar sedan</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad gör ett topic i SNS?</p>
+  <div class="options">
+    <button class="opt" data-why="Det gör CloudWatch-larmet; topicet tar emot notisen och skickar den vidare.">Mäter kostnaden och jämför med gränsen</button>
+    <button class="opt" data-why="Ett topic är en kanal som skickar vidare, inte ett arkiv över mejl.">Sparar kopior av alla skickade notiser</button>
+    <button class="opt" data-correct data-why="Topicet tar emot notisen och skickar den till alla som prenumererar.">Delar ut notisen till alla prenumeranter</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 10: när skickar fakturalarmet en notis till SNS?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Larmet skickar en notis bara när det byter läge, här till ALARM.">När larmet byter läge till ALARM</button>
+    <button class="opt" data-why="Larmet skickar bara när det byter läge, inte vid varje ny siffra.">Varje gång som kostnaden räknas om</button>
+    <button class="opt" data-why="Larmet skickar bara när det byter läge, inte på ett schema.">En gång per dygn, oavsett läge</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>SNS är AWS tjänst för meddelanden. Ett topic tar emot ett meddelande och skickar det till alla som prenumererar.</li>
+    <li>Fakturalarmet skickar en notis till ett topic när det går till ALARM. En prenumeration kopplar topicet till din e-postadress.</li>
+    <li>Prenumerationen måste bekräftas med länken i mejlet, annars kommer inga notiser. Det skyddar mot spam. Länken gäller i 2 dygn.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/sns/latest/dg/sns-email-notifications.html">Amazon SNS: Email subscription setup and management</a>.</p>
+<p>Om SNS: <a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html">Amazon SNS: What is Amazon SNS?</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0010-cloudwatch-larm.html">Förra: CloudWatch-larm</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0012-s3-bucket-objekt.html">Nästa: S3 bucket och objekt</a>
+</nav>
+
+</main>
+</body>
+</html>

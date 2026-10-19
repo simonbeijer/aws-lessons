@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S3 bucket och objekt</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 12 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 12</p>
+<h1>S3 bucket och objekt</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att S3 lagrar filer som objekt i en bucket, och att bucketnamnet är unikt i hela AWS.
+</div>
+
+<section class="explain">
+<h2>Vad är S3?</h2>
+
+<p>S3 (Simple Storage Service) är AWS tjänst för att lagra filer. En fil du laddar upp blir ett objekt. Objektet läggs alltid i en bucket, en behållare för objekt som du skapar först. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html#CoreConcepts">AWS: How Amazon S3 works</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Bucket, objekt och key</h2>
+
+<p>En bucket innehåller objekt, och varje objekt har en key som är dess namn. Klicka på en del för mer. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html#CoreConcepts">AWS: How Amazon S3 works</a>, <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html">AWS: Naming objects</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-bucket">Bucket</button>
+    <button class="chip" data-target="p-objekt">Objekt</button>
+    <button class="chip" data-target="p-key">Key</button>
+  </div>
+  <div class="picker-panel" id="p-bucket"><p>Behållaren. Du ger den ett namn och väljer en region när du skapar den. Namn och region går inte att ändra efteråt.</p></div>
+  <div class="picker-panel" id="p-objekt"><p>Filen plus metadata, uppgifter som beskriver filen, till exempel när den senast ändrades. Vilken filtyp som helst går bra: HTML, bilder, PDF.</p></div>
+  <div class="picker-panel" id="p-key"><p>Objektets namn, till exempel <code>index.html</code>. Två objekt i samma bucket kan inte ha samma key. Det är keys du ser i listan när du öppnar en bucket i konsolen.</p></div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Hur unikt är bucketnamnet?</h2>
+
+<p>Unikt i hela AWS: bland alla AWS-konton, i alla regioner. Två buckets kan aldrig heta likadant. Är namnet upptaget hos någon annan måste du välja ett nytt. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html">AWS: Bucket naming rules</a>)</span></p>
+
+<p>Namnet får ha 3–63 tecken: små bokstäver a–z, siffror, punkt och bindestreck. Inga åäö, inga versaler. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html#general-purpose-bucket-names">AWS: Naming rules</a>)</span></p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Namnet syns i webbadressen till objekten. Skriv inget hemligt i det. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html">AWS: Bucket naming rules</a>)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du laddar upp bilden <code>katt.jpg</code> till S3. Vad blir den?</p>
+  <div class="options">
+    <button class="opt" data-why="En bucket är behållaren som objekten ligger i, inte filen själv.">En ny bucket med namnet katt.jpg</button>
+    <button class="opt" data-why="Key är bara objektets namn; filen och metadatan är objektet.">En key utan innehåll eller metadata</button>
+    <button class="opt" data-correct data-why="En uppladdad fil blir ett objekt, med katt.jpg som key, i en bucket.">Ett objekt med katt.jpg som namn</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du vill skapa bucketen <code>min-sida</code>. S3 säger att namnet är upptaget, fast du aldrig använt det. Varför?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Bucketnamn är unika i alla AWS-konton och regioner, så någon annan har redan namnet.">Ett annat AWS-konto har redan namnet</button>
+    <button class="opt" data-why="Bindestreck är tillåtet; felet gäller att namnet redan är taget.">Bindestreck är inte tillåtet i namn</button>
+    <button class="opt" data-why="Namnet är unikt i alla regioner, så en annan region hjälper inte.">Fel region är vald i AWS-konsolen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 8: du skapar bucketen i <code>eu-north-1</code>. Var finns den då?</p>
+  <div class="options">
+    <button class="opt" data-why="AWS kopierar inget till andra regioner av sig själv.">I alla regioner, kopierad automatiskt</button>
+    <button class="opt" data-correct data-why="eu-north-1 är koden för Europe (Stockholm), och bucketen ligger där.">I AWS datacenter i Stockholm-regionen</button>
+    <button class="opt" data-why="us-east-1 är regionen för kostnadsdata, inte för dina buckets.">I us-east-1, där kostnaderna sparas</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>S3 är AWS tjänst för att lagra filer. En uppladdad fil blir ett objekt: filen plus metadata.</li>
+    <li>Objekten ligger i en bucket. Varje objekt har en key, sitt namn, som är unik i bucketen.</li>
+    <li>Bucketnamnet är unikt bland alla AWS-konton och regioner. Namn och region går inte att ändra efteråt.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html">Amazon S3: What is Amazon S3?</a></p>
+<p>Om bucketnamn: <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html">Amazon S3: General purpose bucket naming rules</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0011-sns.html">Förra: SNS</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0013-block-public-access.html">Nästa: Block Public Access</a>
+</nav>
+
+</main>
+</body>
+</html>

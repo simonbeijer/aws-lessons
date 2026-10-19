@@ -1,0 +1,219 @@
+{
+  "weeks": [
+    {
+      "code": "v39",
+      "title": "v39 – Molnet och AWS",
+      "lessons": [
+        {
+          "nr": 1,
+          "file": "0001-aws-kontotyper.html",
+          "title": "AWS kontotyper (Free plan och Paid plan)",
+          "goal": "Vilken registrering och vilken plan du ska välja när du skapar ditt AWS-konto, och vad som skiljer Free plan från Paid plan.",
+          "tag": "förarbete"
+        },
+        {
+          "nr": 2,
+          "file": "0002-root-user.html",
+          "title": "Root user",
+          "goal": "Vad root user är, och varför du bara loggar in som root när en uppgift kräver det.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 3,
+          "file": "0003-mfa.html",
+          "title": "MFA",
+          "goal": "Vad MFA är, och varför både root user och din IAM user ska ha det.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 4,
+          "file": "0004-iam-user.html",
+          "title": "IAM user",
+          "goal": "Vad en IAM user är, och hur den skiljer sig från root user.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 5,
+          "file": "0005-iam-policy.html",
+          "title": "IAM policy",
+          "goal": "Att en IAM policy är ett dokument som säger vad någon får göra, till exempel <code>AdministratorAccess</code>.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 6,
+          "file": "0006-iam-group.html",
+          "title": "IAM group",
+          "goal": "Varför du ger behörighet till en grupp i stället för till varje användare.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 7,
+          "file": "0007-iam-fakturering.html",
+          "title": "IAM-åtkomst till fakturering",
+          "goal": "Varför en IAM user får Access Denied i Billing tills root user har slagit på åtkomsten.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 8,
+          "file": "0008-region.html",
+          "title": "Region",
+          "goal": "Vad en region är, varför kursen använder <code>eu-north-1</code>, och varför fakturalarm görs i <code>us-east-1</code>.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 9,
+          "file": "0009-aws-budgets.html",
+          "title": "AWS Budgets",
+          "goal": "Vad en budget gör, och skillnaden mellan Zero spend budget och Monthly cost budget.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 10,
+          "file": "0010-cloudwatch-larm.html",
+          "title": "CloudWatch-larm",
+          "goal": "Vad ett CloudWatch-larm är och hur det reagerar på beräknad kostnad.",
+          "tag": "labb 2 extra"
+        },
+        {
+          "nr": 11,
+          "file": "0011-sns.html",
+          "title": "SNS",
+          "goal": "Hur SNS skickar e-post när ett larm går, och varför prenumerationen måste bekräftas.",
+          "tag": "labb 2 extra"
+        },
+        {
+          "nr": 12,
+          "file": "0012-s3-bucket-objekt.html",
+          "title": "S3 bucket och objekt",
+          "goal": "Att S3 lagrar filer som objekt i en bucket, och att bucketnamnet är unikt i hela AWS.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 13,
+          "file": "0013-block-public-access.html",
+          "title": "Block Public Access",
+          "goal": "Att S3 blockerar publik åtkomst som standard, och vad det betyder att stänga av spärren.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 14,
+          "file": "0014-static-website-hosting.html",
+          "title": "Static website hosting",
+          "goal": "Hur en bucket blir webbserver, och varför du först får 403 Forbidden.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 15,
+          "file": "0015-bucket-policy.html",
+          "title": "Bucket policy",
+          "goal": "Vad <code>Principal</code>, <code>Action</code> och <code>Resource</code> betyder i en bucket policy som gör filerna publikt läsbara.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 16,
+          "file": "0016-bygge.html",
+          "title": "Bygge (build)",
+          "goal": "Att React-kod byggs till HTML, CSS och JavaScript i mappen <code>dist/</code> innan en webbläsare kan visa den.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 17,
+          "file": "0017-amplify-hosting.html",
+          "title": "Amplify Hosting",
+          "goal": "Hur Amplify Hosting bygger och publicerar din app av sig själv varje gång du kör <code>git push</code>.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 18,
+          "file": "0018-service-role.html",
+          "title": "Service role (IAM role)",
+          "goal": "Vad en IAM role är, hur den skiljer sig från en IAM user, och att en service role är en roll som en AWS-tjänst använder åt dig.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 19,
+          "file": "0019-shared-responsibility-model.html",
+          "title": "Shared Responsibility Model",
+          "goal": "Vad AWS ansvarar för och vad du ansvarar för, med S3 och Amplify som exempel.",
+          "tag": "labb 3–4"
+        }
+      ]
+    },
+    {
+      "code": "v40",
+      "title": "V40 – Nätverk, servrar och lagring",
+      "lessons": [
+        {
+          "nr": 20,
+          "file": "0020-vpc.html",
+          "title": "VPC",
+          "goal": "Att en VPC är ditt eget avgränsade nätverk i en region, och att default VPC redan finns men inte används i kursen.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 21,
+          "file": "0021-cidr.html",
+          "title": "CIDR",
+          "goal": "Hur <code>10.0.0.0/16</code> och <code>/20</code> anger ett adressintervall, och att AWS reserverar fem adresser i varje subnät.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 22,
+          "file": "0022-availability-zone.html",
+          "title": "Availability Zone",
+          "goal": "Vad en zon är, hur den skiljer sig från en region, och varför kursens nätverk byggs i två zoner.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 23,
+          "file": "0023-subnat.html",
+          "title": "Subnät",
+          "goal": "Att ett subnät är en bit av VPC:ns adressintervall och ligger i exakt en zon.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 24,
+          "file": "0024-internet-gateway.html",
+          "title": "Internet Gateway",
+          "goal": "Att en Internet Gateway är dörren mellan VPC:n och internet.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 25,
+          "file": "0025-route-table.html",
+          "title": "Route table",
+          "goal": "Att raden <code>0.0.0.0/0 → igw</code> gör ett subnät publikt, och att subnätets namn bara är en etikett.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 26,
+          "file": "0026-vpc-endpoint-s3.html",
+          "title": "VPC endpoint (S3 Gateway)",
+          "goal": "Varför den privata route tablen har en rad för S3, och att gateway-endpointen inte kostar något.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 27,
+          "file": "0027-nat-gateway.html",
+          "title": "NAT Gateway",
+          "goal": "Vad en NAT Gateway gör för privata subnät, och varför kursen inte skapar någon: den kostar per timme.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 28,
+          "file": "0028-publik-privat-ip.html",
+          "title": "Publik och privat IP-adress",
+          "goal": "Skillnaden mellan publik och privat IP-adress, och varför auto-assign public IPv4 slås på i de publika subnäten.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 29,
+          "file": "0029-ec2-instans.html",
+          "title": "EC2-instans",
+          "goal": "Att en EC2-instans är en virtuell server, och vilka val du gör när du startar den.",
+          "tag": ""
+        }
+      ]
+    }
+  ]
+}

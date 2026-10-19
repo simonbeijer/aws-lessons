@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NAT Gateway</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 27 av 47 · V40</span>
+</nav>
+
+<p class="lesson-no">Lektion 27</p>
+<h1>NAT Gateway</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad en NAT Gateway gör för privata subnät, och varför kursen inte skapar någon: den kostar per timme.
+</div>
+
+<section class="explain">
+<h2>Vad gör en NAT Gateway?</h2>
+
+<p>En NAT Gateway låter servrar i ett privat subnät skicka trafik ut till internet, men ingen på internet kan själv starta en kontakt med dem. En server kan till exempel ladda ner uppdateringar och ändå inte nås utifrån. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html">AWS: NAT gateways</a>)</span></p>
+
+<p>NAT står för Network Address Translation. NAT Gatewayn skickar trafiken vidare med sin egen adress som avsändare, och lämnar svaren tillbaka till rätt server. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html">AWS: NAT gateways</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Var sitter den?</h2>
+
+<p>NAT Gatewayn står i ett publikt subnät. Den privata route tablen får en rad som skickar internettrafik till den, och därifrån går trafiken ut genom Internet Gatewayn. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/nat-gateway-scenarios.html#public-nat-gateway-routing">AWS: NAT gateway use cases, Routing</a>)</span></p>
+
+<div class="table-wrap">
+  <table>
+    <tr><th>Destination</th><th>Target</th></tr>
+    <tr><td><code>10.0.0.0/16</code></td><td><code>local</code></td></tr>
+    <tr><td><code>0.0.0.0/0</code></td><td><code>nat-...</code></td></tr>
+  </table>
+</div>
+
+<p>Subnätet är fortfarande privat, eftersom raden pekar på NAT Gatewayn och inte på Internet Gatewayn.</p>
+</section>
+
+<section class="explain">
+<h2>Varför skapar kursen ingen?</h2>
+
+<p>Den kostar pengar så länge den finns. Du betalar för varje timme den är tillgänglig, även utan trafik, och dessutom för varje gigabyte den skickar. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/nat-gateway-pricing.html">AWS: Pricing for NAT gateways</a>)</span></p>
+
+<p>AWS prisexempel är 0,045 USD per timme, alltså ungefär 33 USD i månaden. Kursen väljer därför <code>NAT gateways: None</code>. <span class="src">(<a href="https://aws.amazon.com/vpc/pricing/">AWS: Amazon VPC pricing</a>)</span></p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Har du skapat en NAT Gateway av misstag: ta bort den direkt.</p>
+</div>
+
+<div class="box note">
+  <span class="box-title">Ej bekräftat</span>
+  <p>AWS prisexempel gäller US East (Ohio). Priset i Stockholm (<code>eu-north-1</code>) visas inte på prissidan.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad gör en NAT Gateway för ett privat subnät?</p>
+  <div class="options">
+    <button class="opt" data-why="Ingen på internet kan starta en kontakt in. Trafiken går bara ut, och svaren tillbaka.">Låter alla på nätet nå dina servrar</button>
+    <button class="opt" data-correct data-why="Servrarna kan skicka trafik ut, men ingen på internet kan starta en kontakt med dem.">Servrar når ut men nås inte utifrån</button>
+    <button class="opt" data-why="Det gör raden local. NAT Gatewayn släpper ut trafik till internet.">Håller all trafik kvar inne i VPC:n</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. När kostar en NAT Gateway pengar?</p>
+  <div class="options">
+    <button class="opt" data-why="Den kostar per timme även utan trafik, plus per gigabyte.">Bara när trafik går genom den</button>
+    <button class="opt" data-why="Det är gateway endpointen som är gratis. NAT Gatewayn kostar per timme.">Aldrig, den ingår i din VPC:n</button>
+    <button class="opt" data-correct data-why="Du betalar för varje timme den finns, och för varje gigabyte den skickar.">Varje timme som den finns kvar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 25: vilken rad gör ett subnät publikt?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Raden skickar all trafik som inte stannar i VPC:n till Internet Gatewayn.">0.0.0.0/0 → igw-...</button>
+    <button class="opt" data-why="Den raden håller trafiken inne i VPC:n, och finns i alla route tables.">10.0.0.0/16 → local</button>
+    <button class="opt" data-why="Den raden skickar ut trafik via NAT Gatewayn. Subnätet förblir privat.">0.0.0.0/0 → nat-...</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En NAT Gateway låter servrar i ett privat subnät nå internet, men ingen på internet kan starta en kontakt med dem.</li>
+    <li>Den står i ett publikt subnät. Den privata route tablen får raden <code>0.0.0.0/0 → nat-...</code>.</li>
+    <li>Den kostar per timme så länge den finns, plus per gigabyte. Därför skapar kursen ingen.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html">Amazon VPC: NAT gateways</a>.</p>
+<p>Om priset: <a href="https://aws.amazon.com/vpc/pricing/">Amazon VPC pricing</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0026-vpc-endpoint-s3.html">Förra: VPC endpoint (S3 Gateway)</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0028-publik-privat-ip.html">Nästa: Publik och privat IP-adress</a>
+</nav>
+
+</main>
+</body>
+</html>

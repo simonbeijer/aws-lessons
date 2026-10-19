@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VPC</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 20 av 47 · V40</span>
+</nav>
+
+<p class="lesson-no">Lektion 20</p>
+<h1>VPC</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en VPC är ditt eget avgränsade nätverk i en region, och att default VPC redan finns men inte används i kursen.
+</div>
+
+<section class="explain">
+<h2>Vad är en VPC?</h2>
+
+<p>En VPC (Virtual Private Cloud) är ett eget nätverk i AWS som du bestämmer över. Det är avskilt från andra nätverk, både andra kunders och dina egna andra VPC:er. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html">AWS: What is Amazon VPC?</a>, <a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-your-vpc.html">AWS: Configure a VPC</a>)</span></p>
+
+<p>En VPC hör till en region. Skapar du den i <code>eu-north-1</code> finns den bara där. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-subnet-basics.html">AWS: VPC basics</a>)</span></p>
+
+<p>Själva VPC:n kostar inget. Vissa delar du kan lägga till i den kostar. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html#pricing">AWS: Pricing for Amazon VPC</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad är VPC:ns adressintervall?</h2>
+
+<p>Adressintervallet är de IP-adresser som får användas i VPC:n. En IP-adress är numret en maskin har i ett nätverk, till exempel <code>10.0.0.5</code>. Du väljer intervallet när du skapar VPC:n, till exempel <code>10.0.0.0/16</code>. Hur det skrivsättet fungerar tar nästa lektion upp. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-subnet-basics.html#vpc-ip-address-range">AWS: VPC IP address range</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad är default VPC?</h2>
+
+<p>Default VPC är en VPC som AWS redan har skapat åt dig i varje region. Den har adressintervallet <code>172.31.0.0/16</code>. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html">AWS: Default VPCs</a>, <a href="https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc-components.html">AWS: Default VPC components</a>)</span></p>
+
+<p>Den är gjord för att komma igång snabbt: det du startar där kan nås från internet direkt. Kursen bygger i stället en egen VPC, där du själv bestämmer adresserna och vad som når internet. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html">AWS: Default VPCs</a>, <a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-your-vpc.html">AWS: Configure a VPC</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Default VPC</h3>
+    <p>Finns redan. <code>172.31.0.0/16</code>. Låt den vara.</p>
+  </div>
+  <div>
+    <h3>Din egen VPC</h3>
+    <p>Du skapar den. <code>10.0.0.0/16</code>. Här bygger du.</p>
+  </div>
+</div>
+
+<div class="box note">
+  <span class="box-title">Ej bekräftat</span>
+  <p>Kursmaterialet säger inte varför. Skälet ovan är AWS allmänna beskrivning.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du byter region till <code>us-east-1</code>. Syns VPC:n du skapade i <code>eu-north-1</code>?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="En VPC hör till regionen där du skapade den, och syns bara där.">Nej, en VPC hör till en region</button>
+    <button class="opt" data-why="En VPC hör till en region. I us-east-1 syns bara VPC:er som finns där.">Ja, en VPC syns i alla regioner</button>
+    <button class="opt" data-why="Det spelar ingen roll vem du är inloggad som; VPC:n finns bara i sin region.">Ja, men bara för en root user</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du ser en VPC med <code>172.31.0.0/16</code> som du inte har skapat. Vad är det?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är inget fel. AWS skapar en default VPC i varje region.">Ett fel som du måste ta bort direkt</button>
+    <button class="opt" data-correct data-why="AWS skapar en default VPC med 172.31.0.0/16 i varje region.">Default VPC som AWS har gjort åt dig</button>
+    <button class="opt" data-why="Andra kunders nätverk är avskilda och syns aldrig i ditt konto.">En annan kunds VPC som syns för dig</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 8: du har skapat något men ser det inte i konsolen. Vad kontrollerar du först?</p>
+  <div class="options">
+    <button class="opt" data-why="MFA påverkar inloggningen, inte vad konsolen visar.">Att din IAM user har MFA påslaget</button>
+    <button class="opt" data-why="Root behövs inte. Konsolen visar bara den valda regionen.">Att du är inloggad som root user</button>
+    <button class="opt" data-correct data-why="Konsolen visar bara det som finns i regionen du har valt.">Att rätt region är vald i menyn</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En VPC är ditt eget nätverk i AWS, avskilt från andra nätverk. Den hör till en region.</li>
+    <li>När du skapar en VPC väljer du dess adressintervall, till exempel <code>10.0.0.0/16</code>.</li>
+    <li>Default VPC (<code>172.31.0.0/16</code>) finns redan i varje region. Kursen låter den vara och bygger en egen.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html">AWS VPC: What is Amazon VPC?</a>.</p>
+<p>Om default VPC: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html">AWS VPC: Default VPCs</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0019-shared-responsibility-model.html">Förra: Shared Responsibility Model</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0021-cidr.html">Nästa: CIDR</a>
+</nav>
+
+</main>
+</body>
+</html>

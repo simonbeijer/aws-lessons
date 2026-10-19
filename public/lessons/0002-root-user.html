@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Root user</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 2 av 19 · v39</span>
+</nav>
+
+<p class="lesson-no">Lektion 2</p>
+<h1>Root user</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad root user är, och varför du bara loggar in som root när en uppgift kräver det.
+</div>
+
+<section class="explain">
+<h2>Vad är root user?</h2>
+
+<p>Root user är inloggningen som skapas samtidigt som ditt AWS-konto. Du loggar in med e-postadressen och lösenordet du registrerade kontot med. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html">AWS: AWS account root user</a>)</span></p>
+
+<p>Root user har full åtkomst till alla tjänster och allt innehåll i kontot. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html">AWS: AWS account root user</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför används root så sällan?</h2>
+
+<p>För att root kan göra allt. Den som får tag i lösenordet kan också göra allt, till exempel stänga kontot. AWS rekommenderar starkt att du inte använder root till vardagliga uppgifter. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/root-user-best-practices.html">AWS: Root user best practices</a>)</span></p>
+
+<p>Till vardags loggar du i stället in som IAM user, en egen inloggning som du skapar i kontot. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/root-user-best-practices.html">AWS: Root user best practices</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>När behövs root?</h2>
+
+<p>Bara för de få uppgifter som kräver root, till exempel att låta IAM users se fakturering. Klicka och se vem som gör vad. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html#root-user-tasks">AWS: Tasks that require root user credentials</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="t1">Låta IAM users se fakturering</button>
+    <button class="chip" data-target="t2">Byta root-lösenordet</button>
+    <button class="chip" data-target="t3">Byta kontots namn</button>
+  </div>
+  <div class="picker-panel" id="t1"><p><span class="tag bad">Bara root</span> Tills root slår på det nekas även en IAM user med full behörighet i Billing, fakturavyn.</p></div>
+  <div class="picker-panel" id="t2"><p><span class="tag bad">Bara root</span> Samma gäller att byta root-e-posten och att stänga kontot.</p></div>
+  <div class="picker-panel" id="t3"><p><span class="tag good">IAM user</span> Kontonamn och kontaktuppgifter kräver inte root. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html#root-user-tasks">AWS</a>)</span></p></div>
+</div>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Logga in som root, gör uppgiften, logga ut. Allt annat gör du som IAM user.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Hur loggar du in som root user?</p>
+  <div class="options">
+    <button class="opt" data-why="Root user har inget eget användarnamn; den loggar in med kontots e-postadress.">Med ett användarnamn du själv väljer</button>
+    <button class="opt" data-why="Ingen kod ersätter lösenordet; root loggar in med e-postadressen och lösenordet.">Med kontonumret och en sexsiffrig kod</button>
+    <button class="opt" data-correct data-why="Root user är e-postadressen och lösenordet du registrerade kontot med.">Med kontots e-post och ditt lösenord</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du vill att din IAM user ska kunna se fakturorna. Vem måste slå på det?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Bara root kan slå på att IAM users får se fakturering.">Root user, ingen annan kan göra det</button>
+    <button class="opt" data-why="Även en IAM user med full behörighet nekas tills root har slagit på åtkomsten.">En IAM user som har full behörighet</button>
+    <button class="opt" data-why="Det är en inställning i kontot, och bara root kan ändra den.">Ingen, alla IAM users ser den direkt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 1: vilken plan kan aldrig kosta dig pengar?</p>
+  <div class="options">
+    <button class="opt" data-why="Paid plan kostar det du använder utöver krediterna.">Paid plan, så länge du har krediter</button>
+    <button class="opt" data-correct data-why="Free plan kan aldrig kosta pengar, men kontot stängs efter sex månader eller när krediterna är slut.">Free plan, men den stängs efter tid</button>
+    <button class="opt" data-why="Planerna skiljer sig: bara Free plan kan aldrig kosta pengar.">Båda, så länge du har kvar krediter</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Root user är inloggningen med kontots e-postadress och lösenord. Den har full åtkomst till allt i kontot.</li>
+    <li>Eftersom root kan göra allt är den farlig om någon annan får tag i den. Till vardags använder du en IAM user.</li>
+    <li>Logga bara in som root när en uppgift kräver det, till exempel för att låta IAM users se fakturering.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html">AWS IAM: AWS account root user</a>.</p>
+<p>Varför root ska skyddas: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/root-user-best-practices.html">AWS IAM: Root user best practices</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0001-aws-kontotyper.html">Förra: AWS kontotyper</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0003-mfa.html">Nästa: MFA</a>
+</nav>
+
+</main>
+</body>
+</html>
