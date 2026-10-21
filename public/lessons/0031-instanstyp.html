@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instanstyp</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 31 · v40, 12 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 31</p>
+<h1>Instanstyp</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad instanstypen <code>t3.micro</code> säger om serverns storlek, och att den styr priset.
+</div>
+
+<section class="explain">
+<h2>Vad är en instanstyp?</h2>
+
+<p>Instanstypen är serverns storlek: hur mycket processor och minne den får. Du väljer den under Instance type i Launch instances. <span class="src">(<a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/instance-types.html">AWS: Amazon EC2 instance types</a>)</span></p>
+
+<p>Processorn mäts i vCPU, virtuella processorer: den del av den fysiska maskinens processor som din server får för sig själv. Minnet är arbetsminnet (RAM) och mäts i GiB. <span class="src">(<a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/instance-types.html">AWS: Amazon EC2 instance types</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur läser du <code>t3.micro</code>?</h2>
+
+<p>Före punkten står familjen, efter punkten storleken. I <code>t3</code> är <code>t</code> serien och <code>3</code> generationen. <code>micro</code> är storleken. <span class="src">(<a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/instance-type-names.html">AWS: Instance type naming conventions</a>)</span></p>
+
+<p>En server i serien <code>t</code> får en grundnivå av processorkraft och kan tillfälligt gå över den. T3 har en Intel-processor av sorten x86, så den passar AMI:n 64-bit (x86). <span class="src">(<a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/instance-types.html#instance-performance">AWS: Instance performance</a>, <a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/gp.html">AWS: General purpose specifications</a>)</span></p>
+
+<p>Storleken avgör minnet:</p>
+
+<div class="table-wrap">
+  <table>
+    <tr><th>Instanstyp</th><th>vCPU</th><th>Minne</th><th>Pris per timme</th></tr>
+    <tr><td><code>t3.nano</code></td><td>2</td><td>0,5 GiB</td><td>0,0052 USD</td></tr>
+    <tr><td><strong><code>t3.micro</code></strong></td><td><strong>2</strong></td><td><strong>1 GiB</strong></td><td><strong>0,0104 USD</strong></td></tr>
+    <tr><td><code>t3.small</code></td><td>2</td><td>2 GiB</td><td>0,0209 USD</td></tr>
+    <tr><td><code>t3.medium</code></td><td>2</td><td>4 GiB</td><td>0,0418 USD</td></tr>
+  </table>
+</div>
+<p class="src">Linux, region US East (N. Virginia). AWS visar inget pris för Stockholm på sidan. (<a href="https://aws.amazon.com/ec2/instance-types/t3/">AWS: Amazon EC2 T3 Instances</a>)</p>
+</section>
+
+<section class="explain">
+<h2>Hur styr den priset?</h2>
+
+<p>Varje instanstyp har ett eget pris per timme. En storlek större ger dubbelt så mycket minne och ungefär dubbelt pris. Du betalar per sekund medan servern körs. <span class="src">(<a href="https://aws.amazon.com/ec2/instance-types/t3/">AWS: T3 Instances</a>, <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html#ec2-pricing">AWS: Pricing for Amazon EC2</a>)</span></p>
+
+<p>Med Free plan räknas kostnaden av mot krediterna. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html">AWS: Choosing a plan</a>)</span></p>
+
+<div class="box note">
+  <span class="box-title">Ej bekräftat</span>
+  <p>AWS märker <code>t3.micro</code> och <code>t3.small</code> som Free tier eligible för konton skapade från 15 juli 2025, men säger inte om de drar krediter. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-free-tier-usage.html">AWS: Track your Free Tier usage</a>)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad säger <code>micro</code> i <code>t3.micro</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Generationen är siffran 3. Ordet efter punkten är storleken.">Hur ny generation hårdvaran i servern är</button>
+    <button class="opt" data-why="Serien är bokstaven t. Ordet efter punkten är storleken.">Vilka uppgifter som servern är byggd för</button>
+    <button class="opt" data-correct data-why="Efter punkten står storleken: hur mycket processor och minne servern får.">Hur mycket processor och minne den får</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du byter från <code>t3.micro</code> till <code>t3.small</code>. Vad händer med priset?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="t3.small har dubbelt så mycket minne och kostar ungefär dubbelt per timme.">Det blir ungefär dubbelt så högt</button>
+    <button class="opt" data-why="Varje instanstyp har ett eget pris, även inom samma serie.">Det förblir lika högt som förut</button>
+    <button class="opt" data-why="Större storlek kostar mer. t3.small kostar ungefär dubbelt.">Det blir ungefär hälften så högt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 30: vad måste AMI:ns arkitektur passa?</p>
+  <div class="options">
+    <button class="opt" data-why="Subnätet styr var servern står. Arkitekturen måste passa instanstypen.">Subnätet som servern placeras i</button>
+    <button class="opt" data-correct data-why="Arkitekturen är processorsorten. Den måste passa instanstypens processor.">Instanstypen som servern körs på</button>
+    <button class="opt" data-why="Security groupen styr trafiken. Arkitekturen måste passa instanstypen.">Brandväggen som står runt servern</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Instanstypen är serverns storlek: antal vCPU och mängden minne. Du väljer den under Instance type.</li>
+    <li>I <code>t3.micro</code> är <code>t</code> serien, <code>3</code> generationen och <code>micro</code> storleken: 2 vCPU och 1 GiB minne.</li>
+    <li>Varje instanstyp har ett eget pris per timme. Större storlek kostar mer. Med Free plan räknas kostnaden av mot krediterna.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/instance-types.html">Amazon EC2: Amazon EC2 instance types</a>.</p>
+<p>Om namnen: <a href="https://docs.aws.amazon.com/ec2/latest/instancetypes/instance-type-names.html">Amazon EC2: Instance type naming conventions</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0030-ami.html">Förra: AMI</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0032-ebs-volym.html">Nästa: EBS-volym</a>
+</nav>
+
+</main>
+</body>
+</html>

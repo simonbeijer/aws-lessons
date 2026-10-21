@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Header</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 51 · v41, 4 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 51</p>
+<h1>Header</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en header är en rad med nyckel och värde om anropet eller svaret, och att kursens server inte läser kroppen om anropet saknar <code>Content-Type: application/json</code>.
+</div>
+
+<section class="explain">
+<h2>Vad är en header?</h2>
+
+<p>En header är en rad med en nyckel, ett kolon och ett värde. I <code>Content-Type: application/json</code> är <code>Content-Type</code> nyckeln och <code>application/json</code> värdet. <span class="src">(kursens lektion sida 11 och 14, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers">MDN: HTTP headers</a>)</span></p>
+
+<p>Headers står mellan <a href="0048-http-anrop-och-svar.html">startraden och den tomma raden</a>, en per rad. De säger något om meddelandet men är inte innehållet. Nyckeln får skrivas med små bokstäver: <code>content-type</code> är samma header. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers">MDN: HTTP headers</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Fyra headers i kursens exempel</h2>
+
+<p>Kursens exempel skapar en kund och har fyra olika headers: <span class="src">(kursens lektion sida 14)</span></p>
+
+<pre><code>POST /customers HTTP/1.1
+Host: 16.170.12.34:3000
+Content-Type: application/json
+Accept: application/json
+
+{ "name": "Carol" }</code></pre>
+
+<pre><code>HTTP/1.1 201 Created
+Content-Type: application/json
+Location: /customers/3
+
+{ "id": 3, "name": "Carol" }</code></pre>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Header</th><th>Står i</th><th>Säger</th></tr></thead>
+  <tbody>
+    <tr><td><code>Host</code></td><td>Anropet</td><td>Vart anropet ska.</td></tr>
+    <tr><td><code>Content-Type</code></td><td>Båda</td><td>Vilket format kroppen har.</td></tr>
+    <tr><td><code>Accept</code></td><td>Anropet</td><td>Vilket format klienten vill ha tillbaka.</td></tr>
+    <tr><td><code>Location</code></td><td>Svaret</td><td>Var den nya kunden finns.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><code>application/json</code> betyder att kroppen är skriven i formatet JSON. JSON är nästa lektion. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type">MDN: Content-Type</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Accept">MDN: Accept</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location">MDN: Location</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Utan Content-Type läses inte kroppen</h2>
+
+<p>Kursens server läser kroppen bara när anropet har <code>Content-Type: application/json</code>. Saknas headern ser servern ingen kropp, fast den finns där. Klicka och jämför: <span class="src">(kursmaterialet v41, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type">MDN: Content-Type</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-med">Med Content-Type</button>
+    <button class="chip" data-target="p-utan">Utan Content-Type</button>
+  </div>
+  <div class="picker-panel" id="p-med">
+<pre><code>POST /customers HTTP/1.1
+Content-Type: application/json
+
+{ "name": "Carol" }</code></pre>
+    <p>Svar: <code>201 Created</code>. Carol skapas.</p>
+  </div>
+  <div class="picker-panel" id="p-utan">
+<pre><code>POST /customers HTTP/1.1
+
+{ "name": "Carol" }</code></pre>
+    <p>Svar: <code>400 Bad Request</code> och <code>name is required</code>.</p>
+  </div>
+</div>
+
+<p>Servern tror att namnet saknas. Det är en <a href="0050-statuskod.html">4xx</a>: felet ligger i anropet, och klienten rättar det genom att lägga till headern. Kursen kallar det ett vanligt fel i klientkod. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad säger headern <code>Accept: application/json</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är Content-Type som säger vilket format kroppen har.">Vilket format anropets kropp har</button>
+    <button class="opt" data-correct data-why="Accept säger vilket format klienten vill ha i svaret.">Vilket format klienten vill ha</button>
+    <button class="opt" data-why="Det är Location i svaret som säger var den nya kunden finns.">Var den skapade kunden finns</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du skickar <code>POST /customers</code> med ett namn i kroppen men utan <code>Content-Type</code>. Vad svarar kursens server?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Utan headern läser servern inte kroppen, så den tror att namnet saknas och svarar 400.">400, servern läste inte kroppen</button>
+    <button class="opt" data-why="Servern gissar inte; utan headern läser den inte kroppen alls.">201, servern gissar ett format</button>
+    <button class="opt" data-why="Servern klarar anropet; den svarar 400 för att den inte ser något namn.">500, servern kraschar av kroppen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 50: anropet utan <code>Content-Type</code> fick 400. Vem ska rätta felet?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är 5xx som betyder att felet rättas i servern.">Servern, som ändrar sin kod</button>
+    <button class="opt" data-why="En kod som börjar på 4 betyder att något gick fel, inte att det gick bra.">Ingen, eftersom anropet gick bra</button>
+    <button class="opt" data-correct data-why="4xx betyder att felet ligger i anropet, så klienten lägger till headern.">Klienten, som ändrar sitt anrop</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En header är en rad med nyckel och värde, t.ex. <code>Content-Type: application/json</code>. Den står mellan startraden och den tomma raden.</li>
+    <li><code>Host</code> säger vart anropet ska, <code>Content-Type</code> vilket format kroppen har, <code>Accept</code> vad klienten vill ha tillbaka och <code>Location</code> var en ny resurs finns.</li>
+    <li>Saknas <code>Content-Type: application/json</code> läser kursens server inte kroppen och svarar 400. Klienten rättar det med headern.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers">MDN: HTTP headers</a>.</p>
+<p>Om de enskilda headers: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type">MDN: Content-Type</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Accept">MDN: Accept</a> och <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location">MDN: Location</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0050-statuskod.html">Förra: Statuskod</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0052-json.html">Nästa: JSON</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>User data</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 37 · v40, 18 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 37</p>
+<h1>User data</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att user data är ett skript som körs en gång vid första start, och var du ser om det gick fel.
+</div>
+
+<section class="explain">
+<h2>Vad är user data?</h2>
+
+<p>User data är ett skript du ger servern när du startar den. Ett skript är en text med kommandon som servern kör i tur och ordning, utan att någon skriver dem. Du klistrar in det under Advanced details i guiden <a href="0029-ec2-instans.html">Launch instances</a>. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html">AWS: Run commands with user data</a>)</span></p>
+
+<p>Första raden ska vara <code class="copyable">#!/bin/bash</code>. Den säger att programmet bash läser kommandona, samma program som tar emot det du skriver i en terminal. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html#user-data-shell-scripts">AWS: User data and shell scripts</a>)</span></p>
+
+<p>Servern blir <a href="0030-ami.html">AMI</a> plus user data. AMI:n ger operativsystemet. Skriptet lägger till resten, t.ex. installerar en <a href="0033-port.html">webbserver</a> och skriver en webbsida. <span class="src">(<a href="https://docs.aws.amazon.com/linux/al2023/ug/cloud-init.html">AWS: Customized cloud-init</a>, kursens lektion sida 37)</span></p>
+</section>
+
+<section class="explain">
+<h2>När skriptet körs</h2>
+
+<p>Skriptet körs en gång, vid serverns första start. Startar du om servern körs det inte igen. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html#user-data-shell-scripts">AWS: User data and shell scripts</a>, kursens lektion sida 14)</span></p>
+
+<p>Skriptet körs som root, administratören på servern. Det är inte root user i ditt <a href="0002-root-user.html">AWS-konto</a>. Starten tar några minuter extra medan skriptet körs. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html#user-data-shell-scripts">AWS: User data and shell scripts</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Var du ser om det gick fel</h2>
+
+<p>Du ser det i loggen <code class="copyable">/var/log/cloud-init-output.log</code> på servern. En logg är en fil där servern skriver vad som hände. cloud-init är programmet i Amazon Linux som kör user data, och det sparar allt skriptet skriver ut, även felmeddelanden. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html#user-data-shell-scripts">AWS: User data and shell scripts</a>, <a href="https://docs.aws.amazon.com/linux/al2023/ug/cloud-init.html">AWS: Customized cloud-init</a>)</span></p>
+
+<p>Öppna en terminal med <a href="0036-ec2-instance-connect.html">EC2 Instance Connect</a> och visa loggens sista 20 rader. <code>sudo</code> betyder att kommandot körs som root. Valfritt att prova:</p>
+
+<pre><code>sudo tail -n 20 /var/log/cloud-init-output.log</code></pre>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Servern har gått i flera dagar och du startar om den. Vad händer med user data-skriptet?</p>
+  <div class="options">
+    <button class="opt" data-why="Skriptet körs bara vid första start, inte vid varje omstart.">Det körs igen, vid varje ny start</button>
+    <button class="opt" data-correct data-why="User data körs en gång, vid serverns första start.">Det körs inte, det körde redan förut</button>
+    <button class="opt" data-why="Skriptet tas inte bort, men det körs inte heller igen.">Det tas bort från servern vid start</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Webbsidan som skriptet skulle skriva syns inte. Var letar du först?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="cloud-init sparar allt skriptet skriver ut, även felen, i den loggen.">I den logg som cloud-init sparar</button>
+    <button class="opt" data-why="Security group visar regler för trafik, inte vad skriptet gjorde.">I serverns regler i security group</button>
+    <button class="opt" data-why="AMI:n är avbilden servern startar från och visar inte skriptets fel.">I listan över AMI:er i konsolen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 30: vad ger AMI:n servern, innan user data körs?</p>
+  <div class="options">
+    <button class="opt" data-why="Webbsidan skrivs av user data-skriptet, inte av AMI:n.">Webbsidan som visas för besökare</button>
+    <button class="opt" data-why="Disken är en EBS-volym, och dess storlek väljer du själv.">Disken med storleken hundra GiB</button>
+    <button class="opt" data-correct data-why="En AMI innehåller programvaran, främst operativsystemet, t.ex. Linux.">Ett operativsystem som Amazon Linux</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>User data är ett skript du ger servern under Advanced details när du startar den. Första raden är <code>#!/bin/bash</code>.</li>
+    <li>Servern är AMI plus user data: AMI:n ger operativsystemet, skriptet installerar resten.</li>
+    <li>Skriptet körs en gång, vid första start, som root på servern. Inte vid omstart.</li>
+    <li>Gick något fel: läs <code>/var/log/cloud-init-output.log</code> i en terminal på servern.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html">Amazon EC2: Run commands when you launch an EC2 instance with user data input</a>.</p>
+<p>Om cloud-init: <a href="https://docs.aws.amazon.com/linux/al2023/ug/cloud-init.html">Amazon Linux 2023: Customized cloud-init</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0036-ec2-instance-connect.html">Förra: EC2 Instance Connect</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0038-stoppa-terminera.html">Nästa: Stoppa och terminera</a>
+</nav>
+
+</main>
+</body>
+</html>

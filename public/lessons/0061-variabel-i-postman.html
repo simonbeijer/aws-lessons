@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Variabel i Postman</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 61 · v41, 14 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 61</p>
+<h1>Variabel i Postman</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att <code>{{baseUrl}}</code> gör att adressen står på ett ställe och bara ändras där när servern får ny IP.
+</div>
+
+<section class="explain">
+<h2>Vad är en variabel i Postman?</h2>
+
+<p>En variabel är ett namn som står för ett värde. Du skriver namnet inom dubbla klammerparenteser, <code>{{baseUrl}}</code>, och Postman byter ut det mot värdet när anropet skickas. <span class="src">(<a href="https://learning.postman.com/docs/use/send-requests/variables/variables/#variable-concepts">Postman: Variables</a>, kursmaterialet v41)</span></p>
+
+<p>Kursen använder en collection-variabel. Den sparas i <a href="0055-postman.html">collectionen</a> och gäller för alla anrop i den. Du lägger till den under fliken Variables när du har klickat på collectionen. <span class="src">(<a href="https://learning.postman.com/docs/use/send-requests/variables/define-variables/#define-collection-variables">Postman: Define variables</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Adressen på ett ställe</h2>
+
+<p>Adressen står bara i baseUrl, med värdet <code>http://&lt;din publika IP&gt;:3000</code>, utan snedstreck sist. Det är serverns <a href="0028-publik-privat-ip.html">publika adress</a> och <a href="0033-port.html">porten</a> servern använder. Varje anrop börjar sedan med variabeln: <span class="src">(kursmaterialet v41)</span></p>
+
+<pre><code>{{baseUrl}}/customers</code></pre>
+
+<p>Postman skickar då <code>http://&lt;din publika IP&gt;:3000/customers</code>.</p>
+</section>
+
+<section class="explain">
+<h2>När servern får ny IP</h2>
+
+<p>Då ändrar du värdet på baseUrl, en gång. Anropen rör du inte. Servern får en ny publik IP när du <a href="0038-stoppa-terminera.html">stoppar och startar</a> den. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-ec2-instance-stop-start-works.html">AWS: How stop and start works</a>, kursmaterialet v41)</span> Reboot instance, en omstart utan stopp, behåller adressen. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-reboot.html">AWS: Reboot your instance</a>)</span></p>
+
+<p>Kursens poäng: adressen står på ett ställe, så samma collection fungerar mot servern idag och mot en annan adress senare i kursen. <span class="src">(kursmaterialet v41)</span></p>
+
+<div class="box note">
+  <span class="box-title">Kursen och Postman skiljer sig</span>
+  <p>Kursmaterialet säger: fyll i Initial value och Current value, sedan Save. Postman har nu ett enda värde, som sparas automatiskt. Ser du två kolumner: fyll i båda. <span class="src">(<a href="https://learning.postman.com/docs/use/send-requests/variables/define-variables/#previous-way-of-defining-variables">Postman: Define variables</a>)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Servern har fått en ny publik IP. Vad ändrar du i collectionen?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Alla anrop börjar med {{baseUrl}}, så det räcker att ändra variabelns värde en gång.">Värdet på baseUrl, på ett enda ställe</button>
+    <button class="opt" data-why="Anropen innehåller bara {{baseUrl}}, så de behöver du inte röra.">Adressen i varje anrop, en åt gången</button>
+    <button class="opt" data-why="Postman vet inte att servern har fått en ny adress; du måste ändra värdet på baseUrl.">Inget, för Postman hittar den nya själv</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad gör Postman med <code>{{baseUrl}}</code> när anropet skickas?</p>
+  <div class="options">
+    <button class="opt" data-why="Postman skickar inte namnet; det byts ut mot variabelns värde innan anropet går iväg.">Låter namnet stå kvar som vanlig text</button>
+    <button class="opt" data-correct data-why="Postman byter ut {{baseUrl}} mot värdet som är sparat i collectionen.">Byter ut den mot värdet i collectionen</button>
+    <button class="opt" data-why="Värdet är sparat i collectionen, så Postman behöver inte fråga dig.">Ber dig skriva in adressen varje gång</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 38: när får servern en ny publik IP?</p>
+  <div class="options">
+    <button class="opt" data-why="Reboot instance är en omstart utan stopp, och då behålls adressen.">När du startar om den med Reboot instance</button>
+    <button class="opt" data-correct data-why="Den publika adressen släpps vid stopp, och vid start får servern en ny från AWS.">När du stoppar den och startar den igen</button>
+    <button class="opt" data-why="Att logga in ändrar inte servern; adressen byts bara vid stopp och start.">När du loggar in med EC2 Instance Connect</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En variabel är ett namn för ett värde. <code>{{baseUrl}}</code> byts ut mot värdet när anropet skickas.</li>
+    <li>baseUrl är en collection-variabel med serverns adress och port. Varje anrop börjar med den.</li>
+    <li>Får servern ny publik IP efter stopp och start ändrar du bara värdet på baseUrl.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://learning.postman.com/docs/use/send-requests/variables/variables/">Postman: Store and reuse values using variables</a>.</p>
+<p>Om att lägga till en collection-variabel: <a href="https://learning.postman.com/docs/use/send-requests/variables/define-variables/">Postman: Define variables</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0060-process-i-bakgrunden.html">Förra: Process i bakgrunden</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0062-test-i-postman.html">Nästa: Test i Postman</a>
+</nav>
+
+</main>
+</body>
+</html>

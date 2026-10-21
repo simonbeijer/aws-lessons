@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Citattecken i bash</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 45 · v40, 26 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 45</p>
+<h1>Citattecken i bash</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Varför ett lösenord skrivs inom enkla citattecken i terminalen, och vad dubbla citattecken gör annorlunda.
+</div>
+
+<section class="explain">
+<h2>Vad enkla citattecken gör</h2>
+
+<p>Mellan enkla citattecken <code>'...'</code> tolkar bash ingenting. Varje tecken sparas exakt som du skrev det. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Single-Quotes.html">GNU Bash: Single Quotes</a>)</span></p>
+
+<p><a href="0037-user-data.html">Bash</a> läser hela raden innan värdet sparas, och vissa tecken betyder något för bash. Ett lösenord kan innehålla dem.</p>
+
+<pre><code>export DB_PASSWORD='Hav$val77'</code></pre>
+
+<p>Här sparas <code>Hav$val77</code> exakt i <a href="0044-miljovariabel.html">miljövariabeln</a>.</p>
+</section>
+
+<section class="explain">
+<h2>Vad dubbla gör annorlunda</h2>
+
+<p>Mellan dubbla citattecken <code>"..."</code> tolkar bash fortfarande bland annat <code>$</code> och <code>!</code>. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Double-Quotes.html">GNU Bash: Double Quotes</a>)</span></p>
+
+<ul>
+  <li><code>$</code> följt av ett namn hämtar en variabels värde. I <code>"Hav$val77"</code> finns ingen variabel <code>val77</code>, så bara <code>Hav</code> sparas.</li>
+  <li><code>!</code> hämtar ur kommandohistoriken, listan över kommandon du redan skrivit i terminalen. <code>"Demo123!#"</code> blir något helt annat än du skrev.</li>
+</ul>
+
+<p>Dubbla är rätt när en variabel ska in i texten, som <code>"host=$DB_HOST"</code>.</p>
+</section>
+
+<section class="explain">
+<h2>Varför det spelar roll för lösenordet</h2>
+
+<p>Ett tecken som tolkas ändrar lösenordet, och för <code>$</code> ger bash inget felmeddelande. Programmet skickar fel lösenord, och databasen svarar <code>password authentication failed</code>. <span class="src">(kursmaterialet v40)</span></p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Enkla citattecken runt lösenordet, alltid. Endpointen behöver inga: den har bara bokstäver, siffror, punkter och bindestreck. <span class="src">(kursmaterialet v40)</span></p>
+</div>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Ett enkelt citattecken kan inte stå mellan enkla citattecken. Välj ett lösenord utan <code>'</code>. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Single-Quotes.html">GNU Bash: Single Quotes</a>)</span></p>
+</div>
+</section>
+
+<h3>Prova själv (valfritt)</h3>
+
+<p>Att köra raderna är valfritt. <code>echo</code> skriver ut värdet: först <code>Hav$val77</code>, sedan bara <code>Hav</code>.</p>
+
+<pre><code>export DB_PASSWORD='Hav$val77'
+echo $DB_PASSWORD
+export DB_PASSWORD="Hav$val77"
+echo $DB_PASSWORD</code></pre>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du skriver <code>export DB_PASSWORD="Hav$val77"</code>. Vad sparas?</p>
+  <div class="options">
+    <button class="opt" data-why="Mellan dubbla citattecken tolkar bash $, så $val77 hämtar en variabel som inte finns.">Hela Hav$val77, precis som det står</button>
+    <button class="opt" data-correct data-why="$val77 hämtar värdet av en variabel som inte finns, och det värdet är tomt.">Bara Hav, eftersom $val77 blir tomt</button>
+    <button class="opt" data-why="Bash ger inget fel när $ tolkas; raden körs och fel värde sparas.">Inget, bash avbryter raden med fel</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Varför skrivs lösenordet inom enkla citattecken?</p>
+  <div class="options">
+    <button class="opt" data-why="Endpointen skrivs utan citattecken och fungerar ändå.">Bash vill ha citattecken runt värden</button>
+    <button class="opt" data-why="Citattecknen tas bort av bash; databasen får bara själva lösenordet.">Databasen läser bara lösenord med dem</button>
+    <button class="opt" data-correct data-why="Mellan enkla citattecken sparas varje tecken exakt som du skrev det.">Bash sparar då varje tecken oförändrat</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 44: hur får programmet lösenordet?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Programmet läser miljövariabeln med process.env när det körs, så lösenordet står inte i koden.">Det läser variabeln via process.env</button>
+    <button class="opt" data-why="Lösenordet ska just inte stå i koden, där alla som ser koden kan läsa det.">Lösenordet står inskrivet i koden</button>
+    <button class="opt" data-why="Programmet frågar inte; det läser miljövariabeln som terminalen gav det.">Du skriver lösenordet vid starten</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Mellan enkla citattecken tolkar bash ingenting. Lösenordet sparas exakt som du skrev det.</li>
+    <li>Mellan dubbla citattecken tolkar bash bland annat <code>$</code> (hämtar en variabel) och <code>!</code> (hämtar ur kommandohistoriken). Ett lösenord med de tecknen blir fel, ofta utan felmeddelande.</li>
+    <li>Skriv därför lösenordet inom enkla citattecken, och välj ett lösenord utan <code>'</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://www.gnu.org/software/bash/manual/html_node/Single-Quotes.html">GNU Bash Reference Manual: Single Quotes</a>.</p>
+<p>Om dubbla citattecken: <a href="https://www.gnu.org/software/bash/manual/html_node/Double-Quotes.html">GNU Bash Reference Manual: Double Quotes</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0044-miljovariabel.html">Förra: Miljövariabel</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0046-ebs-snapshot.html">Nästa: EBS snapshot</a>
+</nav>
+
+</main>
+</body>
+</html>

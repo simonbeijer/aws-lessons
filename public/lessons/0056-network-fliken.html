@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Network-fliken</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 56 · v41, 9 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 56</p>
+<h1>Network-fliken</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att webbläsarens Network-flik visar anropen en sida gör, och att Copy as cURL låter dig köra ett av dem själv.
+</div>
+
+<section class="explain">
+<h2>Vad är Network-fliken?</h2>
+
+<p>Network-fliken är en del av DevTools, utvecklarverktygen i webbläsaren Chrome. Den listar anropen sidan gör, en rad per anrop. <span class="src">(<a href="https://developer.chrome.com/docs/devtools/overview">Chrome: DevTools overview</a>, <a href="https://developer.chrome.com/docs/devtools/network">Chrome: Inspect network activity</a>)</span></p>
+
+<p>En sida hämtar data med JavaScript-kod. Det är samma <a href="0048-http-anrop-och-svar.html">HTTP-anrop</a> som du skickar med <a href="0054-curl.html">curl</a>, men på sidan ser du bara resultatet. Webbläsaren är alltså en tredje klient bredvid curl och <a href="0055-postman.html">Postman</a>. <span class="src">(kursens lektion sida 18, kursmaterialet v41)</span></p>
+
+<p>Filtret Fetch/XHR visar bara anropen som sidans JavaScript skickar, inte bilder och CSS. <span class="src">(<a href="https://developer.chrome.com/docs/devtools/network/reference#filter-by-type">Chrome: Filter by type</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">MDN: Fetch API</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Så öppnar du den och läser en rad</h2>
+
+<p>På Mac öppnar du DevTools med Cmd+Option+I och väljer fliken Network. DevTools loggar bara anrop medan det är öppet. Öppna det först och ladda om sidan, annars är listan tom. <span class="src">(<a href="https://developer.chrome.com/docs/devtools/open#shortcuts">Chrome: Open DevTools</a>, <a href="https://developer.chrome.com/docs/devtools/network">Chrome: Inspect network activity</a>)</span></p>
+
+<p>Klicka på en rad för att se anropet: <span class="src">(<a href="https://developer.chrome.com/docs/devtools/network/reference#headers">Chrome: Headers</a>, <a href="https://developer.chrome.com/docs/devtools/network/reference#response">Chrome: Response</a>, kursmaterialet v41)</span></p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Flik</th><th>Visar</th></tr>
+  <tr><td>Headers</td><td>Adressen (Request URL), metoden (Request Method), statuskoden (Status Code) och anropets och svarets headers</td></tr>
+  <tr><td>Response</td><td>Svarets kropp, till exempel <a href="0052-json.html">JSON</a></td></tr>
+</table>
+</div>
+</section>
+
+<section class="explain">
+<h2>Copy as cURL</h2>
+
+<p>Copy as cURL gör om ett anrop i listan till ett curl-kommando. Högerklicka på raden, välj Copy, Copy as cURL. Klistra in det i terminalen och kör: du får samma svar. <span class="src">(<a href="https://developer.chrome.com/docs/devtools/network/reference#copy">Chrome: Copy requests</a>, kursmaterialet v41)</span></p>
+
+<p>Kursens poäng: det är det snabbaste sättet att felsöka ett anrop som en sida gör. Kopiera det, kör det själv och ändra en sak i taget. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du öppnar Network-fliken när sidan redan har laddat. Listan är tom. Varför?</p>
+  <div class="options">
+    <button class="opt" data-why="Sidan gjorde anrop, men DevTools var inte öppet då; ladda om sidan med DevTools öppet.">Sidan gjorde inga anrop alls mot någon server</button>
+    <button class="opt" data-why="Fetch/XHR visar anropen som sidans JavaScript skickar; listan är tom för att DevTools öppnades sent.">Filtret Fetch/XHR har gömt alla anrop i listan</button>
+    <button class="opt" data-correct data-why="DevTools loggar bara medan det är öppet, så anrop som gjordes innan syns inte.">DevTools loggar bara anrop medan det är öppet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad får du när du väljer Copy as cURL på en rad?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Copy as cURL kopierar anropet som ett curl-kommando som du kan köra i terminalen.">Anropet som ett curl-kommando att köra</button>
+    <button class="opt" data-why="Copy as cURL sparar inget i Postman; det kopierar anropet som ett curl-kommando.">Anropet sparat som collection i Postman</button>
+    <button class="opt" data-why="Copy as cURL ger hela anropet som curl-kommando, inte bara svarets kropp.">Bara svarets kropp, som ren JSON-text</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 55: vad i Postman gör samma sak som Copy as cURL?</p>
+  <div class="options">
+    <button class="opt" data-why="Send skickar anropet; det är ikonen Code som visar anropet som ett curl-kommando.">Knappen Send, som skickar iväg anropet direkt</button>
+    <button class="opt" data-correct data-why="Ikonen Code visar anropet som ett curl-kommando, precis som Copy as cURL gör i webbläsaren.">Ikonen Code, som visar anropet som curl-kod</button>
+    <button class="opt" data-why="Save sparar anropet i en collection; det är ikonen Code som visar det som curl-kommando.">Knappen Save, som sparar anropet till senare</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Network-fliken i Chromes DevTools listar anropen en sida gör. Filtret Fetch/XHR visar bara anropen från sidans JavaScript.</li>
+    <li>Öppna DevTools med Cmd+Option+I innan du laddar sidan. Headers visar adress, metod och statuskod, Response visar kroppen.</li>
+    <li>Copy as cURL gör om anropet till ett curl-kommando. Kör det själv och ändra en sak i taget när du felsöker.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://developer.chrome.com/docs/devtools/network/reference">Chrome: Network features reference</a>.</p>
+<p>Steg för steg: <a href="https://developer.chrome.com/docs/devtools/network">Chrome: Inspect network activity</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0055-postman.html">Förra: Postman</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0057-express.html">Nästa: Express</a>
+</nav>
+
+</main>
+</body>
+</html>

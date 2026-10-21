@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stoppa och terminera</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 38 · v40, 19 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 38</p>
+<h1>Stoppa och terminera</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad du betalar för när instansen är stoppad, vad som försvinner vid terminering, och varför publik IP byts vid stopp och start.
+</div>
+
+<section class="explain">
+<h2>Vad skiljer stoppa från terminera?</h2>
+
+<p>Stoppa stänger av servern, men den finns kvar och kan startas igen. Terminera tar bort servern för alltid. Båda finns i EC2 → Instances under Instance state: Stop instance och Terminate (delete) instance. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-ec2-instance-stop-start-works.html">AWS: How stop and start works</a>, <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html">AWS: Terminate instances</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Stoppad</h3>
+    <p>Servern är avstängd. Disken med filerna finns kvar.</p>
+  </div>
+  <div>
+    <h3>Terminerad</h3>
+    <p>Servern är borta. Disken raderas också.</p>
+  </div>
+</div>
+
+<p>Disken raderas för att <a href="0032-ebs-volym.html">root volume</a> har inställningen Delete on termination: Yes från början. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-ec2-instance-termination-works.html">AWS: How termination works</a>)</span></p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Terminering går inte att ångra. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html">AWS: Terminate instances</a>)</span></p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad kostar en stoppad server?</h2>
+
+<p>Du betalar bara för disken. Instansen kostar inget medan den är stoppad. Den <a href="0028-publik-privat-ip.html">publika adressen</a> släpps och kostar inte heller. <a href="0032-ebs-volym.html">EBS-volymen</a> kostar per GB och månad så länge den finns. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-ec2-instance-stop-start-works.html#ec2-stop-start-costs">AWS: Costs related to stop and start</a>, <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-instance-addressing.html#concepts-public-addresses">AWS: Public IPv4 addresses</a>)</span></p>
+
+<p>Kursmaterialet räknar med cirka 0,7 USD i månaden för 8 GiB. Med Free plan räknas kostnaden av mot krediterna. <span class="src">(kursens lektion sida 36, <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html">AWS: Choosing a plan</a>)</span></p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Stoppad betalar disk, terminerad är borta. Ska du använda servern igen snart: stoppa. Annars: terminera. <span class="src">(kursens lektion sida 36 och 37)</span></p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Varför byts publik IP vid stopp och start?</h2>
+
+<p>Den publika adressen släpps när servern stoppas. Vid start får servern en ny från AWS lager av <a href="0028-publik-privat-ip.html">publika adresser</a>. Den privata adressen behålls. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-ec2-instance-stop-start-works.html">AWS: How stop and start works</a>)</span></p>
+
+<p>Adressen du hade i webbläsaren slutar fungera. Den nya står under Public IPv4 address. Reboot instance, en omstart utan stopp, behåller adressen. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-reboot.html">AWS: Reboot your instance</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Servern är stoppad hela helgen. Vad betalar du för?</p>
+  <div class="options">
+    <button class="opt" data-why="En stoppad instans kostar inget, bara disken kostar.">För både instansen och EBS-volymen</button>
+    <button class="opt" data-correct data-why="Instansen kostar inget när den är stoppad, men EBS-volymen kostar så länge den finns.">Bara för disken, alltså EBS-volymen</button>
+    <button class="opt" data-why="Disken finns kvar när servern är stoppad, och den kostar per GB och månad.">För ingenting, servern är avstängd</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du terminerar servern. Vad händer med disken?</p>
+  <div class="options">
+    <button class="opt" data-why="Root volume raderas vid terminering, eftersom Delete on termination är Yes från början.">Den ligger kvar som Available i Volumes</button>
+    <button class="opt" data-why="En terminerad server kan aldrig startas igen, och disken raderas.">Den sparas tills du startar servern igen</button>
+    <button class="opt" data-correct data-why="Root volume har Delete on termination: Yes från början, så disken raderas med servern.">Den raderas, Delete on termination är Yes</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 28: var kommer serverns publika adress ifrån?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Den publika adressen lånas från AWS lager, och därför kan den släppas och bytas.">Från AWS lager av publika adresser</button>
+    <button class="opt" data-why="Subnätets intervall ger den privata adressen, inte den publika.">Från subnätets eget intervall i VPC:n</button>
+    <button class="opt" data-why="Internet Gatewayn är dörren till internet och delar inte ut adresser.">Från Internet Gatewayn i din VPC</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Stoppa stänger av servern, och den kan startas igen. Terminera tar bort den för alltid.</li>
+    <li>Stoppad server: du betalar bara för disken (EBS-volymen), inte för instansen eller den publika adressen. Med Free plan räknas det av mot krediterna.</li>
+    <li>Terminering raderar disken, eftersom root volume har Delete on termination: Yes. Det går inte att ångra.</li>
+    <li>Vid stopp släpps den publika adressen, och vid start får servern en ny. Den privata behålls.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-ec2-instance-stop-start-works.html">Amazon EC2: How EC2 instance stop and start works</a>.</p>
+<p>Om terminering: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-ec2-instance-termination-works.html">Amazon EC2: How instance termination works</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0037-user-data.html">Förra: User data</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0039-rds.html">Nästa: RDS</a>
+</nav>
+
+</main>
+</body>
+</html>

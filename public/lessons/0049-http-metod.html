@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTTP-metod</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 49 · v41, 2 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 49</p>
+<h1>HTTP-metod</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad GET, POST, PUT och DELETE gör med en resurs, och vilka av dem som går att skicka två gånger utan att något mer ändras.
+</div>
+
+<section class="explain">
+<h2>Vad är en HTTP-metod?</h2>
+
+<p>En HTTP-metod är verbet i ett anrop: den säger vad klienten vill göra. Den står först på <a href="0048-http-anrop-och-svar.html">startraden</a>, före det som anropet gäller. <span class="src">(kursens lektion sida 11, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods">MDN: HTTP request methods</a>)</span></p>
+
+<p>Det som anropet gäller kallas resurs, t.ex. <code>/customers/42</code>, kund nummer 42. Det är inte samma sak som en <a href="0005-iam-policy.html">resurs i AWS</a>. <span class="src">(kursens lektion sida 11)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad de fyra metoderna gör</h2>
+
+<p>De fyra metoderna hämtar, skapar, ersätter och tar bort. Kursens exempel är en server med kunder i en <a href="0039-rds.html">databas</a>: <span class="src">(kursens lektion sida 13, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods">MDN: HTTP request methods</a>)</span></p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Anrop</th><th>Vad som händer</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /customers/42</code></td><td>Hämtar kund 42. Ändrar inget.</td></tr>
+    <tr><td><code>POST /customers</code></td><td>Skapar en ny kund av kroppen. Servern ger den ett nummer.</td></tr>
+    <tr><td><code>PUT /customers/42</code></td><td>Ersätter kund 42 med kroppen, t.ex. med ett nytt namn.</td></tr>
+    <tr><td><code>DELETE /customers/42</code></td><td>Tar bort kund 42.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>POST och PUT har en kropp med kunden. GET och DELETE har ingen. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages#request_body">MDN: Request body</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Samma anrop två gånger</h2>
+
+<p>GET, PUT och DELETE är idempotenta: två likadana anrop lämnar servern i samma läge som ett. Ett andra DELETE hittar ingen kund, men kunden är lika borttagen. Bara svaret blir ett annat. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Glossary/Idempotent">MDN: Idempotent</a>, kursmaterialet v41)</span></p>
+
+<p>POST är inte idempotent. Två likadana POST skapar två kunder. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Glossary/Idempotent">MDN: Idempotent</a>)</span></p>
+
+<p>Därför kan en klient skicka om ett idempotent anrop om svaret aldrig kom. <span class="src">(<a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.2">RFC 9110: Idempotent methods</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du vill byta namn på kund 42. Vilket anrop skickar du?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="PUT ersätter kund 42 med kroppen, som har det nya namnet.">PUT till /customers/42</button>
+    <button class="opt" data-why="POST skapar en ny kund i stället för att ändra kund 42.">POST till /customers</button>
+    <button class="opt" data-why="GET hämtar bara kund 42 och ändrar ingenting.">GET till /customers/42</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Samma anrop skickas två gånger. Vilket skapar två kunder?</p>
+  <div class="options">
+    <button class="opt" data-why="GET hämtar bara och ändrar inget, hur många gånger det än skickas.">Det med metoden GET</button>
+    <button class="opt" data-correct data-why="POST är inte idempotent, så varje anrop skapar en ny kund.">Det med metoden POST</button>
+    <button class="opt" data-why="PUT är idempotent, så två likadana anrop ger samma kund som ett.">Det med metoden PUT</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 48: var i anropet står metoden?</p>
+  <div class="options">
+    <button class="opt" data-why="Headers kommer efter startraden, och metoden står på startraden.">Sist bland headers</button>
+    <button class="opt" data-why="Kroppen är innehållet efter den tomma raden, inte platsen för metoden.">Överst i kroppen</button>
+    <button class="opt" data-correct data-why="Metoden är första ordet på startraden, före resursen och versionen.">Först på startraden</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En HTTP-metod är verbet i anropet. Den står först på startraden, före resursen, t.ex. <code>/customers/42</code>.</li>
+    <li>GET hämtar, POST skapar, PUT ersätter och DELETE tar bort. POST och PUT har en kropp.</li>
+    <li>GET, PUT och DELETE är idempotenta: samma anrop två gånger ger samma läge som en gång. Två POST skapar två kunder.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods">MDN: HTTP request methods</a>.</p>
+<p>Om att skicka samma anrop två gånger: <a href="https://developer.mozilla.org/en-US/docs/Glossary/Idempotent">MDN: Idempotent</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0048-http-anrop-och-svar.html">Förra: HTTP-anrop och svar</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0050-statuskod.html">Nästa: Statuskod</a>
+</nav>
+
+</main>
+</body>
+</html>

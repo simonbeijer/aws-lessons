@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Port</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 33 · v40, 14 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 33</p>
+<h1>Port</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad en port är, och vad 80, 22, 5432 och 3000 används till i veckan.
+</div>
+
+<section class="explain">
+<h2>Vad är en port?</h2>
+
+<p>En port är ett nummer som säger vilket program på en server trafiken ska till. IP-adressen hittar servern. Porten hittar programmet på servern. <span class="src">(<a href="https://aws.amazon.com/what-is/transmission-control-protocol/">AWS: What is TCP?</a>)</span></p>
+
+<p>Numret går från 0 till 65535. Ett program lyssnar på en port, alltså väntar på trafik till just det numret. <span class="src">(<a href="https://aws.amazon.com/what-is/transmission-control-protocol/">AWS: What is TCP?</a>, <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ConnectToPostgreSQLInstance.html#postgresql-endpoint">AWS: Connecting to PostgreSQL</a>)</span></p>
+
+<p>I en webbadress står porten efter ett kolon: <code>http://&lt;publik IP&gt;:3000</code> betyder port 3000 på den servern.</p>
+</section>
+
+<section class="explain">
+<h2>Vilka portar används i veckan?</h2>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Port</th><th>Program</th><th>Vad den används till</th></tr></thead>
+  <tbody>
+    <tr><td><code>80</code></td><td>Webbserver (HTTP)</td><td>Webbläsaren hämtar webbsidan. HTTP är sättet webbläsare hämtar sidor på.</td></tr>
+    <tr><td><code>22</code></td><td>SSH</td><td>Du skriver kommandon till servern direkt i webbläsaren. SSH är en krypterad inloggning till en server.</td></tr>
+    <tr><td><code>5432</code></td><td>PostgreSQL</td><td>Webbservern läser och sparar data i databasen, som körs på en egen server. PostgreSQL är databasprogrammet.</td></tr>
+    <tr><td><code>3000</code></td><td>Ditt Node.js-program</td><td>Webbläsaren hämtar svaret från ditt program. Node.js kör JavaScript-kod på servern.</td></tr>
+  </tbody>
+</table>
+</div>
+<p><span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html">AWS: Security group rules for different use cases</a>, <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-linux-inst-eic.html">AWS: EC2 Instance Connect</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför just de numren?</h2>
+
+<p>80, 22 och 5432 är standardportar. AWS listar 5432 som standardport för PostgreSQL, och konsolen fyller i den själv när du väljer PostgreSQL. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html#sg-rules-db-server">AWS: Database server rules</a>)</span></p>
+
+<p>3000 är ingen standard. Numret står i programmets kod: <code>server.listen(3000)</code>. Därför måste du skriva <code>:3000</code> i adressen.</p>
+
+<p>Att en port används betyder inte att den går att nå. Vem som får nå porten bestämmer en security group, nästa lektion.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad säger porten i <code>http://&lt;publik IP&gt;:3000</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är IP-adressen som hittar servern, porten hittar programmet.">Vilken server i VPC:n trafiken ska till</button>
+    <button class="opt" data-correct data-why="Porten är numret som säger vilket program på servern som får trafiken.">Vilket program på servern som ska svara</button>
+    <button class="opt" data-why="Porten säger inget om vem som skickar, bara vilket program som tar emot.">Vilken dator det är som skickar trafiken</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad används port 5432 till?</p>
+  <div class="options">
+    <button class="opt" data-why="Webbsidan hämtas på port 80.">Webbläsaren hämtar sidan via HTTP</button>
+    <button class="opt" data-why="Kommandon till servern går via SSH på port 22.">Webbservern tar kommandon via SSH</button>
+    <button class="opt" data-correct data-why="5432 är standardporten för PostgreSQL, databasprogrammet.">Webbservern pratar med en databas</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 28: vilken adress använder din dator för att nå servern från internet?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Den publika adressen kommer från AWS och nås från internet.">Den publika IP-adressen från AWS</button>
+    <button class="opt" data-why="Den privata adressen nås bara inifrån VPC:n.">Den privata IP-adressen i VPC:n</button>
+    <button class="opt" data-why="Ett CIDR-intervall är många adresser, inte serverns egen adress.">Hela intervallet i VPC:n, /16</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En port är ett nummer, 0–65535, som säger vilket program på servern trafiken ska till. IP-adressen hittar servern, porten hittar programmet.</li>
+    <li>80 är webbsidan (HTTP), 22 är kommandon till servern (SSH), 5432 är databasen (PostgreSQL) och 3000 är ditt Node.js-program.</li>
+    <li>80, 22 och 5432 är standardportar. 3000 står i programmets kod, så du skriver <code>:3000</code> i adressen.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html">Amazon EC2: Security group rules for different use cases</a>.</p>
+<p>Om vad en port är: <a href="https://aws.amazon.com/what-is/transmission-control-protocol/">AWS: What is TCP?</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0032-ebs-volym.html">Förra: EBS-volym</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0034-security-group.html">Nästa: Security group</a>
+</nav>
+
+</main>
+</body>
+</html>

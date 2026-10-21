@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Försvar på djupet</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 43 · v40, 24 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 43</p>
+<h1>Försvar på djupet</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att försvar på djupet betyder flera skyddslager kring databasen, och att ett enda stängt lager hade stoppat angreppet i caset.
+</div>
+
+<section class="explain">
+<h2>Vad är försvar på djupet?</h2>
+
+<p>Försvar på djupet betyder att du skyddar databasen med flera lager efter varandra. En angripare måste igenom alla. Ett misstag räcker då inte. <span class="src">(<a href="https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/security.html#design-principles">AWS: Security pillar, design principles</a>)</span></p>
+
+<p>Lagren är ditt ansvar (<a href="0019-shared-responsibility-model.html">lektion 19</a>). Även backup: AWS tar den, men du väljer hur många dagar den sparas.</p>
+</section>
+
+<section class="explain">
+<h2>Vad hände i caset?</h2>
+
+<p>Ett företag sparar kvitton i <a href="0039-rds.html">RDS</a>. En måndag är databasen tom. Kvar finns ett krav på pengar. Fem lager stod öppna:</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Lager</th><th>I caset</th><th>Hade stängt räckt?</th></tr>
+  <tr><td>Placering</td><td>Publikt subnät, <a href="0041-public-access-rds.html">Public access</a>: Yes</td><td><span class="tag good">Ja</span> Ingen publik adress, ingen väg in.</td></tr>
+  <tr><td><a href="0034-security-group.html">Security group</a></td><td>5432 från <code>0.0.0.0/0</code></td><td><span class="tag good">Ja</span> Bara webbserverns grupp kommer in.</td></tr>
+  <tr><td>Lösenord</td><td>Ett vanligt lösenord</td><td>Delvis. Program provar miljontals per dygn.</td></tr>
+  <tr><td><a href="0039-rds.html">Backup</a></td><td>0 dagar, så ingen tas</td><td>Nej. Datan stjäls, men kravet blir meningslöst.</td></tr>
+  <tr><td>Övervakning</td><td><a href="0010-cloudwatch-larm.html">CloudWatch</a> visade 40 anslutningar på natten. Ingen tittade.</td><td>Nej, men upptäckt på natten.</td></tr>
+</table>
+</div>
+<p><span class="src">(kursens lektion sida 25, 26 och 28; <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithAutomatedBackups.BackupRetention.html">AWS: Backup retention period</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför räckte ett lager?</h2>
+
+<p>Angreppet behövde en väg in till port 5432. Placering och security group stänger den var för sig. Backup och övervakning stoppar inget, de minskar skadan.</p>
+
+<p>Kursens databas stänger båda: <a href="0040-db-subnet-group.html">privata subnät</a>, Public access: No, och 5432 bara från <a href="0035-kalla-i-regel.html">webbserverns grupp</a>.</p>
+
+<div class="box good">
+  <span class="box-title">Kursens poäng</span>
+  <p>Ett enda stängt lager hade räckt. Fem var öppna. <span class="src">(kursens lektion sida 28 och 37)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad betyder försvar på djupet?</p>
+  <div class="options">
+    <button class="opt" data-why="Ett lager är precis det försvar på djupet undviker, eftersom ett misstag då räcker.">Ett starkt lager som skyddar allt det andra</button>
+    <button class="opt" data-correct data-why="Flera lager efter varandra gör att ett enda misstag inte släpper in angriparen.">Flera lager, så att ett misstag inte räcker</button>
+    <button class="opt" data-why="Placering i nätverket är ett av lagren, men djupet kommer av att det finns flera.">Att databasen står längst in i hela nätverket</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vilket lager hade ensamt stoppat angreppet i caset?</p>
+  <div class="options">
+    <button class="opt" data-why="Backup stoppar inte stölden, den gör bara att datan finns kvar.">Backup som sparar hela databasen varje dag</button>
+    <button class="opt" data-why="Övervakning stoppar inget, den gör bara att någon upptäcker angreppet.">Övervakning som visar all trafik på natten</button>
+    <button class="opt" data-correct data-why="Släpper gruppen bara in webbservern når ingen annan port 5432.">Security group som bara tar in webbservern</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 35: vilken källa ska regeln för 5432 i databasens grupp ha?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Mellan egna servrar pekar regeln på en grupp, så bara webbservern når databasen.">Webbserverns security group</button>
+    <button class="opt" data-why="0.0.0.0/0 är alla adresser, och det var ett av de öppna lagren i caset.">Alla adresser (0.0.0.0/0)</button>
+    <button class="opt" data-why="Din dators adress (My IP) byts när du byter nätverk, och datorn ska gå via webbservern.">Datorns publika IP-adress</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Försvar på djupet är flera skyddslager efter varandra: placering, security group, lösenord, backup och övervakning. Lagren är ditt ansvar.</li>
+    <li>I caset stod alla fem öppna. Ett enda stängt lager, placering eller security group, hade stoppat angreppet.</li>
+    <li>Backup och övervakning stoppar inget, men gör skadan mindre: kravet på pengar blir meningslöst och angreppet upptäcks tidigt. Kursens databas står i privata subnät med Public access: No och tar bara in webbservern.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/security.html#design-principles">AWS Well-Architected Framework, Security pillar: Design principles</a> (Apply security at all layers).</p>
+<p>Om backup: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithAutomatedBackups.BackupRetention.html">Backup retention period</a>. Om övervakning: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html#rds-cw-metrics-instance">Amazon CloudWatch metrics for Amazon RDS</a> (DatabaseConnections).</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0042-rds-endpoint.html">Förra: RDS endpoint</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0044-miljovariabel.html">Nästa: Miljövariabel</a>
+</nav>
+
+</main>
+</body>
+</html>

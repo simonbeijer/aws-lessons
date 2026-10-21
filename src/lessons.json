@@ -141,7 +141,7 @@
     },
     {
       "code": "v40",
-      "title": "V40 – Nätverk, servrar och lagring",
+      "title": "v40 – Nätverk, servrar och lagring",
       "lessons": [
         {
           "nr": 20,
@@ -211,7 +211,258 @@
           "file": "0029-ec2-instans.html",
           "title": "EC2-instans",
           "goal": "Att en EC2-instans är en virtuell server, och vilka val du gör när du startar den.",
-          "tag": ""
+          "tag": "labb 2"
+        },
+        {
+          "nr": 30,
+          "file": "0030-ami.html",
+          "title": "AMI",
+          "goal": "Att en AMI är avbilden servern startar från, t.ex. Amazon Linux 2023.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 31,
+          "file": "0031-instanstyp.html",
+          "title": "Instanstyp",
+          "goal": "Vad instanstypen <code>t3.micro</code> säger om serverns storlek, och att den styr priset.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 32,
+          "file": "0032-ebs-volym.html",
+          "title": "EBS-volym",
+          "goal": "Att serverns disk är en EBS-volym som lever separat från instansen.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 33,
+          "file": "0033-port.html",
+          "title": "Port",
+          "goal": "Vad en port är, och vad 80, 22, 5432 och 3000 används till i veckan.",
+          "tag": "labb 2–4"
+        },
+        {
+          "nr": 34,
+          "file": "0034-security-group.html",
+          "title": "Security group",
+          "goal": "Att en security group är en brandvägg runt en resurs: bara tillåt-regler, inåt stängt, utåt öppet, stateful. Och att den är en av tre saker som krävs för att en server ska nås från internet.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 35,
+          "file": "0035-kalla-i-regel.html",
+          "title": "Källa i en security group-regel",
+          "goal": "Att källan säger varifrån trafiken får komma. Den kan vara en adress (<code>0.0.0.0/0</code>, My IP), en prefix list eller en annan security group.",
+          "tag": "labb 2–4"
+        },
+        {
+          "nr": 36,
+          "file": "0036-ec2-instance-connect.html",
+          "title": "EC2 Instance Connect",
+          "goal": "Hur du får en terminal på servern i webbläsaren via SSH, utan key pair, och vad som måste vara på plats för att det ska fungera.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 37,
+          "file": "0037-user-data.html",
+          "title": "User data",
+          "goal": "Att user data är ett skript som körs en gång vid första start, och var du ser om det gick fel.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 38,
+          "file": "0038-stoppa-terminera.html",
+          "title": "Stoppa och terminera",
+          "goal": "Vad du betalar för när instansen är stoppad, vad som försvinner vid terminering, och varför publik IP byts vid stopp och start.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 39,
+          "file": "0039-rds.html",
+          "title": "RDS",
+          "goal": "Att RDS är en managed databas: vad AWS sköter och vad du sköter.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 40,
+          "file": "0040-db-subnet-group.html",
+          "title": "DB subnet group",
+          "goal": "Att en DB subnet group säger vilka subnät databasen får stå i, och varför den kräver två zoner.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 41,
+          "file": "0041-public-access-rds.html",
+          "title": "Public access (RDS)",
+          "goal": "Att Public access: No betyder att databasen saknar publik adress, och att din dator därför inte når den.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 42,
+          "file": "0042-rds-endpoint.html",
+          "title": "RDS endpoint",
+          "goal": "Att endpointen är databasens DNS-namn och pekar på en privat adress i VPC:n.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 43,
+          "file": "0043-forsvar-pa-djupet.html",
+          "title": "Försvar på djupet",
+          "goal": "Att försvar på djupet betyder flera skyddslager kring databasen, och att ett enda stängt lager hade stoppat angreppet i caset.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 44,
+          "file": "0044-miljovariabel.html",
+          "title": "Miljövariabel",
+          "goal": "Att en miljövariabel är ett namn med ett värde som terminalen ger programmet, och varför databasens lösenord därför ligger där och inte i koden.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 45,
+          "file": "0045-citattecken-bash.html",
+          "title": "Citattecken i bash",
+          "goal": "Varför ett lösenord skrivs inom enkla citattecken i terminalen, och vad dubbla citattecken gör annorlunda.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 46,
+          "file": "0046-ebs-snapshot.html",
+          "title": "EBS snapshot",
+          "goal": "Att en snapshot är en kopia av en EBS-volym vid ett givet ögonblick, och att den kostar lagring tills du tar bort den.",
+          "tag": "bonus"
+        },
+        {
+          "nr": 47,
+          "file": "0047-egen-ami.html",
+          "title": "Egen AMI",
+          "goal": "Att en egen AMI kopierar serverns disk men inte kör user data igen, och skillnaden mellan att baka in något och att göra det vid start.",
+          "tag": "bonus"
+        }
+      ]
+    },
+    {
+      "code": "v41",
+      "title": "v41 – Bygg och testa ett API",
+      "lessons": [
+        {
+          "nr": 48,
+          "file": "0048-http-anrop-och-svar.html",
+          "title": "HTTP-anrop och svar",
+          "goal": "Att ett HTTP-anrop och svaret på det har samma form: en startrad, headers, en tom rad och sedan kroppen.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 49,
+          "file": "0049-http-metod.html",
+          "title": "HTTP-metod",
+          "goal": "Vad GET, POST, PUT och DELETE gör med en resurs, och vilka av dem som går att skicka två gånger utan att något mer ändras.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 50,
+          "file": "0050-statuskod.html",
+          "title": "Statuskod",
+          "goal": "Vad 200, 201, 204, 400, 404 och 500 betyder, och att en kod som börjar på 4 är klientens fel och en som börjar på 5 är serverns.",
+          "tag": "labb 1–3"
+        },
+        {
+          "nr": 51,
+          "file": "0051-header.html",
+          "title": "Header",
+          "goal": "Att en header är en rad med nyckel och värde om anropet eller svaret, och att kursens server inte läser kroppen om anropet saknar <code>Content-Type: application/json</code>.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 52,
+          "file": "0052-json.html",
+          "title": "JSON",
+          "goal": "Att JSON är formatet som kroppen skrivs i, både i anropet och i svaret, och att JSON är strikt: ett enda fel tecken gör att kursens server svarar 400.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 53,
+          "file": "0053-rest-api.html",
+          "title": "REST-API",
+          "goal": "Att ett REST-API lägger resursen i sökvägen, t.ex. <code>/customers/42</code>, och verbet i metoden, och att det vid fel svarar med en statuskod som säger vad som var fel.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 54,
+          "file": "0054-curl.html",
+          "title": "curl",
+          "goal": "Hur <code>curl -i</code> skickar ett HTTP-anrop från terminalen och visar hela svaret, och hur <code>-X</code>, <code>-H</code> och <code>-d</code> sätter metod, header och kropp.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 55,
+          "file": "0055-postman.html",
+          "title": "Postman",
+          "goal": "Att Postman skickar samma anrop som curl men sparar dem i en collection.",
+          "tag": "labb 1–3"
+        },
+        {
+          "nr": 56,
+          "file": "0056-network-fliken.html",
+          "title": "Network-fliken",
+          "goal": "Att webbläsarens Network-flik visar anropen en sida gör, och att Copy as cURL låter dig köra ett av dem själv.",
+          "tag": "labb 1, 5"
+        },
+        {
+          "nr": 57,
+          "file": "0057-express.html",
+          "title": "Express",
+          "goal": "Att Express är ramverket där varje route är en metod plus en sökväg, t.ex. <code>app.get(\"/customers/:id\")</code>.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 58,
+          "file": "0058-localhost.html",
+          "title": "localhost",
+          "goal": "Att <code>localhost</code> betyder datorn som kör kommandot, och varför du testar API:et på servern innan du testar från din dator.",
+          "tag": "labb 2, 5"
+        },
+        {
+          "nr": 59,
+          "file": "0059-sql-parameter.html",
+          "title": "SQL-parameter",
+          "goal": "Varför värden skickas som <code>$1</code> i stället för att klistras in i SQL-strängen, och vad SQL-injektion är.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 60,
+          "file": "0060-process-i-bakgrunden.html",
+          "title": "Process i bakgrunden (nohup)",
+          "goal": "Hur <code>nohup node server.js &gt; server.log 2&gt;&amp;1 &amp;</code> låter servern köra kvar när fliken stängs, och var loggen hamnar.",
+          "tag": "labb 2–5"
+        },
+        {
+          "nr": 61,
+          "file": "0061-variabel-i-postman.html",
+          "title": "Variabel i Postman",
+          "goal": "Att <code>{{baseUrl}}</code> gör att adressen står på ett ställe och bara ändras där när servern får ny IP.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 62,
+          "file": "0062-test-i-postman.html",
+          "title": "Test i Postman",
+          "goal": "Att ett test är en kort kontroll av svaret som körs efter varje anrop, och att Run kör hela collectionen i ordning.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 63,
+          "file": "0063-negativt-test.html",
+          "title": "Negativt test",
+          "goal": "Varför testerna i Postman också kontrollerar att felaktiga anrop ger 400 och 404.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 64,
+          "file": "0064-yaml.html",
+          "title": "YAML",
+          "goal": "Att YAML är ett textformat där indraget bär betydelse, och att ett fel indrag stoppar servern.",
+          "tag": "labb 4"
         }
       ]
     }

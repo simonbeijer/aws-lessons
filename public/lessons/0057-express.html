@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Express</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 57 · v41, 10 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 57</p>
+<h1>Express</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att Express är ramverket där varje route är en metod plus en sökväg, t.ex. <code>app.get("/customers/:id")</code>.
+</div>
+
+<section class="explain">
+<h2>Vad är Express?</h2>
+
+<p>Express är ett ramverk för <a href="0033-port.html">Node.js</a>: färdig kod som ditt program bygger på när det ska svara på <a href="0048-http-anrop-och-svar.html">HTTP-anrop</a>. <span class="src">(<a href="https://expressjs.com/">Express</a>)</span></p>
+
+<p>Utan Express måste programmet självt läsa metod och sökväg i varje anrop. Enligt kursen är Express det vanligaste ramverket för det i Node.js. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<section class="explain">
+<h2>En route: metod plus sökväg</h2>
+
+<p>En route säger vad servern gör med anrop som har en viss metod och sökväg: <span class="src">(<a href="https://expressjs.com/en/guide/routing.html#route-methods">Express: Route methods</a>, <a href="https://expressjs.com/en/guide/routing.html#route-parameters">Express: Route parameters</a>, kursmaterialet v41)</span></p>
+
+<pre><code>app.get("/customers/:id", (req, res) =&gt; {
+  res.json({ id: req.params.id, name: "Alice" });
+});</code></pre>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Del</th><th>Betyder</th></tr>
+  <tr><td><code>app.get</code></td><td><code>app</code> är ditt Express-program, <code>get</code> är <a href="0049-http-metod.html">metoden</a> GET. Det finns också <code>app.post</code>, <code>app.put</code> och <code>app.delete</code>.</td></tr>
+  <tr><td><code>"/customers/:id"</code></td><td><a href="0053-rest-api.html">Sökvägen</a>. <code>:id</code> matchar vad som står på den platsen, t.ex. 42.</td></tr>
+  <tr><td><code>req</code>, <code>res</code></td><td>Anropet och svaret. Koden mellan <code>{</code> och <code>}</code> körs när ett anrop matchar.</td></tr>
+  <tr><td><code>req.params.id</code></td><td>Det som stod på platsen för <code>:id</code>, som text: <code>"42"</code>.</td></tr>
+</table>
+</div>
+
+<p>En route i Express är inte en route i en <a href="0025-route-table.html">route table</a>.</p>
+</section>
+
+<section class="explain">
+<h2>Vad routen svarar</h2>
+
+<p>Routen svarar med <code>res.json</code>, som skickar <a href="0052-json.html">JSON</a> med <a href="0050-statuskod.html">statuskod</a> 200. Ska statuskoden vara en annan sätter <code>res.status</code> den först: <span class="src">(<a href="https://expressjs.com/en/5x/api/response/#resjson">Express: res.json</a>, <a href="https://expressjs.com/en/5x/api/response/#resstatus">Express: res.status</a>, <a href="https://nodejs.org/api/http.html#responsestatuscode">Node.js: statusCode</a>)</span></p>
+
+<pre><code>res.status(404).json({ error: "customer 999 not found" });</code></pre>
+
+<p>Matchar ingen route anropet, svarar Express själv 404, t.ex. <code>Cannot GET /kunder</code>. Då är sökvägen fel, eller servern startades innan routen fanns. <span class="src">(<a href="https://expressjs.com/en/starter/faq.html#how-do-i-handle-404-responses">Express: FAQ</a>, <a href="https://github.com/pillarjs/finalhandler/blob/master/index.js">finalhandler: Cannot GET</a>, kursens lektion sida 17)</span></p>
+
+<p>Kursens poäng: <code>res.status(404).json(...)</code> gör precis vad det låter som. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Anropet <code>DELETE /customers/42</code> kommer in. Vilken route körs?</p>
+  <div class="options">
+    <button class="opt" data-why="/customer/:id saknar s, så sökvägen matchar inte /customers/42.">app.delete med sökvägen /customer/:id</button>
+    <button class="opt" data-correct data-why="Både metoden DELETE och sökvägen matchar, och :id får värdet 42.">app.delete med sökvägen /customers/:id</button>
+    <button class="opt" data-why="/deleteCustomer matchar inte /customers/42, och verbet står redan i metoden.">app.delete med sökvägen /deleteCustomer</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. En route kör <code>res.json({ name: "Alice" })</code> utan <code>res.status</code>. Vilken statuskod får klienten?</p>
+  <div class="options">
+    <button class="opt" data-why="404 kommer bara om koden sätter den eller om ingen route matchar; här matchade en.">404, eftersom ingen statuskod sätts</button>
+    <button class="opt" data-why="201 kommer bara om koden sätter den med res.status(201).">201, eftersom svaret innehåller Alice</button>
+    <button class="opt" data-correct data-why="Utan res.status skickar res.json svaret med statuskod 200.">200, standardkoden när res.json körs</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 53: kursens server svarar 400 på <code>GET /customers/abc</code>. Varför inte 404?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="400 betyder att anropet är fel; abc kan aldrig vara ett kundnummer.">Anropet är fel, abc är aldrig ett nummer</button>
+    <button class="opt" data-why="Det vore 404, men abc kan aldrig vara ett kundnummer, så anropet är fel.">Kunden abc finns inte i databasen just nu</button>
+    <button class="opt" data-why="En krasch ger 500, felet hos servern; 400 betyder att anropet är fel.">Servern gick ner när den skulle läsa abc</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Express är ett ramverk för Node.js: färdig kod som ditt program bygger på för att svara på HTTP-anrop.</li>
+    <li>En route är en metod plus en sökväg, t.ex. <code>app.get("/customers/:id")</code>. <code>:id</code> fångar värdet, som hamnar i <code>req.params.id</code>.</li>
+    <li><code>res.json</code> svarar med JSON och 200. <code>res.status(404).json(...)</code> sätter en annan statuskod. Saknas routen svarar Express själv 404, t.ex. <code>Cannot GET /kunder</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://expressjs.com/en/guide/routing.html">Express: Routing</a>.</p>
+<p>Om svaret: <a href="https://expressjs.com/en/5x/api/response/">Express 5: Response</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0056-network-fliken.html">Förra: Network-fliken</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0058-localhost.html">Nästa: localhost</a>
+</nav>
+
+</main>
+</body>
+</html>

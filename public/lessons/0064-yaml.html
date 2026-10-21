@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YAML</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 64 · v41, 17 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 64</p>
+<h1>YAML</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att YAML är ett textformat där indraget bär betydelse, och att ett fel indrag stoppar servern.
+</div>
+
+<section class="explain">
+<h2>Vad är YAML?</h2>
+
+<p>YAML är ett textformat för data, som <a href="0052-json.html">JSON</a>, men gjort för att vara lätt att läsa. Varje rad är nyckel, kolon, mellanslag och värde, utan klamrar. <span class="src">(<a href="https://yaml.org/spec/1.2.2/">YAML 1.2.2</a>, <a href="https://yaml.org/spec/1.2.2/#block-mappings">YAML: Block mappings</a>)</span></p>
+
+<p>Samma kund som i lektion 52:</p>
+
+<div class="two-col">
+  <div>
+    <h3>JSON</h3>
+<pre><code>{ "id": 3, "name": "Carol" }</code></pre>
+  </div>
+  <div>
+    <h3>YAML</h3>
+<pre><code>id: 3
+name: Carol</code></pre>
+  </div>
+</div>
+
+<p>I kursen är filen <code>openapi.yaml</code> skriven i YAML. Den beskriver API:et, och servern läser den när den startar. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<section class="explain">
+<h2>Indraget bär betydelse</h2>
+
+<p>Indraget, mellanslagen först på raden, visar vad som hör ihop. En rad längre in hör till raden ovanför. Rader som hör till samma sak står exakt lika långt in. Tabbar (tabbtangentens tecken) får inte användas. <span class="src">(kursmaterialet v41, <a href="https://yaml.org/spec/1.2.2/#indentation-spaces">YAML: Indentation spaces</a>)</span> Klicka och jämför:</p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-ratt">Rätt indrag</button>
+    <button class="chip" data-target="p-steg">Ett steg för lite</button>
+    <button class="chip" data-target="p-ojamn">Ett mellanslag fel</button>
+  </div>
+  <div class="picker-panel" id="p-ratt">
+<pre><code>customer:
+  id: 3
+  name: Carol</code></pre>
+    <p><span class="tag good">Giltig</span> Båda hör till <code>customer</code>.</p>
+  </div>
+  <div class="picker-panel" id="p-steg">
+<pre><code>customer:
+  id: 3
+name: Carol</code></pre>
+    <p><span class="tag note">Annan betydelse</span> <code>name</code> hör inte längre till <code>customer</code>.</p>
+  </div>
+  <div class="picker-panel" id="p-ojamn">
+<pre><code>customer:
+  id: 3
+ name: Carol</code></pre>
+    <p><span class="tag bad">Fel</span> <code>name</code> står varken lika långt in som <code>id</code> eller längst till vänster. <span class="src">(<a href="https://eemeli.org/yaml/#errors">yaml: Errors</a>)</span></p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Ett fel indrag stoppar servern</h2>
+
+<p>Ett ojämnt indrag gör filen ogiltig, och då startar servern inte. Felet syns i <a href="0060-process-i-bakgrunden.html">server.log</a> som <code>YAMLParseError</code> med rad och kolumn (hur många tecken in felet sitter). <span class="src">(kursmaterialet v41, <a href="https://eemeli.org/yaml/#errors">yaml: Errors</a>)</span></p>
+
+<p>Nästan alltid är det ett indrag eller en tabb. Jämför raden med raden ovanför. <span class="src">(kursmaterialet v41)</span></p>
+
+<p>”Ett steg för lite” är giltig YAML. Då startar servern, men en del av API-beskrivningen saknas. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad visar i YAML vilka rader som hör ihop?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Strukturen bestäms av indraget: en rad längre in hör till raden ovanför.">Hur många mellanslag raden börjar med</button>
+    <button class="opt" data-why="YAML behöver inga klamrar; det är indraget som visar vad som hör ihop.">Vilka klamrar som står runt raderna</button>
+    <button class="opt" data-why="Ordningen räcker inte; två rader hör ihop först när de står lika långt in.">Vilken ordning raderna står i filen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. <code>id</code> står två mellanslag in och <code>name</code> på raden under står ett mellanslag in. Vad händer när servern startar?</p>
+  <div class="options">
+    <button class="opt" data-why="Servern läser filen vid start, och ojämnt indrag är inte giltig YAML.">Den startar och läser hela filen som förut</button>
+    <button class="opt" data-why="Servern hoppar inte över raden; filen går inte att läsa alls, så servern startar inte.">Den startar men hoppar över raden med name</button>
+    <button class="opt" data-correct data-why="Ojämnt indrag är inte giltig YAML, så servern startar inte och loggen visar YAMLParseError.">Den startar inte, och felet står i loggen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 60: servern startas med <code>nohup node server.js &gt; server.log 2&gt;&amp;1 &amp;</code> men startar inte. Var syns felmeddelandet?</p>
+  <div class="options">
+    <button class="opt" data-why="&gt; server.log skickar utskriften till filen, så terminalen visar inget.">I terminalen, direkt under det som du skrev</button>
+    <button class="opt" data-correct data-why="2&gt;&amp;1 skickar felmeddelanden samma väg som vanlig utskrift, alltså till server.log.">I filen server.log, i mappen där du startade</button>
+    <button class="opt" data-why="Felet skrivs av servern själv, och 2&gt;&amp;1 skickar det till server.log, inte till YAML-filen.">I filen openapi.yaml, vid raden som är fel</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>YAML är ett textformat för data, som JSON, men utan klamrar. Varje rad är <code>nyckel: värde</code>.</li>
+    <li>Indraget visar vad som hör ihop. Rader som hör till samma sak står exakt lika långt in, med mellanslag, aldrig tabb.</li>
+    <li>Servern läser YAML-filen när den startar. Ett fel indrag ger <code>YAMLParseError</code> i server.log med rad och kolumn, och servern startar inte.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://yaml.org/spec/1.2.2/#indentation-spaces">YAML 1.2.2: Indentation spaces</a> (indrag och tabbar).</p>
+<p>Om felmeddelandet: <a href="https://eemeli.org/yaml/#errors">yaml (paketet för Node): Errors</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0063-negativt-test.html">Förra: Negativt test</a>
+  <a href="../index.html">Alla lektioner</a>
+  <span class="disabled">Nästa: OpenAPI</span>
+</nav>
+
+</main>
+</body>
+</html>

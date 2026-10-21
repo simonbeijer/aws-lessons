@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EBS-volym</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 32 · v40, 13 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 32</p>
+<h1>EBS-volym</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att serverns disk är en EBS-volym som lever separat från instansen.
+</div>
+
+<section class="explain">
+<h2>Vad är en EBS-volym?</h2>
+
+<p>En EBS-volym är serverns disk. Servern använder den som en vanlig hårddisk. EBS står för Elastic Block Store. <span class="src">(<a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volumes.html">AWS: Amazon EBS volumes</a>)</span></p>
+
+<p>När du startar en instans skapar AWS en root volume, disken servern startar från, med innehållet i AMI:n. Storlek och typ väljer du under Configure storage, till exempel 8 GiB <code>gp3</code>, en SSD-disk (flashminne utan rörliga delar) för allmänt bruk. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/RootDeviceStorage.html">AWS: Root volumes</a>, <a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html">AWS: EBS volume types</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad betyder det att den lever separat?</h2>
+
+<p>Instansen och volymen är två olika resurser:</p>
+
+<div class="two-col">
+  <div>
+    <h3>Instansen</h3>
+    <p>Processor och minne. Under EC2 → Instances.</p>
+  </div>
+  <div>
+    <h3>EBS-volymen</h3>
+    <p>Disken med datan. Under EC2 → Volumes.</p>
+  </div>
+</div>
+
+<p>Volymen finns kvar oberoende av om instansen körs. Stoppar du instansen ligger filerna kvar. Volymen måste ligga i samma Availability Zone som instansen. I Volumes står den som In-use när den är kopplad och Available när den inte är det. <span class="src">(<a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volumes.html">AWS: Amazon EBS volumes</a>, <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/RootDeviceStorage.html#root-volume-ebs-backed">AWS: Instances with an EBS root volume</a>, <a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-describing-volumes.html#volume-state">AWS: Volume states</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad kostar den?</h2>
+
+<p>Du betalar för storleken du valt, per GB och månad, tills du tar bort volymen. <span class="src">(<a href="https://aws.amazon.com/ebs/pricing/">AWS: Amazon EBS pricing</a>)</span></p>
+
+<p>Kursmaterialet räknar med cirka 0,7 USD i månaden för 8 GiB. AWS prissida visar inget pris för Stockholm. Med Free plan räknas kostnaden av mot krediterna. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html">AWS: Choosing a plan</a>)</span></p>
+
+<div class="box note">
+  <span class="box-title">Ej bekräftat</span>
+  <p>AWS märker <code>gp3</code> som Free tier eligible för konton skapade från 15 juli 2025, men säger inte om volymen drar krediter. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-free-tier-usage.html">AWS: Track your Free Tier usage</a>)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Var i konsolen ser du serverns disk?</p>
+  <div class="options">
+    <button class="opt" data-why="Under Instances ser du processor och minne, men disken är en egen resurs.">Under EC2 → Instances, inne i servern</button>
+    <button class="opt" data-correct data-why="Volymen är en egen resurs, skild från instansen, och listas under EC2 → Volumes.">Under EC2 → Volumes, som egen resurs</button>
+    <button class="opt" data-why="S3 lagrar filer som objekt, men serverns disk är en EBS-volym i EC2.">Under S3 → Buckets, som ett S3-objekt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Var måste EBS-volymen ligga för att kunna kopplas till instansen?</p>
+  <div class="options">
+    <button class="opt" data-why="Samma region räcker inte, volymen och instansen måste ligga i samma zon.">I valfri zon inom samma region</button>
+    <button class="opt" data-why="En volym hör till en zon, inte till ett subnät med internet.">I ett publikt subnät inom VPC:n</button>
+    <button class="opt" data-correct data-why="AWS kräver att volymen och instansen ligger i samma Availability Zone.">I samma zon som själva instansen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 31: vad bestämmer instanstypen <code>t3.micro</code>?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Instanstypen ger processor och minne, medan disken är en egen EBS-volym.">Processorn och minnet servern får</button>
+    <button class="opt" data-why="Disken är en EBS-volym som du väljer under Configure storage.">Diskstorlek och disktyp för servern</button>
+    <button class="opt" data-why="Operativsystemet kommer från AMI:n, inte från instanstypen.">Operativsystem som servern ska köra</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En EBS-volym är serverns disk. Root volume är disken servern startar från, till exempel 8 GiB <code>gp3</code>.</li>
+    <li>Instansen ger processor och minne. Volymen är en egen resurs som sparar datan och lever oberoende av instansen.</li>
+    <li>Volymen ligger i samma Availability Zone som instansen och kostar per GB och månad tills du tar bort den.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volumes.html">Amazon EBS: Amazon EBS volumes</a>.</p>
+<p>Om disken servern startar från: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/RootDeviceStorage.html">Amazon EC2: Root volumes</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0031-instanstyp.html">Förra: Instanstyp</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0033-port.html">Nästa: Port</a>
+</nav>
+
+</main>
+</body>
+</html>

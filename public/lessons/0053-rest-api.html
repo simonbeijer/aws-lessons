@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REST-API</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 53 · v41, 6 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 53</p>
+<h1>REST-API</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att ett REST-API lägger resursen i sökvägen, t.ex. <code>/customers/42</code>, och verbet i metoden, och att det vid fel svarar med en statuskod som säger vad som var fel.
+</div>
+
+<section class="explain">
+<h2>Vad är ett REST-API?</h2>
+
+<p>Ett REST-API är en server som andra program anropar över HTTP, byggd efter reglerna i REST. API är de anrop servern svarar på, t.ex. hämta kund 42. REST är ett vanligt sätt att forma dem. <span class="src">(kursens lektion sida 2, <a href="https://developer.mozilla.org/en-US/docs/Glossary/API">MDN: API</a>, <a href="https://developer.mozilla.org/en-US/docs/Glossary/REST">MDN: REST</a>)</span></p>
+
+<p>I REST står resursen i sökvägen. Sökvägen är delen av adressen efter <a href="0033-port.html">porten</a>. I <code>http://16.170.12.34:3000/customers/42</code> är sökvägen <code>/customers/42</code>. Det är samma text som efter metoden på <a href="0048-http-anrop-och-svar.html">startraden</a>. <span class="src">(kursens lektion sida 11 och 14)</span></p>
+</section>
+
+<section class="explain">
+<h2>Substantiv i sökvägen, verb i metoden</h2>
+
+<p>Sökvägen säger vilken sak anropet gäller: ett substantiv. <a href="0049-http-metod.html">Metoden</a> är verbet: vad som ska göras. Fem anrop för kunder, men bara två sökvägar: <span class="src">(kursens lektion sida 36, kursmaterialet v41, <a href="https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design">Microsoft: Web API design</a>)</span></p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Anrop</th><th>Gör</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /customers</code></td><td>Hämtar alla kunder.</td></tr>
+    <tr><td><code>GET /customers/42</code></td><td>Hämtar kund 42.</td></tr>
+    <tr><td><code>POST /customers</code></td><td>Skapar en kund.</td></tr>
+    <tr><td><code>PUT /customers/42</code></td><td>Ersätter kund 42.</td></tr>
+    <tr><td><code>DELETE /customers/42</code></td><td>Tar bort kund 42.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Ett verb i sökvägen, som <code>/deleteCustomer/42</code>, bryter mot REST. Metoden säger redan vad som ska göras. <span class="src">(<a href="https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design">Microsoft: Web API design</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Rätt statuskod vid fel</h2>
+
+<p>Vid fel svarar ett REST-API med en <a href="0050-statuskod.html">statuskod</a> som säger vad som var fel, och ett felmeddelande i JSON: 404 om resursen inte finns, 400 om anropet är fel. Klicka och jämför: <span class="src">(kursens lektion sida 13 och 36, kursmaterialet v41, <a href="https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design">Microsoft: Web API design</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-999">GET /customers/999</button>
+    <button class="chip" data-target="p-abc">GET /customers/abc</button>
+  </div>
+  <div class="picker-panel" id="p-999">
+<pre><code>404 Not Found
+{"error":"customer 999 not found"}</code></pre>
+    <p>Anropet är rätt, men kund 999 finns inte.</p>
+  </div>
+  <div class="picker-panel" id="p-abc">
+<pre><code>400 Bad Request
+{"error":"id must be a positive integer, got \"abc\""}</code></pre>
+    <p>Anropet är fel: <code>abc</code> kan aldrig vara ett kundnummer.</p>
+  </div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du vill ta bort kund 7. Vilket anrop följer REST?</p>
+  <div class="options">
+    <button class="opt" data-why="Ordet delete i sökvägen är ett verb, och POST skapar i stället för att ta bort.">POST till sökvägen /deleteCustomer/7</button>
+    <button class="opt" data-correct data-why="Sökvägen pekar på kund 7, och metoden DELETE säger att den ska tas bort.">DELETE till sökvägen /customers/7</button>
+    <button class="opt" data-why="PUT ersätter, och remove i sökvägen är ett verb som hör hemma i metoden.">PUT till sökvägen /removeCustomer/7</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. <code>GET /customers/abc</code> ger 400, men <code>GET /customers/999</code> ger 404. Varför?</p>
+  <div class="options">
+    <button class="opt" data-why="En kund som saknas ger 404; abc ger 400 eftersom anropet i sig är fel.">Kund abc saknas bara i databasen</button>
+    <button class="opt" data-why="Ett fel i servern ger 500; här känner servern igen felet och svarar 400.">Servern går sönder av alla bokstäver</button>
+    <button class="opt" data-correct data-why="Anropet är fel oavsett vad databasen innehåller, så svaret blir 400 och inte 404.">abc kan aldrig vara ett kundnummer</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 49: samma <code>DELETE /customers/42</code> skickas två gånger. Hur ser det ut efter andra anropet?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="DELETE är idempotent, så två likadana anrop lämnar servern i samma läge som ett.">Kund 42 är borttagen, som förut</button>
+    <button class="opt" data-why="Anropet pekar bara på kund 42, så ingen annan kund påverkas.">Kund 43 tas också bort samtidigt</button>
+    <button class="opt" data-why="DELETE tar bort och kan aldrig skapa kunden igen.">Kund 42 skapas igen i databasen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett REST-API är en server som andra program anropar över HTTP, byggd efter reglerna i REST.</li>
+    <li>Resursen står i sökvägen, delen av adressen efter porten, t.ex. <code>/customers/42</code>. Verbet står i metoden. Inga verb i sökvägen.</li>
+    <li>Vid fel svarar API:et med rätt statuskod och ett felmeddelande i JSON: 404 när resursen inte finns, 400 när anropet är fel.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design">Microsoft: Web API design best practices</a>.</p>
+<p>Kort om begreppen: <a href="https://developer.mozilla.org/en-US/docs/Glossary/REST">MDN: REST</a> och <a href="https://developer.mozilla.org/en-US/docs/Glossary/API">MDN: API</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0052-json.html">Förra: JSON</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0054-curl.html">Nästa: curl</a>
+</nav>
+
+</main>
+</body>
+</html>

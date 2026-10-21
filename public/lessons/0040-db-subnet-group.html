@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DB subnet group</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 40 · v40, 21 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 40</p>
+<h1>DB subnet group</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en DB subnet group säger vilka subnät databasen får stå i, och varför den kräver två zoner.
+</div>
+
+<section class="explain">
+<h2>Vad är en DB subnet group?</h2>
+
+<p>En DB subnet group är en lista med <a href="0023-subnat.html">subnät</a> i en VPC som <a href="0039-rds.html">RDS</a> får ställa databasen i. Du skapar den i RDS under Subnet groups och väljer den när du skapar databasen. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.Subnets">AWS: Working with DB subnet groups</a>)</span></p>
+
+<p>Kursens grupp heter <code>v40-db-subnets</code> och har de två privata subnäten. Privata betyder att deras <a href="0025-route-table.html">route table</a> saknar raden till internet.</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Subnät</th><th>CIDR</th><th>Zon</th></tr>
+  <tr><td><code>private1</code></td><td><code>10.0.128.0/20</code></td><td><code>eu-north-1a</code></td></tr>
+  <tr><td><code>private2</code></td><td><code>10.0.144.0/20</code></td><td><code>eu-north-1b</code></td></tr>
+</table>
+</div>
+</section>
+
+<section class="explain">
+<h2>Var hamnar databasen?</h2>
+
+<p>Databasen hamnar i ett av subnäten i gruppen, och RDS väljer vilket. RDS ger den också en ledig IP-adress i subnätet. Databasen står i zonen där subnätet ligger. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.Subnets">AWS: Working with DB subnet groups</a>)</span></p>
+
+<p>Har gruppen bara privata subnät hamnar databasen i ett privat.</p>
+</section>
+
+<section class="explain">
+<h2>Varför två zoner?</h2>
+
+<p>Gruppen kräver subnät i minst två <a href="0022-availability-zone.html">zoner</a> så att RDS kan lägga en kopia av databasen i den andra zonen. Kopian tar över om första zonen går ner. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.CreateDBSubnetGroup">AWS: Create a DB subnet group</a>)</span></p>
+
+<p>Kravet gäller även när databasen bara står i en zon, som i kursen. Då går kopian att slå på senare. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.CreateDBSubnetGroup">AWS: Create a DB subnet group</a>)</span></p>
+
+<p>Ett subnät ligger i exakt en zon, så gruppen behöver minst två subnät i olika zoner.</p>
+
+<div class="box good">
+  <span class="box-title">Kursens poäng</span>
+  <p>DB subnet group i två privata subnät, i två zoner. <span class="src">(kursens lektion sida 14 och 17)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vem bestämmer vilket subnät i gruppen databasen hamnar i?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Du väljer gruppen, och RDS väljer ett av subnäten i den.">RDS väljer ett subnät åt dig</button>
+    <button class="opt" data-why="Du väljer bara gruppen, subnätet i den väljer RDS.">Du väljer det vid varje start</button>
+    <button class="opt" data-why="Subnätet väljs ur gruppen, och det gör RDS åt dig.">Det står alltid i det första</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Kursens databas står i en zon. Varför kräver gruppen ändå två zoner?</p>
+  <div class="options">
+    <button class="opt" data-why="Databasen står i ett subnät åt gången, i en zon.">Den står i båda zonerna samtidigt</button>
+    <button class="opt" data-why="Kravet handlar om zoner, inte om hur många adresser som finns.">Varje zon har för få IP-adresser</button>
+    <button class="opt" data-correct data-why="Med två zoner kan RDS lägga en kopia i den andra zonen om du slår på den senare.">Plats för kopia i andra zonen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 23: hur många zoner kan ett subnät ligga i?</p>
+  <div class="options">
+    <button class="opt" data-why="Ett subnät ligger i exakt en zon, aldrig i flera.">I alla zoner i hela regionen</button>
+    <button class="opt" data-correct data-why="Ett subnät ligger i exakt en zon, så två zoner kräver minst två subnät.">I exakt en zon, aldrig flera</button>
+    <button class="opt" data-why="Ett subnät kan inte sträcka sig över flera zoner.">I två zoner, som kursens nät</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En DB subnet group är en lista med subnät som RDS får ställa databasen i. Kursens grupp har de två privata subnäten.</li>
+    <li>Du väljer gruppen. RDS väljer subnätet och en ledig IP-adress, och databasen står i subnätets zon.</li>
+    <li>Gruppen måste ha subnät i minst två zoner, så att RDS kan lägga en kopia av databasen i den andra zonen. Kravet gäller även när databasen bara står i en zon.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.Subnets">Amazon RDS: Working with DB subnet groups</a>.</p>
+<p>Om kravet på två zoner: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.CreateDBSubnetGroup">Amazon RDS: Create a DB subnet group</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0039-rds.html">Förra: RDS</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0041-public-access-rds.html">Nästa: Public access (RDS)</a>
+</nav>
+
+</main>
+</body>
+</html>

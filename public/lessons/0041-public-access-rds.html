@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public access (RDS)</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 41 · v40, 22 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 41</p>
+<h1>Public access (RDS)</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att Public access: No betyder att databasen saknar publik adress, och att din dator därför inte når den.
+</div>
+
+<section class="explain">
+<h2>Vad är Public access?</h2>
+
+<p>Public access är en inställning i <a href="0039-rds.html">RDS</a> som säger om databasen får en publik IP-adress. Du väljer den under Connectivity när du skapar databasen, och kan ändra den senare. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.Hiding">AWS: Hiding a DB instance from the internet</a>)</span></p>
+
+<p>Databasen har alltid en privat adress i VPC:n. Valet gäller bara om den får en publik adress också.</p>
+
+<div class="two-col">
+  <div>
+    <h3>Yes</h3>
+    <p>Privat adress och publik adress.</p>
+  </div>
+  <div>
+    <h3>No</h3>
+    <p>Bara privat adress.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Varför når din dator den inte?</h2>
+
+<p>Din dator är på internet, utanför VPC:n, och en <a href="0028-publik-privat-ip.html">privat adress</a> kan bara nås inifrån VPC:n. Med No finns ingen adress som din dator kan nå. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.IP_addressing">AWS: Amazon RDS IP addressing</a>)</span></p>
+
+<p>Att nå något från internet kräver tre saker: route till <a href="0024-internet-gateway.html">Internet Gateway</a>, publik IP-adress och en <a href="0034-security-group.html">security group</a> som släpper in. No tar bort den publika adressen. Då hjälper ingen regel i security group, och din dator får timeout.</p>
+</section>
+
+<section class="explain">
+<h2>Vem når databasen då?</h2>
+
+<p>Webbservern. Den står i samma VPC och når databasens privata adress. Databasens security group släpper bara in webbserverns grupp, som i <a href="0035-kalla-i-regel.html">lektion 35</a>. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.Hiding">AWS: Hiding a DB instance from the internet</a>)</span></p>
+
+<p>Vill du nå databasen från din dator går du via webbservern.</p>
+
+<div class="box good">
+  <span class="box-title">Kursens poäng</span>
+  <p>Public access: No. Alltid. RDS står i de privata subnäten från <a href="0040-db-subnet-group.html">lektion 40</a> och nås från webbservern. <span class="src">(kursens lektion sida 13, 14 och 37)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad betyder Public access: No?</p>
+  <div class="options">
+    <button class="opt" data-why="Databasen har en security group även med No, den styr vem som släpps in.">Databasen står utan en security group</button>
+    <button class="opt" data-correct data-why="Med No får databasen ingen publik adress, bara den privata i VPC:n.">Databasen har bara en privat adress</button>
+    <button class="opt" data-why="Inställningen gäller adressen, inte vilka användare som får logga in.">Bara root user når databasen alls</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Databasen har Public access: No. Din dator försöker ansluta på port 5432. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Det finns ingen publik adress att nå, så din dator väntar och ger upp.">Timeout, det finns ingen väg in</button>
+    <button class="opt" data-why="Lösenordet spelar ingen roll när din dator inte når databasen alls.">Det går om lösenordet är rätt</button>
+    <button class="opt" data-why="RDS ger inte din dator någon adress, och No betyder ingen publik adress.">RDS ger dig en publik adress</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 28: varifrån kan en privat adress nås?</p>
+  <div class="options">
+    <button class="opt" data-why="En privat adress kan inte nås från internet, bara inifrån VPC:n.">Från alla datorer på internet</button>
+    <button class="opt" data-why="Det är inte bara samma subnät, hela VPC:n når adressen.">Bara från det egna subnätet</button>
+    <button class="opt" data-correct data-why="En privat adress kan bara nås inifrån VPC:n, därför når webbservern databasen.">Bara inifrån den egna VPC:n</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Public access är en inställning i RDS: får databasen en publik IP-adress utöver den privata, eller inte.</li>
+    <li>Med No har databasen bara en privat adress. Din dator på internet når den inte, oavsett regler i security group. Det blir timeout.</li>
+    <li>Webbservern i samma VPC når databasen. Kursens val: Public access: No, alltid, och vägen in går via webbservern.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.Hiding">Amazon RDS: Hiding a DB instance in a VPC from the internet</a>.</p>
+<p>Om privat och publik adress för databasen: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.IP_addressing">Amazon RDS IP addressing</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0040-db-subnet-group.html">Förra: DB subnet group</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0042-rds-endpoint.html">Nästa: RDS endpoint</a>
+</nav>
+
+</main>
+</body>
+</html>

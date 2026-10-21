@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Källa i regel</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 35 · v40, 16 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 35</p>
+<h1>Källa i en security group-regel</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att källan säger varifrån trafiken får komma. Den kan vara en adress (<code>0.0.0.0/0</code>, My IP), en prefix list eller en annan security group.
+</div>
+
+<section class="explain">
+<h2>Vad är källan?</h2>
+
+<p>Källan är den del av en inbound rule som säger varifrån trafiken får komma. Du väljer den i rutan Source. Det finns tre sorter. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html#security-group-rule-components">AWS: Components of a security group rule</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>De tre sorterna</h2>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="k-adress">Adress</button>
+    <button class="chip" data-target="k-prefix">Prefix list</button>
+    <button class="chip" data-target="k-grupp">Security group</button>
+  </div>
+  <div class="picker-panel" id="k-adress">
+    <p>Ett adressintervall i <a href="0021-cidr.html">CIDR</a>. <code>0.0.0.0/0</code> är alla adresser, Anywhere-IPv4 i konsolen. My IP fyller i din dators <a href="0028-publik-privat-ip.html">publika adress</a>. Byter du nätverk måste regeln ändras. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/working-with-security-group-rules.html">AWS: Configure security group rules</a>)</span></p>
+  </div>
+  <div class="picker-panel" id="k-prefix">
+    <p>En <a href="0026-vpc-endpoint-s3.html">prefix list</a> är en AWS-tjänsts adresser, som AWS håller uppdaterade. Med <code class="copyable">com.amazonaws.eu-north-1.ec2-instance-connect</code> når bara EC2 Instance Connect port 22. Det är tjänsten för kommandon till servern i webbläsaren (<a href="0030-ami.html">lektion 30</a>). <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/working-with-aws-managed-prefix-lists.html">AWS: AWS-managed prefix lists</a>)</span></p>
+  </div>
+  <div class="picker-panel" id="k-grupp">
+    <p>En annan grupp, med ID <code>sg-...</code>. Alla servrar i den gruppen släpps in, via sina privata adresser. Även nya servrar, och även om en server byter adress. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html#security-group-referencing">AWS: Security group referencing</a>)</span></p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vilken källa ska du välja?</h2>
+
+<p>Den smalaste som räcker. AWS rekommenderar att bara släppa in adresser som behöver nå resursen. Kursens poäng: mellan egna servrar pekar regeln på en grupp, inte på adresser. I tabellen har webbservern gruppen <code>v40-web-sg</code> och databasen <code>v40-db-sg</code>. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/working-with-security-group-rules.html">AWS: Configure security group rules</a>, kursens lektion sida 11 och 37)</span></p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Grupp och port</th><th>Källa</th><th>Varför</th></tr></thead>
+  <tbody>
+    <tr><td><code>v40-web-sg</code> 80</td><td><code>0.0.0.0/0</code></td><td>Alla ska se webbsidan.</td></tr>
+    <tr><td><code>v40-web-sg</code> 22</td><td>Prefix list</td><td>Bara EC2 Instance Connect.</td></tr>
+    <tr><td><code>v40-web-sg</code> 3000</td><td>My IP</td><td>Bara du testar programmet.</td></tr>
+    <tr><td><code>v40-db-sg</code> 5432</td><td><code>v40-web-sg</code></td><td>Bara webbservern.</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Bara din egen dator ska nå port 3000 på servern. Vilken källa väljer du?</p>
+  <div class="options">
+    <button class="opt" data-why="0.0.0.0/0 är alla adresser, så vem som helst når porten.">Alla adresser på internet</button>
+    <button class="opt" data-correct data-why="My IP fyller i din dators publika adress, så ingen annan släpps in.">Din dators publika adress</button>
+    <button class="opt" data-why="En grupp som källa släpper in servrar som har den, inte din dator.">Gruppen som webbservern har</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. <code>v40-db-sg</code> släpper in port 5432 från <code>v40-web-sg</code>. Du startar en andra webbserver med <code>v40-web-sg</code>. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Regeln pekar på gruppen, inte på adresser, så ingen ny adress behövs.">Den stoppas tills du lagt in dess adress</button>
+    <button class="opt" data-why="Regeln gäller direkt för alla servrar i gruppen, utan omstart.">Den kommer in först när den startats om</button>
+    <button class="opt" data-correct data-why="Alla servrar som har v40-web-sg släpps in, även nya.">Den släpps in direkt, utan en ny regel</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 26: vad är en prefix list?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="En prefix list samlar en AWS-tjänsts adresser, och AWS håller den uppdaterad.">En lista med adresser till en AWS-tjänst</button>
+    <button class="opt" data-why="Servrar i VPC:n anges med en security group som källa, inte med en prefix list.">En lista med servrarna i ditt nätverk</button>
+    <button class="opt" data-why="Din dators adress anges med My IP, inte med en prefix list.">En lista med dina egna datorers adresser</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Källan är den del av en inbound rule som säger varifrån trafiken får komma.</li>
+    <li>En adress: <code>0.0.0.0/0</code> är alla, My IP är din dators publika adress och måste ändras om du byter nätverk.</li>
+    <li>En prefix list: en AWS-tjänsts adresser, till exempel EC2 Instance Connect för port 22.</li>
+    <li>En annan security group: alla servrar i gruppen släpps in, även nya, och även om adressen byts.</li>
+    <li>Välj den smalaste källan som räcker. Mellan egna servrar pekar regeln på en grupp, inte på adresser.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html">Amazon VPC: Security group rules</a>.</p>
+<p>Om My IP och Anywhere-IPv4 i konsolen: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/working-with-security-group-rules.html">Amazon VPC: Configure security group rules</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0034-security-group.html">Förra: Security group</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0036-ec2-instance-connect.html">Nästa: EC2 Instance Connect</a>
+</nav>
+
+</main>
+</body>
+</html>

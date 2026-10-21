@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Statuskod</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 50 · v41, 3 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 50</p>
+<h1>Statuskod</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad 200, 201, 204, 400, 404 och 500 betyder, och att en kod som börjar på 4 är klientens fel och en som börjar på 5 är serverns.
+</div>
+
+<section class="explain">
+<h2>Vad är en statuskod?</h2>
+
+<p>En statuskod är tre siffror i svarets <a href="0048-http-anrop-och-svar.html">startrad</a> som säger hur anropet gick. I <code>HTTP/1.1 201 Created</code> är <code>201</code> koden och <code>Created</code> en kort text för människor. <span class="src">(kursens lektion sida 11 och 14, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages">MDN: HTTP messages</a>)</span></p>
+
+<p>Första siffran säger vilken grupp koden hör till: 2xx gick bra, 4xx är klientens fel och 5xx serverns. <span class="src">(kursens lektion sida 11, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status">MDN: HTTP response status codes</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>De sex koderna i kursen</h2>
+
+<p>Kursen använder sex koder: 200, 201 och 204 när det gick bra, 400, 404 och 500 vid fel. Exemplen är <a href="0049-http-metod.html">anropen</a> från förra lektionen: <span class="src">(kursens lektion sida 13 och 14, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status">MDN: HTTP response status codes</a>)</span></p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Kod</th><th>Betyder</th><th>Exempel</th></tr></thead>
+  <tbody>
+    <tr><td><code>200 OK</code></td><td>Gick bra.</td><td><code>GET /customers/42</code></td></tr>
+    <tr><td><code>201 Created</code></td><td>Något nytt skapades.</td><td><code>POST /customers</code></td></tr>
+    <tr><td><code>204 No Content</code></td><td>Gick bra, tom kropp.</td><td><code>DELETE /customers/42</code></td></tr>
+    <tr><td><code>400 Bad Request</code></td><td>Anropet är felaktigt.</td><td><code>POST /customers</code> med tomt namn.</td></tr>
+    <tr><td><code>404 Not Found</code></td><td>Resursen finns inte.</td><td><code>GET /customers/999</code></td></tr>
+    <tr><td><code>500 Internal Server Error</code></td><td>Något gick fel i servern.</td><td>Serverns kod går sönder.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>200 och 201 har kunden i kroppen. 400, 404 och 500 har ett kort felmeddelande. <span class="src">(kursens lektion sida 13, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/204">MDN: 204 No Content</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/201">MDN: 201 Created</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vems felet är</h2>
+
+<p>Vid 4xx ligger felet i anropet, t.ex. ett tomt namn. Klienten måste ändra anropet. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status#client_error_responses">MDN: Client error responses</a>)</span></p>
+
+<p>Vid 5xx kan anropet vara rätt, men servern klarade det inte, t.ex. för att databasen inte svarar. Felet rättas i servern. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status#server_error_responses">MDN: Server error responses</a>, kursmaterialet v41)</span></p>
+
+<p>Klienten vet alltså hur det gick utan att läsa kroppen. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Kund 999 finns inte. Du skickar <code>GET /customers/999</code>. Vilken kod får du?</p>
+  <div class="options">
+    <button class="opt" data-why="Anropet är rätt skrivet; det som saknas är kunden, och det ger 404.">400: anropet är trasigt</button>
+    <button class="opt" data-why="Servern klarade anropet; den svarar med en kod om att kunden saknas.">500: servern gick ner</button>
+    <button class="opt" data-correct data-why="404 betyder att resursen, här kund 999, inte finns.">404: kunden finns inte</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Svaret har en kod som börjar på 5. Vad säger det?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="5xx betyder att servern inte klarade anropet, så felet rättas i servern.">Felet ligger hos servern</button>
+    <button class="opt" data-why="Det är 4xx som betyder att klienten måste ändra anropet.">Felet ligger hos klienten</button>
+    <button class="opt" data-why="Det är 2xx som betyder att anropet gick bra.">Anropet gick helt bra</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 49: du skickar <code>DELETE /customers/42</code> två gånger. Första svaret är 204. Vad blir det andra?</p>
+  <div class="options">
+    <button class="opt" data-why="DELETE skapar aldrig något, och kunden kommer inte tillbaka.">201, kunden skapas igen</button>
+    <button class="opt" data-correct data-why="Kunden är redan borttagen, så det andra anropet hittar ingen och får 404.">404, kunden finns inte</button>
+    <button class="opt" data-why="DELETE är idempotent för serverns läge, men svaret blir ett annat när kunden saknas.">204, samma som förra</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En statuskod är tre siffror i svarets startrad. Den säger hur anropet gick.</li>
+    <li>200 gick bra, 201 skapade något nytt och 204 gick bra med tom kropp. 400 är ett felaktigt anrop, 404 en resurs som inte finns och 500 ett fel i servern.</li>
+    <li>4xx är klientens fel: ändra anropet. 5xx är serverns fel: rätta servern.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status">MDN: HTTP response status codes</a>.</p>
+<p>Om koderna utan och med kropp: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/204">MDN: 204 No Content</a> och <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/201">MDN: 201 Created</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0049-http-metod.html">Förra: HTTP-metod</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0051-header.html">Nästa: Header</a>
+</nav>
+
+</main>
+</body>
+</html>

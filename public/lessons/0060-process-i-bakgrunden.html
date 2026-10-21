@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Process i bakgrunden</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 60 · v41, 13 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 60</p>
+<h1>Process i bakgrunden (nohup)</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Hur <code>nohup node server.js &gt; server.log 2&gt;&amp;1 &amp;</code> låter servern köra kvar när fliken stängs, och var loggen hamnar.
+</div>
+
+<section class="explain">
+<h2>Vad händer med servern när fliken stängs?</h2>
+
+<p>Den stannar. <code>node server.js</code> startar en process, alltså ett program som körs, i <a href="0036-ec2-instance-connect.html">terminalen</a>. En signal är ett kort besked till en process. Stänger du fliken försvinner terminalen, och då får bash normalt signalen hangup ("lägg på"). Bash skickar den vidare till processerna den startat, och de avslutas. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Signals.html">Bash: Signals</a>, kursmaterialet v41)</span></p>
+</section>
+
+<section class="explain">
+<h2>Kommandot del för del</h2>
+
+<pre><code>nohup node server.js &gt; server.log 2&gt;&amp;1 &amp;</code></pre>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Del</th><th>Betyder</th></tr>
+  <tr><td><code>nohup</code></td><td>"No hangup": programmet bryr sig inte om signalen, så det kör kvar när fliken stängs. <span class="src">(<a href="https://www.gnu.org/software/coreutils/manual/html_node/nohup-invocation.html">coreutils: nohup</a>)</span></td></tr>
+  <tr><td><code>node server.js</code></td><td>Startar din <a href="0057-express.html">Express</a>-server.</td></tr>
+  <tr><td><code>&gt; server.log</code></td><td>Det programmet skriver ut hamnar i filen server.log i stället för i terminalen. Filen skapas, eller töms om den finns. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Redirections.html#Redirecting-Output">Bash: Redirecting Output</a>)</span></td></tr>
+  <tr><td><code>2&gt;&amp;1</code></td><td>Felmeddelanden (kanal 2) går samma väg som vanlig utskrift (kanal 1), alltså också till server.log. Står efter <code>&gt;</code>. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Redirections.html#Duplicating-File-Descriptors">Bash: Duplicating</a>)</span></td></tr>
+  <tr><td><code>&amp;</code></td><td>Kör i bakgrunden: terminalen väntar inte, du kan skriva nästa kommando direkt. <code>nohup</code> gör inte det själv. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Lists.html">Bash: Lists</a>)</span></td></tr>
+</table>
+</div>
+</section>
+
+<section class="explain">
+<h2>Var loggen hamnar</h2>
+
+<p>Loggen hamnar i server.log, i mappen du stod i när du startade servern. Där syns också serverns felmeddelanden. <code>tail -f</code> visar filen medan den växer: <span class="src">(<a href="https://www.gnu.org/software/coreutils/manual/html_node/tail-invocation.html">coreutils: tail</a>, kursmaterialet v41)</span></p>
+
+<pre><code>tail -f server.log</code></pre>
+
+<p>Ctrl+C stoppar visningen, inte servern. Har du ändrat koden: <code class="copyable">pkill node</code> stoppar servern, sedan startar du den igen. <span class="src">(<a href="https://man7.org/linux/man-pages/man1/pkill.1.html">pkill(1)</a>, kursmaterialet v41)</span></p>
+
+<p>Kursens poäng: starta servern så att den överlever att du stänger fliken. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du startar servern med <code>nohup node server.js &gt; server.log 2&gt;&amp;1 &amp;</code> och stänger fliken. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="nohup gör att servern inte bryr sig om hangup-signalen, så den stannar inte.">Servern stannar, eftersom bash får en signal</button>
+    <button class="opt" data-why="&gt; server.log skickar utskriften till filen, inte till terminalen.">Servern kör vidare, loggen syns i terminalen</button>
+    <button class="opt" data-correct data-why="nohup ignorerar hangup-signalen, och &gt; server.log 2&gt;&amp;1 skickar all utskrift till filen.">Servern kör vidare, loggen skrivs i server.log</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad gör <code>2&gt;&amp;1</code> i kommandot?</p>
+  <div class="options">
+    <button class="opt" data-why="Kommandot startar en enda server; 2 och 1 är kanaler för utskrift.">Startar två servrar, en för vardera kanal</button>
+    <button class="opt" data-why="Det är &amp; som gör att terminalen inte väntar; 2&gt;&amp;1 styr felmeddelandena.">Låter terminalen gå vidare till nästa rad</button>
+    <button class="opt" data-correct data-why="Kanal 2 (felmeddelanden) går samma väg som kanal 1, som redan går till server.log.">Skickar fel till samma fil som utskrift</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 44: du öppnar en ny terminalflik och startar servern med nohup, utan <code>export</code>. Varför når servern inte databasen?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Miljövariabler finns bara i fliken där du satte dem, så servern får inget DB_HOST.">Miljövariablerna finns inte i den nya fliken</button>
+    <button class="opt" data-why="nohup ändrar inte miljövariablerna; de saknades redan i den nya fliken.">nohup tar bort alla miljövariablerna vid start</button>
+    <button class="opt" data-why="Databasen ser inte vilken flik anropet kommer från; variablerna saknas.">Databasen tar bara emot från första fliken</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En process är ett program som körs. Stängs fliken får den normalt signalen hangup och avslutas.</li>
+    <li><code>nohup</code> gör att servern kör kvar, <code>&amp;</code> lägger den i bakgrunden, och <code>&gt; server.log 2&gt;&amp;1</code> skickar både utskrift och fel till server.log.</li>
+    <li>Läs loggen med <code>tail -f server.log</code>. Ctrl+C stoppar bara visningen. <code>pkill node</code> stoppar servern.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://www.gnu.org/software/coreutils/manual/html_node/nohup-invocation.html">GNU coreutils: nohup invocation</a>.</p>
+<p>Om <code>&gt;</code> och <code>2&gt;&amp;1</code>: <a href="https://www.gnu.org/software/bash/manual/html_node/Redirections.html">GNU Bash Reference Manual: Redirections</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0059-sql-parameter.html">Förra: SQL-parameter</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0061-variabel-i-postman.html">Nästa: Variabel i Postman</a>
+</nav>
+
+</main>
+</body>
+</html>

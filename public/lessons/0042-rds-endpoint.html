@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RDS endpoint</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 42 · v40, 23 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 42</p>
+<h1>RDS endpoint</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att endpointen är databasens DNS-namn och pekar på en privat adress i VPC:n.
+</div>
+
+<section class="explain">
+<h2>Vad är en RDS endpoint?</h2>
+
+<p>En RDS endpoint är databasens adress skriven som ett namn. Det står under Endpoint, bredvid Port, på fliken Connectivity &amp; security när du klickar på databasen i <a href="0039-rds.html">RDS</a>. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ConnectToPostgreSQLInstance.html#postgresql-endpoint">AWS: Finding the connection information</a>)</span></p>
+
+<p>Så kan den se ut, med databasens namn först och regionen sist:</p>
+
+<pre><code>v40-db.c9akciq32xyz.eu-north-1.rds.amazonaws.com</code></pre>
+
+<p>Det är inte samma sak som <a href="0026-vpc-endpoint-s3.html">VPC endpoint</a>, som är en väg till S3. Här betyder endpoint bara databasens adress.</p>
+</section>
+
+<section class="explain">
+<h2>Vad är ett DNS-namn?</h2>
+
+<p>Ett DNS-namn är ett namn som översätts till en IP-adress. Datorer når varandra med IP-adresser. DNS är systemet som slår upp namnet och svarar med adressen, som en telefonkatalog. <span class="src">(<a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/welcome-dns-service.html">AWS: How internet traffic is routed</a>)</span></p>
+
+<p>Den som ansluter till endpointen frågar DNS först och använder adressen i svaret.</p>
+</section>
+
+<section class="explain">
+<h2>Vart pekar endpointen?</h2>
+
+<p>Endpointen pekar på databasens <a href="0028-publik-privat-ip.html">privata adress</a> i VPC:n. Med <a href="0041-public-access-rds.html">Public access: No</a> finns ingen annan adress. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.Hiding">AWS: Hiding a DB instance</a>)</span></p>
+
+<p>Webbservern står i samma VPC. Den får den privata adressen och når databasen på <a href="0033-port.html">port 5432</a>. Din dator har ingen väg till den privata adressen. Det blir timeout.</p>
+
+<p>Använd alltid namnet. Adressen bakom kan bytas när en kopia tar över (<a href="0040-db-subnet-group.html">lektion 40</a>). Namnet är detsamma. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.Subnets">AWS: Working with DB subnet groups</a>)</span></p>
+
+<div class="box good">
+  <span class="box-title">Kursens poäng</span>
+  <p>Från webbservern går det. Från din dator går det inte, och det är poängen. <span class="src">(kursens lektion sida 31)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad är en RDS endpoint?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är en VPC endpoint, ett annat begrepp med samma ord.">En väg från VPC:n direkt till S3-buckets</button>
+    <button class="opt" data-why="Endpointen är ett namn, och adressen bakom den kan bytas.">Det är databasens IP-adress i fyra tal</button>
+    <button class="opt" data-correct data-why="Endpointen är databasens DNS-namn, och DNS svarar med adressen.">Ett namn som DNS översätter till adress</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Webbservern ansluter till endpointen. Vad händer först?</p>
+  <div class="options">
+    <button class="opt" data-why="Trafiken stannar i VPC:n, den går aldrig ut via Internet Gateway.">Trafiken går ut via Internet Gateway</button>
+    <button class="opt" data-correct data-why="Namnet slås upp först, och svaret är databasens privata adress i VPC:n.">DNS ger den databasens privata adress</button>
+    <button class="opt" data-why="RDS ger ingen adress till webbservern, den slår bara upp namnet.">RDS ger webbservern en publik adress</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 33: endpointen står bredvid Port 5432. Vad betyder porten?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="5432 är standardporten för PostgreSQL, där databasen tar emot anslutningar.">Databasen tar emot trafik på 5432</button>
+    <button class="opt" data-why="Porten säger var databasen tar emot anslutningar, inte var loggar skickas.">Servern skickar loggar ut via 5432</button>
+    <button class="opt" data-why="Webbsidor använder port 80, och 5432 är databasens port.">Webbläsaren hämtar en sida på 5432</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>RDS endpoint är databasens DNS-namn. Du hittar den på fliken Connectivity &amp; security, bredvid Port. Den har inget med VPC endpoint för S3 att göra.</li>
+    <li>DNS översätter namnet till en IP-adress. Med Public access: No är det databasens privata adress i VPC:n.</li>
+    <li>Webbservern i VPC:n når databasen, din dator får timeout. Anslut alltid med namnet, eftersom adressen bakom kan bytas.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ConnectToPostgreSQLInstance.html#postgresql-endpoint">Amazon RDS: Finding the connection information for an RDS for PostgreSQL DB instance</a>.</p>
+<p>Om vart namnet pekar: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.Hiding">Hiding a DB instance in a VPC from the internet</a>. Om DNS: <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/welcome-dns-service.html">How internet traffic is routed to your website</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0041-public-access-rds.html">Förra: Public access (RDS)</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0043-forsvar-pa-djupet.html">Nästa: Försvar på djupet</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Egen AMI</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 47 · v40, 28 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 47</p>
+<h1>Egen AMI</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en egen AMI kopierar serverns disk men inte kör user data igen, och skillnaden mellan att baka in något och att göra det vid start.
+</div>
+
+<section class="explain">
+<h2>Vad är en egen AMI?</h2>
+
+<p>En egen AMI är en <a href="0030-ami.html">AMI</a> du gör av din server. Den kopierar serverns disk, med allt du installerat, och nya servrar startar från kopian. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/creating-an-ami-ebs.html">AWS: Create an Amazon EBS-backed AMI</a>)</span></p>
+
+<p>Du skapar den under EC2 → Instances: markera servern, Actions → Image and templates → Create image. AWS tar då en <a href="0046-ebs-snapshot.html">snapshot</a> av disken. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/creating-an-ami-ebs.html#how-to-create-ebs-ami">AWS: Create an AMI from an instance</a>, kursmaterialet v40)</span></p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Deregister AMI tar bort AMI:n. Dess snapshot blir kvar och kostar lagring tills du raderar den. Med Free plan räknas det av mot krediterna. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/creating-an-ami-ebs.html#process-creating-an-ami-ebs">AWS: Overview of AMI creation</a>, <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/deregister-ami.html">AWS: Deregister an AMI</a>, kursmaterialet v40, <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html">AWS: Choosing a plan</a>)</span></p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Varför user data inte körs igen</h2>
+
+<p><a href="0037-user-data.html">User data</a> hör till servern, inte disken. Den följer därför inte med i AMI:n. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html">AWS: Run commands with user data</a>)</span></p>
+
+<p>Det skriptet gjorde ligger kvar på disken. Kursens exempel: skriptet skrev en webbsida som visar <a href="0022-availability-zone.html">zonen</a>, eu-north-1a. En ny server från AMI:n i eu-north-1b visar ändå eu-north-1a. <span class="src">(kursmaterialet v40)</span></p>
+</section>
+
+<section class="explain">
+<h2>Baka in eller göra vid start</h2>
+
+<p>Att baka in betyder att något ligger färdigt i AMI:n. Att göra vid start betyder att ett skript gör det när servern startar. <span class="src">(kursmaterialet v40)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Baka in</h3>
+    <p>Det som ska vara lika på alla servrar, t.ex. program. Servern startar snabbare.</p>
+  </div>
+  <div>
+    <h3>Gör vid start</h3>
+    <p>Det som skiljer servrarna åt, t.ex. zonen.</p>
+  </div>
+</div>
+
+<p class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html#user-data-shell-scripts">AWS: User data and shell scripts</a>, kursmaterialet v40)</p>
+
+<p>Kursens poäng: <a href="0037-user-data.html">en server är AMI plus user data</a>. En egen AMI bakar in det user data gjorde. <span class="src">(kursens lektion sida 37)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du startar en ny server från din egen AMI, utan user data. Varför finns webbsidan redan där?</p>
+  <div class="options">
+    <button class="opt" data-why="User data hör till den första servern och följer inte med in i AMI:n.">Skriptet körs igen på nya servern</button>
+    <button class="opt" data-correct data-why="AMI:n är en kopia av disken, och sidan låg redan på disken.">Sidan låg på den kopierade disken</button>
+    <button class="opt" data-why="AWS hämtar inget från den första servern; allt kommer från AMI:ns kopia av disken.">AWS hämtar sidan ur gamla servern</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad passar bäst att baka in i en egen AMI?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Det som ska vara lika på alla servrar passar att baka in, och starten går snabbare.">Programmen som alla servrar ska ha</button>
+    <button class="opt" data-why="Zonen skiljer sig mellan servrarna, så den måste tas fram vid start.">Zonen där varje enskild server står</button>
+    <button class="opt" data-why="Den publika adressen får servern av AWS och den skiljer sig mellan servrar.">Den publika adressen som servern får</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 30: vad ger en AMI från AWS, t.ex. Amazon Linux 2023, främst servern?</p>
+  <div class="options">
+    <button class="opt" data-why="Skriptet är user data, som du själv ger servern när du startar den.">Skriptet som körs vid serverstart</button>
+    <button class="opt" data-why="Nätverket väljer du under Network settings; det ingår inte i AMI:n.">Nätverket som servern kopplas till</button>
+    <button class="opt" data-correct data-why="En AMI innehåller främst operativsystemet, grundprogrammet som styr datorn.">Ett operativsystem som styr servern</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En egen AMI är en kopia av din servers disk. Nya servrar kan starta från den. Du skapar den med Actions → Image and templates → Create image.</li>
+    <li>User data följer inte med in i AMI:n och körs inte igen. Det skriptet skrev på disken finns däremot kvar.</li>
+    <li>Baka in det som ska vara lika på alla servrar. Gör det som skiljer dem åt vid start.</li>
+    <li>Deregister AMI tar bort AMI:n. Snapshoten kostar lagring tills du raderar den. Med Free plan räknas det av mot krediterna.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/creating-an-ami-ebs.html">Amazon EC2: Create an Amazon EBS-backed AMI</a>.</p>
+<p>Om user data i en AMI: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html">Amazon EC2: Run commands with user data</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0046-ebs-snapshot.html">Förra: EBS snapshot</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0048-http-anrop-och-svar.html">Nästa: HTTP-anrop och svar</a>
+</nav>
+
+</main>
+</body>
+</html>

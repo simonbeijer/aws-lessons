@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>curl</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 54 · v41, 7 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 54</p>
+<h1>curl</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Hur <code>curl -i</code> skickar ett HTTP-anrop från terminalen och visar hela svaret, och hur <code>-X</code>, <code>-H</code> och <code>-d</code> sätter metod, header och kropp.
+</div>
+
+<section class="explain">
+<h2>Vad är curl?</h2>
+
+<p>curl är ett kommando som skickar ett HTTP-anrop från <a href="0036-ec2-instance-connect.html">terminalen</a> och skriver ut svaret. Det finns redan i appen Terminal på din Mac. <span class="src">(<a href="https://curl.se/docs/manpage.html">curl: man page</a>, kursmaterialet v41)</span></p>
+
+<p>Utan något mer skickar curl GET och skriver bara ut kroppen. En flagga är ett tillägg efter ett bindestreck som ändrar vad kommandot gör. Flaggan <code>-i</code> skriver också ut startraden och headers. Kursens poäng: curl visar exakt vad servern svarade. Prova mot en öppen testserver, eller klicka och jämför: <span class="src">(<a href="https://curl.se/docs/manpage.html#-i">curl: -i</a>, kursens lektion sida 19 och 36)</span></p>
+
+<pre><code>curl -i https://jsonplaceholder.typicode.com/posts/1</code></pre>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-utan">Utan -i</button>
+    <button class="chip" data-target="p-med">Med -i</button>
+  </div>
+  <div class="picker-panel" id="p-utan">
+<pre><code>{
+  "userId": 1,
+  "id": 1,
+  "title": "sunt aut facere ...",
+  "body": "quia et suscipit ..."
+}</code></pre>
+    <p>Bara kroppen.</p>
+  </div>
+  <div class="picker-panel" id="p-med">
+<pre><code>HTTP/2 200
+content-type: application/json; charset=utf-8
+content-length: 292
+...
+
+{
+  "userId": 1,
+  "id": 1,
+  "title": "sunt aut facere ...",
+  "body": "quia et suscipit ..."
+}</code></pre>
+    <p>Hela svaret: startrad, headers, tom rad och kropp.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>-X, -H och -d bygger anropet</h2>
+
+<p><code>-X</code> sätter <a href="0049-http-metod.html">metoden</a>, <code>-H</code> lägger till en <a href="0051-header.html">header</a> och <code>-d</code> skickar kroppen. Så här skapar du ett inlägg med POST: <span class="src">(<a href="https://curl.se/docs/manpage.html">curl: man page</a>, kursens lektion sida 19)</span></p>
+
+<pre><code>curl -i -X POST https://jsonplaceholder.typicode.com/posts \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Hej från curl","userId":1}'</code></pre>
+
+<p><code>\</code> sist på en rad betyder att kommandot fortsätter på nästa rad. De <a href="0045-citattecken-bash.html">enkla citattecknen</a> gör att terminalen lämnar JSON-texten orörd. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/bash.html#Escape-Character">Bash: Escape Character</a>)</span></p>
+
+<p>Svaret blir <code>201 Created</code> och ditt <a href="0052-json.html">JSON-objekt</a> med ett nytt <code>"id": 101</code>. Testservern sparar inget, den låtsas bara. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför -H behövs</h2>
+
+<p>Utan <code>-H</code> skickar <code>-d</code> kroppen med <code>Content-Type: application/x-www-form-urlencoded</code>, formatet för webbformulär. Då läser kursens server inte kroppen som JSON och svarar 400, som i <a href="0051-header.html">lektion 51</a>. <span class="src">(<a href="https://curl.se/docs/manpage.html#-d">curl: -d</a>, kursmaterialet v41)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad visar <code>curl -i</code> som inte syns utan <code>-i</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Kroppen syns även utan -i; det är startraden och headers som läggs till med -i.">Bara kroppen med objektet i JSON-format</button>
+    <button class="opt" data-why="Det du själv skickar visas inte med -i; -i lägger till svarets startrad och headers.">Anropet som curl själv skickade dit</button>
+    <button class="opt" data-correct data-why="Utan -i skrivs bara kroppen ut; -i lägger till svarets startrad och headers.">Startraden och alla headers i svaret</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du skickar bara <code>-X POST</code> och <code>-d '{"name":"Dave"}'</code> till kursens server. Varför blir svaret 400?</p>
+  <div class="options">
+    <button class="opt" data-why="POST får ha en kropp; felet är att -H saknas, så kroppen får fel Content-Type.">POST får aldrig skickas med kropp</button>
+    <button class="opt" data-correct data-why="Utan -H sätter -d formulärformatet som Content-Type, så servern läser inte kroppen som JSON.">Kroppen får fel Content-Type utan -H</button>
+    <button class="opt" data-why="Namnet är giltigt; servern läser bara inte kroppen, eftersom -H saknas.">Namnet Dave måste vara betydligt längre</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 48: i utskriften från <code>curl -i</code>, var börjar kroppen?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Den tomma raden säger att headers är slut, och sedan kommer kroppen.">Efter den tomma raden under headers</button>
+    <button class="opt" data-why="Efter startraden kommer headers; kroppen kommer först efter den tomma raden.">Direkt på första raden efter startraden</button>
+    <button class="opt" data-why="Startraden är alltid första raden, så inget kan stå före den.">Före startraden högst upp i texten</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>curl skickar ett HTTP-anrop från terminalen. Utan flaggor blir det GET, och bara kroppen skrivs ut.</li>
+    <li><code>-i</code> visar hela svaret: startrad, headers, tom rad och kropp. curl visar exakt vad servern svarade.</li>
+    <li><code>-X</code> sätter metoden, <code>-H</code> en header och <code>-d</code> kroppen. Skickar du JSON med <code>-d</code>: lägg till <code>-H "Content-Type: application/json"</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://curl.se/docs/manpage.html">curl: man page</a> (flaggorna <code>-i</code>, <code>-X</code>, <code>-H</code> och <code>-d</code>).</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0053-rest-api.html">Förra: REST-API</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0055-postman.html">Nästa: Postman</a>
+</nav>
+
+</main>
+</body>
+</html>

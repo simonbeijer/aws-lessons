@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security group</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 34 · v40, 15 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 34</p>
+<h1>Security group</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en security group är en brandvägg runt en resurs: bara tillåt-regler, inåt stängt, utåt öppet, stateful. Och att den är en av tre saker som krävs för att en server ska nås från internet.
+</div>
+
+<section class="explain">
+<h2>Vad är en security group?</h2>
+
+<p>En security group är en brandvägg runt en resurs, till exempel en EC2-instans. En brandvägg bestämmer vilken trafik som får passera. Du hittar dem i EC2-konsolen under Security Groups, och varje grupp hör till en VPC. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html">AWS: Security groups</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vilka regler har den?</h2>
+
+<p>En regel säger vilken port trafiken får gå till och varifrån den kommer. Inbound rules gäller trafik in, outbound rules trafik ut. Det finns bara tillåt-regler. Det du inte har tillåtit är stängt. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html">AWS: Security group rules</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>In: stängt</h3>
+    <p>En ny grupp har inga inbound rules, så ingen trafik kommer in.</p>
+  </div>
+  <div>
+    <h3>Ut: öppet</h3>
+    <p>En ny grupp har en outbound rule som släpper ut all trafik.</p>
+  </div>
+</div>
+
+<p>Gruppen är stateful: den minns trafik den har släppt igenom och släpper alltid svaret tillbaka. Släpper en inbound rule in port 80, går webbsidan ut till webbläsaren utan någon outbound rule. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-security-groups.html">AWS: EC2 security groups</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad krävs för att nå servern från internet?</h2>
+
+<p>Tre saker:</p>
+<ol>
+  <li>En route till <a href="0024-internet-gateway.html">Internet Gateway</a> i subnätets <a href="0025-route-table.html">route table</a>.</li>
+  <li>En <a href="0028-publik-privat-ip.html">publik IP-adress</a> på servern.</li>
+  <li>En security group som släpper in trafiken på rätt port.</li>
+</ol>
+
+<p>Saknas en av dem blir det timeout: din dator väntar på ett svar som aldrig kommer och ger upp. Inget felmeddelande säger vad som saknas, så kontrollera alla tre. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/TroubleshootingInstancesConnecting.html#TroubleshootingInstancesConnectionTimeout">AWS: Connection timed out</a>, <a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">AWS: Internet gateway</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du skapar en ny security group och lägger inte till några regler. Vad gäller då?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är tvärtom: in är stängt och ut är öppet tills du ändrar.">All trafik in släpps, all trafik ut stoppas</button>
+    <button class="opt" data-why="En ny grupp har inga inbound rules, så ingen trafik kommer in.">Ingen trafik stoppas, varken in eller ut än</button>
+    <button class="opt" data-correct data-why="En ny grupp saknar inbound rules men har en outbound rule som släpper ut allt.">All trafik in stoppas, all trafik ut släpps</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Gruppen släpper in port 80 men har inga outbound rules. Kommer webbsidan ut till webbläsaren?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Gruppen är stateful, så svaret på en tillåten förfrågan släpps alltid ut.">Ja, svaret på en tillåten begäran går ut</button>
+    <button class="opt" data-why="Svaret behöver ingen egen regel, eftersom gruppen är stateful.">Nej, ett svar ut kräver en outbound rule</button>
+    <button class="opt" data-why="Regeln gäller trafik in, men svaret ut släpps ändå eftersom gruppen är stateful.">Nej, regeln för port 80 gäller bara inåt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 25 och 28: servern har en publik IP-adress och en security group som släpper in port 80. Ändå blir det timeout. Vad kan saknas?</p>
+  <div class="options">
+    <button class="opt" data-why="Gruppen är stateful, så svaret går ut utan outbound rule.">Outbound rule som släpper ut webbsidan</button>
+    <button class="opt" data-correct data-why="Utan raden 0.0.0.0/0 till Internet Gateway i route tablen når trafiken aldrig servern.">Route till Internet Gateway i subnätet</button>
+    <button class="opt" data-why="Varje server får alltid en privat adress, så den saknas inte.">Privat IP-adress i det lokala subnätet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En security group är en brandvägg runt en resurs, till exempel en EC2-instans. Bara trafik som reglerna tillåter når resursen.</li>
+    <li>Det finns bara tillåt-regler. En ny grupp är stängd inåt och öppen utåt.</li>
+    <li>Gruppen är stateful: svaret på trafik som släppts igenom går alltid tillbaka, utan egen regel.</li>
+    <li>En server nås från internet bara med route till Internet Gateway, publik IP-adress och en security group som släpper in. Saknas en blir det timeout utan felmeddelande.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html">Amazon VPC: Control traffic to your AWS resources using security groups</a>.</p>
+<p>Om reglerna: <a href="https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html">Amazon VPC: Security group rules</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0033-port.html">Förra: Port</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0035-kalla-i-regel.html">Nästa: Källa i en security group-regel</a>
+</nav>
+
+</main>
+</body>
+</html>

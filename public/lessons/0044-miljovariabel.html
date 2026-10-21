@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Miljövariabel</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 44 · v40, 25 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 44</p>
+<h1>Miljövariabel</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en miljövariabel är ett namn med ett värde som terminalen ger programmet, och varför databasens lösenord därför ligger där och inte i koden.
+</div>
+
+<section class="explain">
+<h2>Vad är en miljövariabel?</h2>
+
+<p>En miljövariabel är ett namn med ett värde, till exempel <code>DB_PASSWORD</code> med ditt lösenord. Den finns i <a href="0036-ec2-instance-connect.html">terminalen</a>, och varje program du startar därifrån får en kopia. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Environment.html">GNU Bash: Environment</a>)</span></p>
+
+<p>Du sätter den med kommandot <code>export</code> i <a href="0037-user-data.html">bash</a>: namnet, ett likhetstecken och värdet.</p>
+
+<pre><code>export DB_HOST=v40-db.xxxxxxxxxxxx.eu-north-1.rds.amazonaws.com
+export DB_PASSWORD=ditt-losenord</code></pre>
+
+<p><code>DB_HOST</code> är databasens <a href="0042-rds-endpoint.html">endpoint</a>.</p>
+
+<p>Att prova raderna är valfritt. Exemplets lösenord har bara bokstäver och bindestreck, som bash inte tolkar. Hur ett riktigt lösenord skrivs tar nästa lektion upp.</p>
+</section>
+
+<section class="explain">
+<h2>Hur programmet läser den</h2>
+
+<p>Kursens program, skrivet i <a href="0033-port.html">Node.js</a>, läser den med <code>process.env</code>. I koden står bara namnet:</p>
+
+<pre><code>password: process.env.DB_PASSWORD,</code></pre>
+
+<p><code>process.env</code> är Node.js lista över de miljövariabler programmet fick från terminalen. Värdet hämtas först när programmet körs. <span class="src">(<a href="https://nodejs.org/api/process.html#processenv">Node.js: process.env</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför inte i koden?</h2>
+
+<p>Koden sparas ofta i ett <a href="0017-amplify-hosting.html">Git-repo på GitHub</a>. Står lösenordet i koden kan alla som ser koden läsa det. <span class="src">(<a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/hardcoded.html">AWS: Move hardcoded secrets</a>)</span> Lösenordet är ett lager i <a href="0043-forsvar-pa-djupet.html">försvar på djupet</a>, och det står då öppet.</p>
+
+<p>I en miljövariabel finns lösenordet bara på servern. Koden kan delas som den är.</p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Variabeln finns bara i terminalfliken där du satte den. Stänger du fliken försvinner den, och i en ny flik måste du sätta den igen. <span class="src">(kursmaterialet v40)</span></p>
+</div>
+
+<div class="box good">
+  <span class="box-title">Kursens poäng</span>
+  <p>Databasens lösenord i en miljövariabel, inte i koden. <span class="src">(kursens lektion sida 34)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Varför ligger databasens lösenord i en miljövariabel och inte i koden?</p>
+  <div class="options">
+    <button class="opt" data-why="Programmet läser variabeln när det körs, så det går lika fort som om lösenordet stod i koden.">Så att programmet kan köras lite fortare</button>
+    <button class="opt" data-why="Databasen kontrollerar lösenordet på samma sätt, oavsett var programmet hämtade det.">Så att databasen inte kräver ett lösenord</button>
+    <button class="opt" data-correct data-why="Koden delas, ofta i ett Git-repo, och då kan alla som ser koden läsa lösenordet.">Så att ingen läser lösenordet i källkoden</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du stänger terminalfliken och öppnar en ny. Vad händer med DB_PASSWORD?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Variabeln finns bara i fliken där du satte den, så du kör export igen.">Den försvinner och måste sättas på nytt</button>
+    <button class="opt" data-why="Variabeln finns bara i den flik där du satte den, inte på hela servern.">Den finns kvar tills servern startas om</button>
+    <button class="opt" data-why="Ingenting skrivs in i koden; det var just det miljövariabeln skulle undvika.">Den sparas i koden när fliken stängs</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 42: vad ska stå efter <code>DB_HOST=</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Webbserverns adress är fel maskin; programmet ska nå databasen.">Webbserverns egen publika IP-adress</button>
+    <button class="opt" data-correct data-why="Endpointen är databasens DNS-namn, och namnet fungerar även om adressen bakom byts.">Databasens endpoint, ett DNS-namn</button>
+    <button class="opt" data-why="Den privata adressen kan bytas när en kopia tar över, så använd alltid namnet.">Databasens egen privata IP-adress</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En miljövariabel är ett namn med ett värde. Du sätter den med <code>export</code> i terminalen, och programmet du startar där får en kopia.</li>
+    <li>Node.js läser den med <code>process.env</code>. I koden står bara namnet, inte lösenordet.</li>
+    <li>Står lösenordet i koden kan alla som ser koden läsa det. I en miljövariabel finns det bara på servern, men bara i terminalfliken där du satte det.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://www.gnu.org/software/bash/manual/html_node/Environment.html">GNU Bash Reference Manual: Environment</a>.</p>
+<p>Om Node.js: <a href="https://nodejs.org/api/process.html#processenv">Node.js: process.env</a>. Om lösenord i koden: <a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/hardcoded.html">AWS Secrets Manager: Move hardcoded secrets</a>. AWS rekommenderar där Secrets Manager, som kursen tar upp senare.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0043-forsvar-pa-djupet.html">Förra: Försvar på djupet</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0045-citattecken-bash.html">Nästa: Citattecken i bash</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RDS</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 39 · v40, 20 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 39</p>
+<h1>RDS</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att RDS är en managed databas: vad AWS sköter och vad du sköter.
+</div>
+
+<section class="explain">
+<h2>Vad är RDS?</h2>
+
+<p>RDS (Amazon Relational Database Service) är en databas som AWS kör åt dig. Managed betyder att AWS sköter driften, och du använder databasen. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html">AWS: What is Amazon RDS?</a>)</span></p>
+
+<p>En databas är ett program som sparar data, så att andra program, till exempel webbservern, kan läsa och skriva i den. En relationsdatabas sparar datan i tabeller med rader och kolumner. <span class="src">(<a href="https://aws.amazon.com/relational-database/">AWS: What is a relational database?</a>)</span></p>
+
+<p>Databasprogrammet kallas motor, engine på engelska. Kursen använder <a href="0033-port.html">PostgreSQL</a>. Du väljer det under Engine options när du skapar databasen. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html#Welcome.Concepts.DBInstance.engine">AWS: DB engines</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad AWS sköter och vad du sköter</h2>
+
+<p>AWS sköter motorn, patchar och backup. Du sköter schema, användare och security group. <span class="src">(kursens lektion sida 14, <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html#Welcome.Concepts.comparison">AWS: Comparison of responsibilities</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>AWS</h3>
+    <p>Installerar motorn. Patchar operativsystemet och motorn, alltså uppdaterar dem så att fel och säkerhetshål rättas. Tar backup, en kopia som databasen kan återställas från.</p>
+  </div>
+  <div>
+    <h3>Du</h3>
+    <p>Schemat: vilka tabeller och kolumner som finns. Datan. Användarna: inloggningar i själva databasen, inte <a href="0004-iam-user.html">IAM users</a>. <a href="0034-security-group.html">Security group</a>: vem som får ansluta.</p>
+  </div>
+</div>
+<p><span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.html">AWS: Security in Amazon RDS</a>, <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html#Welcome.Concepts.comparison">AWS: Comparison of responsibilities</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Skillnaden mot en databas på EC2</h2>
+
+<p>Installerar du PostgreSQL själv på en <a href="0029-ec2-instans.html">EC2-instans</a> är <a href="0030-ami.html">operativsystemet</a>, motorn, patcharna och backupen ditt ansvar. AWS sköter bara maskinerna och datacentret. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html#Welcome.Concepts.comparison">AWS: Comparison of responsibilities</a>)</span></p>
+
+<p>Det är <a href="0019-shared-responsibility-model.html">Shared Responsibility Model</a>: hur mycket som är ditt beror på tjänsten. Med RDS tar AWS en större del. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.html">AWS: Security in Amazon RDS</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vem patchar operativsystemet som RDS-databasen körs på?</p>
+  <div class="options">
+    <button class="opt" data-why="I RDS kommer du inte åt databasens operativsystem, det sköter AWS.">Du, via en terminal på servern</button>
+    <button class="opt" data-why="Operativsystemet patchas, och i RDS är det AWS som gör det.">Ingen, det patchas aldrig i RDS</button>
+    <button class="opt" data-correct data-why="RDS är managed, så AWS patchar både operativsystemet och motorn.">AWS sköter det, RDS är managed</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vem bestämmer vilka tabeller och kolumner databasen har?</p>
+  <div class="options">
+    <button class="opt" data-why="AWS sköter motorn, men vad som sparas i den bestämmer du.">AWS, det följer med motorn</button>
+    <button class="opt" data-correct data-why="Tabellerna och kolumnerna är databasens schema, och schemat sköter du.">Du, det är databasens schema</button>
+    <button class="opt" data-why="PostgreSQL skapar bara de tabeller som du ber om.">PostgreSQL, det gör den själv</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 19: vad ansvarar AWS för enligt Shared Responsibility Model?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="AWS ansvarar för säkerheten av molnet: datacenter, maskiner och nätverk.">Säkerheten av molnet</button>
+    <button class="opt" data-why="Säkerheten i molnet, till exempel din data, är ditt ansvar.">Säkerheten i molnet</button>
+    <button class="opt" data-why="Ansvaret delas, och hur mycket som är ditt beror på tjänsten.">Säkerheten för allt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>RDS är en managed databas: AWS kör den, och du använder den. Databasprogrammet kallas motor, i kursen PostgreSQL.</li>
+    <li>AWS sköter motorn, patchar och backup. Du sköter schema, användare och security group.</li>
+    <li>Kör du databasen på EC2 är operativsystem, motor, patchar och backup ditt ansvar. Det är Shared Responsibility Model.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html">Amazon RDS: What is Amazon Relational Database Service?</a>.</p>
+<p>Om ansvaret: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.html">Amazon RDS: Security in Amazon RDS</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0038-stoppa-terminera.html">Förra: Stoppa och terminera</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0040-db-subnet-group.html">Nästa: DB subnet group</a>
+</nav>
+
+</main>
+</body>
+</html>

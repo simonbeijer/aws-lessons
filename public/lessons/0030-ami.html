@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMI</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 30 · v40, 11 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 30</p>
+<h1>AMI</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en AMI är avbilden servern startar från, t.ex. Amazon Linux 2023.
+</div>
+
+<section class="explain">
+<h2>Vad är en AMI?</h2>
+
+<p>En AMI (Amazon Machine Image) är avbilden servern startar från. Den innehåller programvaran som behövs för att starta servern, främst operativsystemet: grundprogrammet som styr datorn, t.ex. Linux eller Windows. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html">AWS: Amazon Machine Images</a>)</span></p>
+
+<p>Du måste välja en AMI när du startar en instans. Från samma AMI kan du starta flera servrar som blir likadana. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html">AWS: Amazon Machine Images</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Var väljer du AMI?</h2>
+
+<p>Du väljer AMI under Application and OS Images i guiden Launch instances. Fliken Quick Start visar vanliga AMI:er, sorterade efter operativsystem. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-launch-parameters.html#liw-ami">AWS: Application and OS Images</a>)</span></p>
+
+<p>AMI:er kommer från AWS, från andra användare eller från AWS Marketplace, en butik där vissa AMI:er kostar pengar. Märkningen Verified provider betyder att AMI:n kommer från Amazon eller en granskad partner. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-launch-parameters.html#liw-ami">AWS: Application and OS Images</a>, <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/paid-amis.html">AWS: Paid AMIs</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför Amazon Linux 2023?</h2>
+
+<p>Amazon Linux 2023 passar kursen eftersom den är AWS egen Linux och inte kostar något extra utöver servern. <span class="src">(<a href="https://docs.aws.amazon.com/linux/al2023/ug/what-is-amazon-linux.html">AWS: What is Amazon Linux 2023?</a>)</span></p>
+
+<p>Den har också EC2 Instance Connect färdigt installerat. Det är tjänsten som låter dig skriva kommandon till servern direkt i webbläsaren. Med en annan AMI kan den saknas. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-set-up.html">AWS: Install EC2 Instance Connect</a>)</span></p>
+
+<p>Kursen väljer arkitekturen 64-bit (x86). Arkitekturen är den sorts processor AMI:n är byggd för, och den måste passa instanstypen. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html">AWS: Amazon Machine Images</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad är en AMI?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är instanstypen. AMI:n är avbilden servern startar från.">Storleken på processorn och minnet i servern</button>
+    <button class="opt" data-correct data-why="AMI:n innehåller programvaran servern startar med, främst operativsystemet.">Avbilden med systemet som servern startar från</button>
+    <button class="opt" data-why="Det är en security group. AMI:n är avbilden servern startar från.">Brandväggen som släpper in trafik till servern</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Varför passar Amazon Linux 2023 i kursen?</p>
+  <div class="options">
+    <button class="opt" data-why="Det finns många AMI:er, t.ex. med Windows. Skälet är kostnad och Instance Connect.">Den är ensam om att fungera på EC2-servrarna</button>
+    <button class="opt" data-why="Valet av AMI påverkar inte om servern nås. Skälet är kostnad och Instance Connect.">Den gör att servern blir nåbar från internet</button>
+    <button class="opt" data-correct data-why="Den kostar inget extra, och EC2 Instance Connect är förinstallerat.">Den kostar inte extra och har Instance Connect</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 29: hur betalar du för en EC2-instans?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Du betalar per sekund medan den körs, minst 60 sekunder.">Per sekund medan den körs</button>
+    <button class="opt" data-why="Det är per sekund, inte per månad, och bara medan den körs.">En fast avgift varje månad</button>
+    <button class="opt" data-why="Du betalar för tiden den körs, inte per besök.">Per besök som sidan får</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En AMI är avbilden servern startar från. Den innehåller programvaran, främst operativsystemet.</li>
+    <li>Du väljer AMI under Application and OS Images när du startar en instans. Samma AMI kan starta flera likadana servrar.</li>
+    <li>Kursen använder Amazon Linux 2023, 64-bit (x86): AWS egen Linux, utan extra kostnad och med EC2 Instance Connect installerat.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html">Amazon EC2: Amazon Machine Images in Amazon EC2</a>.</p>
+<p>Om Amazon Linux 2023: <a href="https://docs.aws.amazon.com/linux/al2023/ug/what-is-amazon-linux.html">Amazon Linux 2023: What is Amazon Linux 2023?</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0029-ec2-instans.html">Förra: EC2-instans</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0031-instanstyp.html">Nästa: Instanstyp</a>
+</nav>
+
+</main>
+</body>
+</html>

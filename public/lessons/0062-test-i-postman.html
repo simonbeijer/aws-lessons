@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test i Postman</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 62 · v41, 15 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 62</p>
+<h1>Test i Postman</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att ett test är en kort kontroll av svaret som körs efter varje anrop, och att Run kör hela collectionen i ordning.
+</div>
+
+<section class="explain">
+<h2>Vad är ett test i Postman?</h2>
+
+<p>Ett test är en kort kontroll av svaret, skriven i JavaScript. Postman kör den varje gång svaret har kommit. <span class="src">(<a href="https://learning.postman.com/docs/tests-and-scripts/write-scripts/test-scripts/">Postman: Write scripts to test API response data</a>, kursmaterialet v41)</span></p>
+
+<p>Testet skrivs på anropet, under fliken Scripts, delen Post-response. Resultatet syns vid svaret under fliken Test Results: grönt om kontrollen stämmer, annars rött. <span class="src">(<a href="https://learning.postman.com/docs/tests-and-scripts/write-scripts/test-scripts/#add-a-post-response-test">Postman: Add a post-response test</a>, kursmaterialet v41)</span></p>
+</section>
+
+<section class="explain">
+<h2>Ett test av statuskoden</h2>
+
+<p>Det här testet kontrollerar att svaret har <a href="0050-statuskod.html">statuskoden</a> 200: <span class="src">(kursmaterialet v41, <a href="https://learning.postman.com/docs/tests-and-scripts/write-scripts/test-scripts/#add-a-post-response-test">Postman: Add a post-response test</a>)</span></p>
+
+<pre><code>pm.test("Status 200", () =&gt; pm.response.to.have.status(200));</code></pre>
+
+<p>Allt som börjar med <code>pm</code> kommer från Postman. <code>pm.test</code> skapar testet <code>"Status 200"</code>, och namnet visas i Test Results. <code>pm.response</code> är svaret, och <code>to.have.status(200)</code> kontrollerar dess statuskod. Är koden en annan blir testet rött. <span class="src">(<a href="https://learning.postman.com/docs/tests-and-scripts/write-scripts/test-scripts/#validate-responses">Postman: Validate responses</a>)</span></p>
+
+<p>Kursens poäng: ett test per anrop. Blir ett test rött är det API:et som ska rättas, inte testet. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<section class="explain">
+<h2>Run kör hela collectionen</h2>
+
+<p>Run skickar alla anrop i <a href="0055-postman.html">collectionen</a> i ordning och kör testerna efter varje svar. Klicka på collectionen och välj Run, så öppnas fönstret Collection Runner. Längst upp står antalet tester som gick igenom (passed) och inte (failed). <span class="src">(<a href="https://learning.postman.com/docs/tests-and-scripts/running-collections/intro-to-collection-runs/">Postman: Collection Runner</a>, kursmaterialet v41)</span></p>
+
+<p>Ordningen spelar roll: anropet som skapar en kund måste gå före det som hämtar den. Du ändrar ordningen genom att dra. <span class="src">(<a href="https://learning.postman.com/docs/tests-and-scripts/running-collections/intro-to-collection-runs/#configure-a-collection-run">Postman: Configure a collection run</a>, kursmaterialet v41)</span></p>
+
+<p>Kursens poäng: kör samma anrop i samma ordning efter varje ändring i servern. Då ser du om något som fungerade har gått sönder. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. När kör Postman ett test som ligger under Post-response?</p>
+  <div class="options">
+    <button class="opt" data-why="Post-response betyder efter svaret; testet behöver svaret för att ha något att kontrollera.">Innan anropet går iväg till servern</button>
+    <button class="opt" data-correct data-why="Testet ligger under Post-response, så Postman kör det när svaret har kommit, varje gång.">Varje gång svaret har kommit fram</button>
+    <button class="opt" data-why="Testet körs varje gång anropet skickas, inte bara när du öppnar Run.">Bara när hela collectionen ska köras</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad gör Run på en collection?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Collection Runner skickar alla anrop i ordning, kör testerna efter varje svar och visar passed och failed.">Skickar alla anrop i ordning och kör testerna</button>
+    <button class="opt" data-why="Run skickar anropen i den ordning de ligger; ordningen spelar roll och du ändrar den genom att dra.">Skickar alla anropen på en gång utan ordning</button>
+    <button class="opt" data-why="Run skickar anropen på riktigt och kör testerna efter varje svar, den listar inte bara testerna.">Listar bara de tester som finns i collectionen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 50: <code>POST /customers</code> skapar en ny kund. Vilken statuskod ska testet vänta sig?</p>
+  <div class="options">
+    <button class="opt" data-why="200 betyder att det gick bra, men när något nytt skapas svarar API:et med 201.">200, som betyder att anropet gick bra</button>
+    <button class="opt" data-why="204 betyder att det gick bra med tom kropp, som vid DELETE; något nytt skapat ger 201.">204, som betyder att det saknas kropp</button>
+    <button class="opt" data-correct data-why="201 Created betyder att något nytt skapades, och det är vad POST /customers gör.">201, som betyder att något nytt skapats</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett test är en kort kontroll av svaret i JavaScript. Det ligger under Scripts, Post-response, och körs varje gång svaret har kommit.</li>
+    <li>Resultatet syns under Test Results: grönt om kontrollen stämmer, rött om inte. Rött betyder att API:et ska rättas.</li>
+    <li>Run öppnar Collection Runner, som skickar alla anrop i collectionen i ordning och visar passed och failed.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://learning.postman.com/docs/tests-and-scripts/write-scripts/test-scripts/">Postman: Write scripts to test API response data</a>.</p>
+<p>Om att köra hela collectionen: <a href="https://learning.postman.com/docs/tests-and-scripts/running-collections/intro-to-collection-runs/">Postman: Test your API using the Collection Runner</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0061-variabel-i-postman.html">Förra: Variabel i Postman</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0063-negativt-test.html">Nästa: Negativt test</a>
+</nav>
+
+</main>
+</body>
+</html>

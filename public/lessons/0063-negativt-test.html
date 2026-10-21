@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negativt test</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 63 · v41, 16 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 63</p>
+<h1>Negativt test</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Varför testerna i Postman också kontrollerar att felaktiga anrop ger 400 och 404.
+</div>
+
+<section class="explain">
+<h2>Vad är ett negativt test?</h2>
+
+<p>Ett negativt test skickar ett anrop som ska misslyckas och kontrollerar att svaret har rätt felkod. Testet blir grönt när API:et svarar 400 eller 404, som det ska. <span class="src">(kursmaterialet v41)</span></p>
+
+<p>Testerna i <a href="0062-test-i-postman.html">förra lektionen</a> prövar den lyckliga vägen: rätta anrop som ska ge 200, 201 eller 204. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<section class="explain">
+<h2>Tre fel som kursen testar</h2>
+
+<p>Kursen har tre negativa tester, och varje fel har sin <a href="0050-statuskod.html">statuskod</a>: <span class="src">(kursmaterialet v41, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/400">MDN: 400 Bad Request</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404">MDN: 404 Not Found</a>)</span></p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Anrop</th><th>Väntad kod</th><th>Varför</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /customers/42</code> när kund 42 är borttagen</td><td><code>404</code></td><td>Kunden finns inte.</td></tr>
+    <tr><td><code>POST /customers</code> med <code>{"name":""}</code></td><td><code>400</code></td><td>Namnet är <a href="0052-json.html">tomt</a>.</td></tr>
+    <tr><td><code>GET /customers/abc</code></td><td><code>400</code></td><td><code>abc</code> kan aldrig vara ett <a href="0053-rest-api.html">kundnummer</a>.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Testet skrivs som i förra lektionen. Bara siffran är en annan: <span class="src">(kursmaterialet v41, <a href="https://learning.postman.com/docs/tests-and-scripts/write-scripts/test-examples/#test-for-a-status-code">Postman: Test for a status code</a>)</span></p>
+
+<pre><code>pm.test("Status 404", () =&gt; pm.response.to.have.status(404));</code></pre>
+</section>
+
+<section class="explain">
+<h2>Varför felen också testas</h2>
+
+<p>Ett API som bara testas på den lyckliga vägen går sönder i det som inte testades. Därför är de negativa testerna enligt kursen de viktigaste. <span class="src">(kursmaterialet v41)</span></p>
+
+<p>Ett exempel: <code>DELETE</code> svarar 204 men tar inte bort kunden ur databasen. Alla tester på den lyckliga vägen blir gröna. Bara hämtningen efteråt avslöjar felet, med 200 i stället för 404. <span class="src">(kursmaterialet v41)</span></p>
+
+<p>Felkoden är också ett besked till klienten: 400 betyder att anropet ska ändras, 404 att resursen inte finns. <span class="src">(<a href="0050-statuskod.html">lektion 50</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status#client_error_responses">MDN: Client error responses</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad kontrollerar ett negativt test?</p>
+  <div class="options">
+    <button class="opt" data-why="Det gör testerna på den lyckliga vägen; ett negativt test skickar ett anrop som ska misslyckas.">Att ett rätt anrop får statuskod 200</button>
+    <button class="opt" data-why="Servern ska svara även på fel anrop, med en felkod som 400 eller 404, och det är den koden testet kontrollerar.">Att servern inte svarar på fel anrop</button>
+    <button class="opt" data-correct data-why="Ett negativt test skickar ett anrop som ska misslyckas och blir grönt när felkoden är den väntade.">Att ett fel anrop får väntad felkod</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Kund 42 har tagits bort med <code>DELETE</code>. Vilken kod ska testet för <code>GET /customers/42</code> vänta sig?</p>
+  <div class="options">
+    <button class="opt" data-why="200 skulle betyda att kunden finns kvar, alltså att DELETE inte tog bort den.">200, eftersom själva anropet är rätt</button>
+    <button class="opt" data-why="204 är svaret på själva DELETE; en hämtning av en kund som inte finns ger 404.">204, eftersom kunden har tagits bort</button>
+    <button class="opt" data-correct data-why="Resursen finns inte längre, och det betyder 404 Not Found.">404, eftersom kunden inte längre finns</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 52: <code>{"name":""}</code> är giltig JSON. Vad svarar kursens server på <code>POST /customers</code> med den kroppen?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Servern kontrollerar också värdet, och ett tomt namn ger 400 och name is required.">400, eftersom namnet inte är ifyllt</button>
+    <button class="opt" data-why="Giltig JSON räcker inte; servern kontrollerar också att namnet inte är tomt.">201, eftersom kroppen är giltig JSON</button>
+    <button class="opt" data-why="404 gäller en resurs som inte finns; här är det kroppen som är fel, så svaret blir 400.">404, eftersom kunden inte finns än</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett negativt test skickar ett anrop som ska misslyckas och kontrollerar att felkoden är rätt, t.ex. 400 eller 404.</li>
+    <li>Kursens tre: borttagen kund ger 404, tomt namn ger 400, <code>/customers/abc</code> ger 400. Testet är samma rad som förut, med en annan siffra.</li>
+    <li>Ett API som bara testas på den lyckliga vägen går sönder i det som inte testades. Felkoden är dessutom ett besked till klienten.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status#client_error_responses">MDN: Client error responses</a> (400 och 404).</p>
+<p>Om testet av statuskoden: <a href="https://learning.postman.com/docs/tests-and-scripts/write-scripts/test-examples/#test-for-a-status-code">Postman: Test script examples</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0062-test-i-postman.html">Förra: Test i Postman</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0064-yaml.html">Nästa: YAML</a>
+</nav>
+
+</main>
+</body>
+</html>

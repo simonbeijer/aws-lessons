@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQL-parameter</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 59 · v41, 12 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 59</p>
+<h1>SQL-parameter</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Varför värden skickas som <code>$1</code> i stället för att klistras in i SQL-strängen, och vad SQL-injektion är.
+</div>
+
+<section class="explain">
+<h2>Vad är en SQL-parameter?</h2>
+
+<p>En SQL-parameter är en plats i SQL-frågan, skriven <code>$1</code>, som fylls med ett värde som skickas separat. SQL är språket programmet ställer frågor till databasen med, här <a href="0039-rds.html">PostgreSQL</a>. <span class="src">(<a href="https://www.postgresql.org/docs/current/sql-prepare.html">PostgreSQL: PREPARE</a>, <a href="https://node-postgres.com/features/queries#parameterized-query">node-postgres: Parameterized query</a>)</span></p>
+
+<pre><code>pool.query(
+  "SELECT id, name FROM customers WHERE id = $1",
+  [id]
+);</code></pre>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Del</th><th>Betyder</th></tr>
+  <tr><td><code>pool.query</code></td><td>Skickar frågan till databasen. <code>pool</code> är programmets kopplingar dit.</td></tr>
+  <tr><td><code>"SELECT ... $1"</code></td><td>Frågan, som text (en sträng). <code>SELECT</code> hämtar id och name ur tabellen customers, <code>WHERE</code> väljer raden där id är <code>$1</code>.</td></tr>
+  <tr><td><code>[id]</code></td><td>En lista med värdena, t.ex. <a href="0057-express.html"><code>req.params.id</code></a>. Det första fylls i på <code>$1</code>.</td></tr>
+</table>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad är SQL-injektion?</h2>
+
+<p>SQL-injektion är när ett värde klistras in i SQL-strängen och databasen kör delar av det som SQL. Här sätter koden ihop en <code>INSERT</code>, som lägger till en kund, med <code>+</code>: <span class="src">(<a href="https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html#anatomy-of-a-typical-sql-injection-vulnerability">OWASP: SQL Injection</a>, <a href="https://www.postgresql.org/docs/current/sql-insert.html">PostgreSQL: INSERT</a>)</span></p>
+
+<pre><code>"INSERT INTO customers (name) VALUES ('" + name + "')"</code></pre>
+
+<p>Skickar någon namnet <code>x'); DROP TABLE customers; --</code> i <a href="0052-json.html">JSON</a>-kroppen, blir frågan:</p>
+
+<pre><code>INSERT INTO customers (name) VALUES ('x'); DROP TABLE customers; --')</code></pre>
+
+<p><code>'</code> avslutar texten, <code>;</code> avslutar kommandot och <code>--</code> gör resten till en kommentar, text som databasen hoppar över. Kvar blir kommandot <code>DROP TABLE customers</code>, som raderar tabellen. <span class="src">(<a href="https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS">PostgreSQL: Lexical structure</a>, <a href="https://www.postgresql.org/docs/current/sql-droptable.html">PostgreSQL: DROP TABLE</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför <code>$1</code> stoppar det</h2>
+
+<p>Med <code>$1</code> skickas frågan och värdet var för sig, så databasen läser värdet som data, aldrig som kod. Samma namn sparas då bara som ett kundnamn. <span class="src">(<a href="https://node-postgres.com/features/queries#parameterized-query">node-postgres: Parameterized query</a>, <a href="https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html#defense-option-1-prepared-statements-with-parameterized-queries">OWASP: Parameterized queries</a>)</span></p>
+
+<p>Kursens poäng: SQL med parametrar, aldrig ihopklistrade strängar. <span class="src">(kursens lektion sida 22)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Koden kör <code>pool.query("SELECT name FROM customers WHERE id = $1", [42])</code>. Vad fyller databasen i på platsen för <code>$1</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="$1 är en plats för ett värde, och värdet kommer från listan [42].">Texten $1, orörd, precis som i frågan</button>
+    <button class="opt" data-correct data-why="Det första värdet i listan fylls i på $1, alltså 42.">Talet 42, första värdet ur listan [42]</button>
+    <button class="opt" data-why="Listan [42] ger värdet till $1, så frågan går att köra.">Ingenting, och frågan ger då ett fel</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Koden klistrar in <code>name</code> i SQL-strängen med <code>+</code>. Någon skickar namnet <code>x'); DROP TABLE customers; --</code>. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="' avslutar texten och ; kommandot, så DROP TABLE körs som ett eget kommando.">Databasen kör DROP TABLE och raderar tabellen</button>
+    <button class="opt" data-why="Så blir det med $1; ihopklistrat körs en del av namnet som SQL.">Databasen sparar namnet som ett vanligt namn</button>
+    <button class="opt" data-why="Namnet är en giltig text, så inget stoppar det innan databasen.">Express stoppar anropet med 400 före frågan</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 45: du skriver lösenordet inom enkla citattecken i terminalen. Varför ska lösenordet inte innehålla <code>'</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är $ som hämtar en variabel, och inte inom enkla citattecken.">Bash läser tecknet som start på variabelnamn</button>
+    <button class="opt" data-why="Bash hoppar inte över tecken mellan enkla citattecken; ' avslutar texten.">Bash hoppar över tecknet och behåller resten</button>
+    <button class="opt" data-correct data-why="Samma sak som i SQL: ' avslutar texten, och resten läses inte som lösenord.">Tecknet avslutar texten, så resten blir fel</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En SQL-parameter, <code>$1</code>, är en plats i frågan. Värdet skickas separat i en lista: <code>pool.query("... WHERE id = $1", [id])</code>.</li>
+    <li>SQL-injektion: ett värde klistras in i SQL-strängen, och databasen kör en del av det som SQL, t.ex. <code>DROP TABLE customers</code>.</li>
+    <li>Med <code>$1</code> läser databasen värdet som data, aldrig som kod. Klistra aldrig ihop SQL-strängar med värden från ett anrop.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html">OWASP: SQL Injection Prevention Cheat Sheet</a>.</p>
+<p>Om <code>$1</code> i koden: <a href="https://node-postgres.com/features/queries">node-postgres: Queries</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0058-localhost.html">Förra: localhost</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0060-process-i-bakgrunden.html">Nästa: Process i bakgrunden (nohup)</a>
+</nav>
+
+</main>
+</body>
+</html>

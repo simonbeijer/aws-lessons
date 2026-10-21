@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EBS snapshot</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 46 · v40, 27 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 46</p>
+<h1>EBS snapshot</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en snapshot är en kopia av en EBS-volym vid ett givet ögonblick, och att den kostar lagring tills du tar bort den.
+</div>
+
+<section class="explain">
+<h2>Vad är en EBS snapshot?</h2>
+
+<p>En EBS snapshot är en kopia av en <a href="0032-ebs-volym.html">EBS-volym</a>, alltså serverns disk, som den såg ut när du tog kopian. Det du ändrar efteråt kommer inte med. <span class="src">(<a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-snapshots.html">AWS: Amazon EBS snapshots</a>)</span></p>
+
+<p>Du tar den under EC2 → Volumes med Actions → Create snapshot. Den syns sedan under EC2 → Snapshots. <span class="src">(<a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-creating-snapshot.html">AWS: Create EBS snapshots</a>, kursmaterialet v40)</span></p>
+
+<p>AWS sparar den i <a href="0012-s3-bucket-objekt.html">S3</a>, men inte bland dina buckets. Från den kan du skapa en ny, likadan volym. <span class="src">(<a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-snapshots.html">AWS: Amazon EBS snapshots</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad sparar nästa snapshot?</h2>
+
+<p>Bara det som ändrats sedan förra snapshoten av volymen. Den första sparar all data. Det kallas inkrementellt. <span class="src">(<a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-deleting-snapshot.html#ebs-deleting-snapshot-incremental">AWS: How deleting incremental snapshots works</a>)</span></p>
+
+<p>AWS exempel, 10 GiB data:</p>
+
+<div class="two-col">
+  <div>
+    <h3>Snapshot 1</h3>
+    <p>Sparar alla 10 GiB.</p>
+  </div>
+  <div>
+    <h3>Snapshot 2</h3>
+    <p>4 GiB har ändrats och sparas. Lagrat: 14 GiB.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad kostar den?</h2>
+
+<p>Du betalar per sparad GB och månad, så länge snapshoten finns. Kursen räknar med cirka 0,05 USD per GB och månad. Med Free plan räknas kostnaden av mot krediterna. <span class="src">(kursmaterialet v40, <a href="https://aws.amazon.com/ebs/pricing/">AWS: Amazon EBS pricing</a>, <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html">AWS: Choosing a plan</a>)</span></p>
+
+<p>Snapshoten lever separat från volymen. Tar du bort volymen, eller <a href="0038-stoppa-terminera.html">terminerar</a> servern, finns snapshoten kvar. <span class="src">(<a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-deleting-snapshot.html">AWS: Delete an EBS snapshot</a>)</span></p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>En glömd snapshot kostar varje månad.</p>
+</div>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Borttaget kostar noll. EC2 → Snapshots, Actions → Delete snapshot. <span class="src">(kursens lektion sida 36, <a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-deleting-snapshot.html#ebs-delete-snapshot">AWS: Delete a snapshot</a>)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad innehåller en EBS snapshot?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="En snapshot är en kopia av volymen vid ett givet ögonblick; senare ändringar kommer inte med.">Diskens innehåll när du tog kopian</button>
+    <button class="opt" data-why="En snapshot uppdateras inte av sig själv; den visar disken som den var när du tog den.">En kopia som uppdateras varje natt</button>
+    <button class="opt" data-why="En snapshot kopierar bara EBS-volymen, inte instansens processor och minne.">Servern med sin processor och minne</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du terminerar servern och disken raderas. Vad händer med snapshoten av disken?</p>
+  <div class="options">
+    <button class="opt" data-why="Att radera en volym påverkar inte snapshots som gjorts av den.">Den tas också bort, precis som disken</button>
+    <button class="opt" data-why="Snapshoten kostar så länge den finns, oavsett om volymen finns kvar.">Den slutar kosta när disken är borta</button>
+    <button class="opt" data-correct data-why="Snapshoten lever separat från volymen och kostar tills du själv tar bort den.">Den finns kvar och kostar varje månad</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 38: vad betalar du för när servern är stoppad?</p>
+  <div class="options">
+    <button class="opt" data-why="Den automatiska publika adressen släpps vid stopp, och servern får en ny vid start.">Den publika adressen till servern</button>
+    <button class="opt" data-correct data-why="Disken finns kvar när servern är stoppad, och den kostar per GB och månad.">Disken, det vill säga EBS-volymen</button>
+    <button class="opt" data-why="En stoppad instans kostar inget för användning; det är disken som kostar.">Instansen, som finns kvar stoppad</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En EBS snapshot är en kopia av en EBS-volym som den såg ut när du tog den. Du hittar den under EC2 → Snapshots.</li>
+    <li>Den första snapshoten sparar all data. Nästa sparar bara det som ändrats.</li>
+    <li>Snapshoten kostar per GB och månad tills du tar bort den, även om volymen och servern är borta. Med Free plan räknas det av mot krediterna.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-snapshots.html">Amazon EBS: Amazon EBS snapshots</a>.</p>
+<p>Om kostnaden: <a href="https://aws.amazon.com/ebs/pricing/">Amazon EBS pricing</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0045-citattecken-bash.html">Förra: Citattecken i bash</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0047-egen-ami.html">Nästa: Egen AMI</a>
+</nav>
+
+</main>
+</body>
+</html>

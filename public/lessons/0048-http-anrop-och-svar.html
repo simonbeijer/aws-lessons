@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTTP-anrop och svar</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 48 · v41, 1 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 48</p>
+<h1>HTTP-anrop och svar</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att ett HTTP-anrop och svaret på det har samma form: en startrad, headers, en tom rad och sedan kroppen.
+</div>
+
+<section class="explain">
+<h2>Vad är ett anrop och ett svar?</h2>
+
+<p>Ett HTTP-anrop är ett meddelande som en klient skickar till en <a href="0029-ec2-instans.html">server</a> för att be om något. Svaret är meddelandet servern skickar tillbaka. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages">MDN: HTTP messages</a>)</span></p>
+
+<p>Klienten är programmet som skickar anropet, t.ex. webbläsaren. <a href="0033-port.html">HTTP</a> är sättet den hämtar sidor på. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages">MDN: HTTP messages</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Fyra delar i samma ordning</h2>
+
+<p>Anrop och svar har fyra delar: startrad, headers, tom rad och kropp. Kursens exempel skapar en kund: <span class="src">(kursens lektion sida 14, <a href="https://www.rfc-editor.org/rfc/rfc9112.html#section-2.1">RFC 9112: Message format</a>)</span></p>
+
+<h3>Anropet, från klienten</h3>
+<pre><code>POST /customers HTTP/1.1
+Host: 16.170.12.34:3000
+Content-Type: application/json
+
+{ "name": "Carol" }</code></pre>
+
+<h3>Svaret, från servern</h3>
+<pre><code>HTTP/1.1 201 Created
+Content-Type: application/json
+
+{ "id": 3, "name": "Carol" }</code></pre>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Del</th><th>Vad den gör</th></tr></thead>
+  <tbody>
+    <tr><td>Startrad</td><td>Första raden. I anropet: vad klienten vill och var. I svaret: hur det gick. Båda har versionen, <code>HTTP/1.1</code>.</td></tr>
+    <tr><td>Headers</td><td>En rad per uppgift om meddelandet. <code>Host</code> säger vart anropet ska: serverns <a href="0028-publik-privat-ip.html">IP-adress</a> och <a href="0033-port.html">port</a>.</td></tr>
+    <tr><td>Tom rad</td><td>Säger att headers är slut.</td></tr>
+    <tr><td>Kropp</td><td>Innehållet: det klienten skickar eller servern lämnar tillbaka.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><code>POST</code>, <code>201</code> och headers får egna lektioner. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages#anatomy_of_an_http_message">MDN: Anatomy of an HTTP message</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Samma form åt båda hållen</h2>
+
+<p>Kursens poäng: anrop och svar är byggda likadant. Bara startraden skiljer: anropet säger vad klienten vill, svaret hur det gick. <span class="src">(kursens lektion sida 14)</span></p>
+
+<p>Läs därför ett svar uppifrån: startrad, headers och kroppen efter den tomma raden. Ett anrop som bara hämtar något har ingen kropp. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages#request_body">MDN: Request body</a>)</span></p>
+
+<p>Står det <code>HTTP/2</code> i startraden är det en nyare version. Delarna betyder samma sak. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages#http2_messages">MDN: HTTP/2 messages</a>, kursmaterialet v41)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Var slutar headers, och var börjar kroppen?</p>
+  <div class="options">
+    <button class="opt" data-why="Efter startraden kommer headers; kroppen börjar först efter den tomma raden.">Rakt efter den första raden</button>
+    <button class="opt" data-why="Inget ord markerar kroppen; det är den tomma raden som skiljer headers från kroppen.">Efter raden som heter Body</button>
+    <button class="opt" data-correct data-why="Den tomma raden säger att headers är slut, och allt efter den är kroppen.">Vid den första tomma raden</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad skiljer ett svar från ett anrop?</p>
+  <div class="options">
+    <button class="opt" data-why="Svaret har headers precis som anropet, till exempel vad kroppen är.">Svaret har aldrig några headers</button>
+    <button class="opt" data-correct data-why="Formen är densamma, men svarets startrad säger hur det gick i stället för vad klienten vill.">Startraden säger hur det gick</button>
+    <button class="opt" data-why="Ordningen är densamma åt båda hållen: startrad, headers, tom rad, kropp.">Svaret har kroppen före headers</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 33: anropet har <code>Host: 16.170.12.34:3000</code>. Vad säger 3000?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Porten säger vilket program på servern som ska ta emot anropet.">Vilket program anropet ska till</button>
+    <button class="opt" data-why="Servern hittas med IP-adressen; porten säger vilket program på servern som ska få anropet.">Vilken server anropet ska till</button>
+    <button class="opt" data-why="Talet efter kolonet är porten, inte någon storlek på kroppen.">Hur många tecken kroppen har</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett HTTP-anrop är ett meddelande från en klient, t.ex. webbläsaren, till en server. Svaret är meddelandet servern skickar tillbaka.</li>
+    <li>Båda har fyra delar i samma ordning: startrad, headers, en tom rad och kroppen.</li>
+    <li>Bara startraden skiljer: anropet säger vad klienten vill, svaret hur det gick. Kroppen kan saknas.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages">MDN: HTTP messages</a>.</p>
+<p>Standarden för formen: <a href="https://www.rfc-editor.org/rfc/rfc9112.html#section-2.1">RFC 9112: HTTP/1.1, Message format</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0047-egen-ami.html">Förra: Egen AMI</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0049-http-metod.html">Nästa: HTTP-metod</a>
+</nav>
+
+</main>
+</body>
+</html>

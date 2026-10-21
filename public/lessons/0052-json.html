@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JSON</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 52 · v41, 5 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 52</p>
+<h1>JSON</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att JSON är formatet som kroppen skrivs i, både i anropet och i svaret, och att JSON är strikt: ett enda fel tecken gör att kursens server svarar 400.
+</div>
+
+<section class="explain">
+<h2>Vad är JSON?</h2>
+
+<p>JSON är textformatet som kroppen skrivs i, åt båda hållen. Headern <a href="0051-header.html"><code>Content-Type: application/json</code></a> säger att kroppen är JSON. <span class="src">(kursens lektion sida 14, <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON">MDN: Working with JSON</a>, <a href="https://www.rfc-editor.org/rfc/rfc8259.html#section-11">RFC 8259</a>)</span></p>
+
+<p>Klienten skickar en ny kund:</p>
+
+<pre><code>{ "name": "Carol" }</code></pre>
+
+<p>Servern svarar med kunden som skapades:</p>
+
+<pre><code>{ "id": 3, "name": "Carol", "created_at": "2026-10-08T15:05:00Z" }</code></pre>
+
+<p>Du har sett JSON förut: policyn AdministratorAccess i <a href="0005-iam-policy.html">lektion 5</a> är skriven i JSON.</p>
+</section>
+
+<section class="explain">
+<h2>Hur JSON skrivs</h2>
+
+<p>Det som står inom <code>{ }</code> kallas ett JSON-objekt. Det är något annat än ett <a href="0012-s3-bucket-objekt.html">objekt i S3</a>. JSON-objektet har par av namn och värde, med kolon emellan och komma mellan paren. Namnet står alltid inom dubbla citattecken. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON">MDN: Working with JSON</a>)</span></p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Värde</th><th>Exempel</th><th>Skrivs</th></tr></thead>
+  <tbody>
+    <tr><td>Text</td><td><code>"Carol"</code></td><td>Inom dubbla citattecken.</td></tr>
+    <tr><td>Tal</td><td><code>3</code></td><td>Utan citattecken.</td></tr>
+    <tr><td>Sant eller falskt</td><td><code>true</code></td><td>Utan citattecken.</td></tr>
+    <tr><td>Lista</td><td><code>[1, 2]</code></td><td>Inom <code>[ ]</code>.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>JSON har ingen typ för datum. Därför skickas datum som text, som <code>created_at</code> ovan. <span class="src">(kursens lektion sida 36, <a href="https://www.rfc-editor.org/rfc/rfc8259.html#section-3">RFC 8259</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Ett fel tecken ger 400</h2>
+
+<p>Ett fel tecken gör att kroppen inte är JSON. Då svarar kursens server 400. Enkla citattecken, ett komma efter sista paret eller en avbruten kropp räcker. Klicka och jämför: <span class="src">(kursmaterialet v41, <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON">MDN: Working with JSON</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-hel">Hel kropp</button>
+    <button class="chip" data-target="p-trasig">Trasig kropp</button>
+  </div>
+  <div class="picker-panel" id="p-hel">
+<pre><code>{"name":"Carol"}</code></pre>
+    <p>Svar: <code>201 Created</code>. Carol skapas.</p>
+  </div>
+  <div class="picker-panel" id="p-trasig">
+<pre><code>{"name":</code></pre>
+    <p>Svar: <code>400 Bad Request</code> och <code>body is not valid JSON</code>.</p>
+  </div>
+</div>
+
+<p>Servern kontrollerar också varje värde: <code>{"name":""}</code> är giltig JSON men ger ändå <a href="0050-statuskod.html">400</a> och <code>name is required</code>. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Klienten skickar <code>{ 'name': 'Carol' }</code> med rätt <code>Content-Type</code>. Vad svarar kursens server?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="JSON kräver dubbla citattecken, så servern kan inte läsa kroppen och svarar 400.">400: enkla citattecken är inte JSON</button>
+    <button class="opt" data-why="Med enkla citattecken är kroppen inte JSON, så ingen kund skapas.">201: Carol skapas precis som vanligt</button>
+    <button class="opt" data-why="Servern kraschar inte; den känner igen trasig JSON och svarar 400.">500: servern går sönder av tecknen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Hur står datumet <code>created_at</code> i serverns svar?</p>
+  <div class="options">
+    <button class="opt" data-why="Ett tal skrivs utan citattecken; kursens datum står inom dubbla citattecken.">Som ett heltal utan några citattecken</button>
+    <button class="opt" data-why="JSON har ingen typ för datum, så ett datum måste skrivas som text.">Som en särskild datumtyp för JSON</button>
+    <button class="opt" data-correct data-why="JSON har ingen datumtyp, så datumet skickas som text inom dubbla citattecken.">Som en text inom dubbla citattecken</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 5: i AdministratorAccess står paret <code>"Effect": "Allow"</code>. Vad betyder det?</p>
+  <div class="options">
+    <button class="opt" data-why="Allow betyder tillåt, medan att neka skrivs Deny.">Regeln nekar allting som den gäller</button>
+    <button class="opt" data-correct data-why="Allow betyder tillåt, så regeln tillåter det den gäller för.">Regeln tillåter det den gäller för</button>
+    <button class="opt" data-why="Vad regeln gäller står i Action och Resource, inte i Effect.">Regeln gäller bara en IAM user</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>JSON är textformatet som kroppen skrivs i, både i anropet och i svaret. <code>Content-Type: application/json</code> säger att kroppen är JSON.</li>
+    <li>Ett JSON-objekt är par av namn och värde inom <code>{ }</code>. Namn och text står inom dubbla citattecken. Datum skickas som text.</li>
+    <li>JSON är strikt. Ett fel tecken, t.ex. enkla citattecken, ger 400 från kursens server. Även giltig JSON kontrolleras: ett tomt namn ger också 400.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON">MDN: Working with JSON</a>.</p>
+<p>Standarden: <a href="https://www.rfc-editor.org/rfc/rfc8259.html">RFC 8259: The JSON Data Interchange Format</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0051-header.html">Förra: Header</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0053-rest-api.html">Nästa: REST-API</a>
+</nav>
+
+</main>
+</body>
+</html>

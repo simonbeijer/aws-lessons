@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EC2 Instance Connect</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 36 · v40, 17 av 28 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 36</p>
+<h1>EC2 Instance Connect</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Hur du får en terminal på servern i webbläsaren via SSH, utan key pair, och vad som måste vara på plats för att det ska fungera.
+</div>
+
+<section class="explain">
+<h2>Vad är EC2 Instance Connect?</h2>
+
+<p>EC2 Instance Connect är en AWS-tjänst som ger dig en terminal på servern i webbläsaren. En terminal är ett fönster där du skriver kommandon och servern svarar med text. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-methods.html#ec2-instance-connect-connecting-console">AWS: Connect using the EC2 console</a>)</span></p>
+
+<p>Anslutningen går över <a href="0033-port.html">SSH</a> på port 22. Tjänsten kostar inget utöver servern. Servern behöver en <a href="0030-ami.html">AMI</a> med tjänsten installerad, som Amazon Linux 2023. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-linux-inst-eic.html">AWS: EC2 Instance Connect</a>, <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-set-up.html">AWS: Install EC2 Instance Connect</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför inget key pair behövs</h2>
+
+<p>Ett key pair är två nycklar: en publik på servern och en privat på din dator. Tappar du den privata går den inte att få tillbaka. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html">AWS: Key pairs</a>)</span></p>
+
+<p>Med Instance Connect lägger AWS en ny publik nyckel på servern vid varje anslutning, i 60 sekunder. En <a href="0005-iam-policy.html">IAM policy</a> avgör om du får göra det. Därför väljer du Proceed without a key pair i guiden <a href="0029-ec2-instans.html">Launch instances</a>. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-linux-inst-eic.html">AWS: EC2 Instance Connect</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad som måste vara på plats</h2>
+
+<p>Servern måste nås från internet: route till Internet Gateway och publik IP-adress (<a href="0034-security-group.html">lektion 34</a>). Regeln för port 22 ska ha <a href="0035-kalla-i-regel.html">prefix list</a> för EC2 Instance Connect som källa, inte alla adresser. Trafiken kommer från tjänsten, inte från din dator. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-prerequisites.html">AWS: Prerequisites</a>, kursens lektion sida 13)</span></p>
+
+<p>Anslut i EC2-konsolen: <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-methods.html#ec2-instance-connect-connecting-console">AWS: Connect using the EC2 console</a>)</span></p>
+<ol>
+  <li>Markera servern och klicka Connect.</li>
+  <li>Välj fliken EC2 Instance Connect.</li>
+  <li>Användarnamnet ska vara <code class="copyable">ec2-user</code>, standardanvändaren i Amazon Linux.</li>
+  <li>Klicka Connect. Terminalen öppnas.</li>
+</ol>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Varför kan du välja Proceed without a key pair när du startar servern?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Instance Connect lägger en ny publik nyckel på servern vid varje anslutning, och den finns kvar i 60 sekunder.">AWS lägger en tillfällig nyckel på servern</button>
+    <button class="opt" data-why="Port 22 släpps bara in från prefix list för Instance Connect, inte från alla.">Servern öppnar port 22 för hela internet</button>
+    <button class="opt" data-why="Ingen privat nyckel sparas alls, eftersom AWS lägger en ny publik nyckel på servern vid varje anslutning.">Konsolen sparar din privata nyckel åt dig</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vilken källa ska regeln för port 22 ha, så att Instance Connect fungerar och ingen annan kommer in?</p>
+  <div class="options">
+    <button class="opt" data-why="Då släpps vem som helst på internet in på port 22.">Alla adresser på hela internet</button>
+    <button class="opt" data-why="Trafiken kommer från tjänsten Instance Connect, inte från din dator, så My IP släpper inte in den.">Din dators egen publika adress</button>
+    <button class="opt" data-correct data-why="Trafiken kommer från EC2 Instance Connect, och prefix list för tjänsten innehåller dess adresser.">Prefix list för Instance Connect</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 33: vad är SSH?</p>
+  <div class="options">
+    <button class="opt" data-why="Webbsidan går över HTTP på port 80, inte SSH.">Protokollet för webbsidan på port 80</button>
+    <button class="opt" data-correct data-why="SSH är en krypterad inloggning till en server, på port 22.">En krypterad inloggning till en server</button>
+    <button class="opt" data-why="Port 5432 är databasen med PostgreSQL, inte SSH.">Databasen som lyssnar på port 5432</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>EC2 Instance Connect ger en terminal på servern i webbläsaren, över SSH på port 22. Den kostar inget utöver servern.</li>
+    <li>Inget key pair behövs: AWS lägger en ny publik nyckel på servern vid varje anslutning, i 60 sekunder.</li>
+    <li>Servern behöver en AMI med tjänsten, route till Internet Gateway och publik IP-adress.</li>
+    <li>Port 22 öppnas bara för prefix list för EC2 Instance Connect, inte för alla.</li>
+    <li>Anslut med Connect, fliken EC2 Instance Connect och användaren <code>ec2-user</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-linux-inst-eic.html">Amazon EC2: Connect using EC2 Instance Connect</a>.</p>
+<p>Om vad som måste vara på plats: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-prerequisites.html">Amazon EC2: Prerequisites for EC2 Instance Connect</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0035-kalla-i-regel.html">Förra: Källa i en security group-regel</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0037-user-data.html">Nästa: User data</a>
+</nav>
+
+</main>
+</body>
+</html>

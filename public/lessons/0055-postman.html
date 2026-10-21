@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Postman</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 55 · v41, 8 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 55</p>
+<h1>Postman</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att Postman skickar samma anrop som curl men sparar dem i en collection.
+</div>
+
+<section class="explain">
+<h2>Vad är Postman?</h2>
+
+<p>Postman är ett program där du bygger ett HTTP-anrop i fält i stället för att skriva ett <a href="0054-curl.html">curl-kommando</a>. Du väljer metod i en lista, skriver adressen och klickar Send. <span class="src">(<a href="https://learning.postman.com/docs/sending-requests/create-requests/request-basics/">Postman: Send a request</a>, kursens lektion sida 19)</span></p>
+
+<p>Svaret visas under anropet: statuskoden, kroppen under Body och svarets headers under fliken Headers. Det är samma sak som <code>curl -i</code> visar. Varje curl-flagga har ett eget fält: <span class="src">(kursmaterialet v41)</span></p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>curl</th><th>Postman</th></tr>
+  <tr><td><code>-X POST</code></td><td>Listan där du väljer metod</td></tr>
+  <tr><td><code>-H</code></td><td>Fliken Headers på anropet</td></tr>
+  <tr><td><code>-d</code></td><td>Fliken Body, raw (ren text), JSON</td></tr>
+</table>
+</div>
+
+<p>Väljer du JSON under Body lägger Postman själv till <code>Content-Type: application/json</code>. <span class="src">(<a href="https://learning.postman.com/docs/sending-requests/create-requests/parameters/#raw-data">Postman: Raw data</a>, kursmaterialet v41)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad är en collection?</h2>
+
+<p>En collection är en mapp i Postman där du sparar anrop. Du klickar Save, ger anropet ett namn, till exempel <em>GET post 1</em>, och väljer collection. Nästa gång öppnar du anropet och klickar Send igen. <span class="src">(<a href="https://learning.postman.com/docs/collections/collections-overview/">Postman: Collections overview</a>, <a href="https://learning.postman.com/docs/sending-requests/create-requests/request-basics/">Postman: Send a request</a>)</span></p>
+
+<p>curl sparar inte anropet åt dig, det finns bara i kommandot du skriver. Kursens poäng: curl visar exakt, Postman minns. Alla anrop till kursens <a href="0053-rest-api.html">kund-API</a> hamnar därför i en och samma collection. <span class="src">(kursens lektion sida 30 och 36)</span></p>
+</section>
+
+<section class="explain">
+<h2>Från Postman till curl</h2>
+
+<p>Ikonen <code>&lt;/&gt;</code> (Code) till höger om anropet visar anropet som ett curl-kommando. Det är bryggan mellan verktygen: du kan klistra in kommandot i terminalen och få samma svar. <span class="src">(<a href="https://learning.postman.com/docs/sending-requests/create-requests/generate-code-snippets/">Postman: Generate code snippets</a>, kursmaterialet v41)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad gör en collection i Postman?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="En collection är en mapp med sparade anrop, så de finns kvar nästa gång du öppnar Postman.">Den sparar anropen till nästa gång</button>
+    <button class="opt" data-why="En collection skickar inte anropen fortare; den sparar dem så att du kan öppna dem igen.">Den skickar anrop fortare än curl</button>
+    <button class="opt" data-why="Det gör ikonen Code för ett anrop; en collection är där anropen sparas.">Den gör om anropen till curl-kod</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Var i Postman skriver du det som curl skickar med <code>-d</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Listan för metoden motsvarar -X, inte kroppen som -d skickar.">I listan för själva metoden</button>
+    <button class="opt" data-why="Fliken Headers motsvarar -H; kroppen från -d hör hemma under Body.">Under fliken Headers i anropet</button>
+    <button class="opt" data-correct data-why="-d skickar kroppen, och kroppen skriver du under Body med raw och JSON.">Under fliken Body i anropet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 54: vilken metod skickar curl om du varken anger <code>-X</code> eller <code>-d</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="POST måste du ange själv med -X; utan flaggor skickar curl GET.">POST, som skapar en resurs</button>
+    <button class="opt" data-correct data-why="Utan flaggor skickar curl GET, som hämtar resursen utan att ändra något.">GET, som hämtar en resurs</button>
+    <button class="opt" data-why="PUT måste du ange själv med -X; utan flaggor skickar curl GET.">PUT, som ersätter en resurs</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Postman skickar samma HTTP-anrop som curl, men du fyller i fält: metod, adress, Headers och Body. Väljer du JSON sätter Postman Content-Type åt dig.</li>
+    <li>En collection är en mapp med sparade anrop. curl visar exakt, Postman minns.</li>
+    <li>Ikonen Code visar ett anrop som ett curl-kommando.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://learning.postman.com/docs/collections/collections-overview/">Postman: Collections overview</a>.</p>
+<p>Om att skicka ett anrop: <a href="https://learning.postman.com/docs/sending-requests/create-requests/request-basics/">Postman: Send a request</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0054-curl.html">Förra: curl</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0056-network-fliken.html">Nästa: Network-fliken</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>localhost</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 58 · v41, 11 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 58</p>
+<h1>localhost</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att <code>localhost</code> betyder datorn som kör kommandot, och varför du testar API:et på servern innan du testar från din dator.
+</div>
+
+<section class="explain">
+<h2>Vad är localhost?</h2>
+
+<p><code>localhost</code> är namnet på datorn som kör kommandot. Namnet ger alltid en loopback-adress, till exempel <code>127.0.0.1</code>, en adress som pekar tillbaka på samma dator och aldrig syns utanför den. Anropet lämnar alltså aldrig datorn. <span class="src">(<a href="https://www.rfc-editor.org/rfc/rfc6761.html#section-6.3">RFC 6761: localhost</a>, <a href="https://www.rfc-editor.org/rfc/rfc1122.html#page-31">RFC 1122: loopback</a>)</span></p>
+
+<p>Med en <a href="0033-port.html">port</a> efter kolonet betyder <code>http://localhost:3000</code> programmet på port 3000 på samma dator.</p>
+</section>
+
+<section class="explain">
+<h2>Samma ord, olika datorer</h2>
+
+<p>Vilken dator <code>localhost</code> är beror på var du skriver det. <span class="src">(kursmaterialet v41)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>På servern</h3>
+    <p>I terminalen i <a href="0036-ec2-instance-connect.html">EC2 Instance Connect</a> är <code>localhost</code> servern. Där når anropet ditt <a href="0057-express.html">Express</a>-program.</p>
+  </div>
+  <div>
+    <h3>På din Mac</h3>
+    <p>I Terminal på din Mac är <code>localhost</code> din Mac. Där kör inget API. Använd serverns <a href="0028-publik-privat-ip.html">publika IP</a> i stället.</p>
+  </div>
+</div>
+
+<p>Så testar du API:et på servern:</p>
+
+<pre><code>curl -i http://localhost:3000/customers</code></pre>
+</section>
+
+<section class="explain">
+<h2>Varför testa på servern först?</h2>
+
+<p>Där testar du bara programmet. Ett anrop till <code>localhost</code> på servern lämnar aldrig servern och passerar därför ingen <a href="0034-security-group.html">security group</a>. Svarar det, fungerar programmet. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html">AWS: Security groups</a>, <a href="https://www.rfc-editor.org/rfc/rfc1122.html#page-31">RFC 1122: loopback</a>)</span></p>
+
+<p>Kursens poäng: får du timeout från din dator, testa <code class="copyable">curl http://localhost:3000</code> på servern först. Svarar det där, ligger felet i vägen dit, inte i koden. Oftast saknas regeln för port 3000, eller så har <a href="0035-kalla-i-regel.html">My IP</a> en gammal adress. <span class="src">(kursmaterialet v41, kursens lektion sida 17, <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/TroubleshootingInstancesConnecting.html#TroubleshootingInstancesConnectionTimeout">AWS: Connection timed out</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. API:et kör på servern. Du kör <code>curl -i http://localhost:3000/customers</code> i Terminal på din Mac. Vart går anropet?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="localhost är datorn som kör kommandot, alltså din Mac, och där kör inget API.">Till din Mac, där API:et inte finns</button>
+    <button class="opt" data-why="localhost lämnar aldrig datorn som kör kommandot; servern nås via sin publika IP.">Till servern i AWS, där API:et kör</button>
+    <button class="opt" data-why="localhost går aldrig ut på nätverket; till servern når du via dess publika IP.">Till AWS, som sedan skickar det dit</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. På servern svarar <code>curl http://localhost:3000/customers</code> med 200. Från din Mac blir det timeout. Var ligger felet?</p>
+  <div class="options">
+    <button class="opt" data-why="Saknas en route svarar Express 404, men här svarade programmet 200 på servern.">I koden, routen saknas helt i Express</button>
+    <button class="opt" data-correct data-why="Programmet fungerar på servern, så felet ligger i vägen dit, t.ex. security group-regeln.">I nätverket, t.ex. regeln för port 3000</button>
+    <button class="opt" data-why="Programmet svarade 200 på servern, så det kör; felet ligger på vägen dit.">I programmet, som inte kör på servern</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 35: regeln för port 3000 har källan My IP. Du byter till ett annat wifi. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="My IP ändras inte av sig själv; regeln har kvar den gamla adressen.">Regeln byter själv till din nya adress</button>
+    <button class="opt" data-why="My IP släpper bara in en adress; alla släpps in först med 0.0.0.0/0.">Alla adresser släpps in på port 3000</button>
+    <button class="opt" data-correct data-why="My IP fyller i din adress när regeln sparas; byter du nätverk måste regeln ändras.">Din nya adress blockeras på port 3000</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>localhost</code> är datorn som kör kommandot. Det ger en loopback-adress, t.ex. <code>127.0.0.1</code>, och anropet lämnar aldrig datorn.</li>
+    <li>På servern är <code>localhost</code> servern. På din Mac är det din Mac. Från din Mac når du servern via dess publika IP.</li>
+    <li>Testa <code>curl http://localhost:3000</code> på servern först. Svarar det där men inte från din dator, ligger felet i nätverket, t.ex. security group-regeln, inte i koden.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://www.rfc-editor.org/rfc/rfc6761.html#section-6.3">RFC 6761: localhost</a>.</p>
+<p>Om timeout från din dator: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/TroubleshootingInstancesConnecting.html#TroubleshootingInstancesConnectionTimeout">AWS EC2: Connection timed out</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0057-express.html">Förra: Express</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0059-sql-parameter.html">Nästa: SQL-parameter</a>
+</nav>
+
+</main>
+</body>
+</html>
