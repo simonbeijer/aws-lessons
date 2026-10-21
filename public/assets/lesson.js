@@ -109,9 +109,28 @@
     });
   }
 
+  // Klick på "Nästa: ..." markerar den här lektionen som klar på startsidan.
+  // Samma nyckel och format som index.html.
+  function setupDoneOnNext() {
+    var KEY = "aws-lektioner-klara";
+    var file = "lessons/" + location.pathname.split("/").pop();
+    document.querySelectorAll("a").forEach(function (a) {
+      if (!/^\s*Nästa:/.test(a.textContent)) return;
+      a.addEventListener("click", function () {
+        try {
+          var state = JSON.parse(localStorage.getItem(KEY)) || {};
+          state.lessons = state.lessons || {};
+          state.lessons[file] = true;
+          localStorage.setItem(KEY, JSON.stringify(state));
+        } catch (e) {}
+      });
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     setupQuiz();
     setupPickers();
     setupCopy();
+    setupDoneOnNext();
   });
 })();
