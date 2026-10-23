@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Autentisering</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 67 · v41, 20 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 67</p>
+<h1>Autentisering</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att autentisering kontrollerar vem som anropar, och att ett anrop utan token ska få 401.
+</div>
+
+<section class="explain">
+<h2>Vad är autentisering?</h2>
+
+<p>Autentisering är att servern kontrollerar vem som anropar. Du autentiseras själv när du <a href="0002-root-user.html">loggar in i AWS</a> med e-post och lösenord. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication">MDN: HTTP authentication</a>)</span></p>
+
+<p>En app skickar inte lösenordet i varje anrop. Den skickar en token: en lång rad tecken som appen fick när användaren loggade in. Den som har token räknas som den användaren. <span class="src">(<a href="https://www.rfc-editor.org/rfc/rfc6750.html#section-1">RFC 6750: Bearer token</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Var står token?</h2>
+
+<p>Token står i <a href="0051-header.html">headern</a> <code>Authorization</code>, efter ordet <code>Bearer</code>. Det betyder att den som bär token ska släppas in: <span class="src">(<a href="https://www.rfc-editor.org/rfc/rfc6750.html#section-2.1">RFC 6750: Authorization header</a>)</span></p>
+
+<pre><code>GET /bookings/42 HTTP/1.1
+Authorization: Bearer mF_9.B5f-4.1JqM</code></pre>
+
+<p>Servern kontrollerar token först. Saknas den, eller är den ogiltig, svarar servern <code>401 Unauthorized</code> och hämtar ingenting. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401">MDN: 401 Unauthorized</a>, kursens lektion sida 27)</span></p>
+
+<p>401 är en <a href="0050-statuskod.html">4xx</a>: klienten ska logga in och skicka anropet igen med token. Trots namnet gäller 401 vem du är, inte vad du får göra. Det senare är nästa lektion. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401">MDN: 401 Unauthorized</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför kontrollera på servern?</h2>
+
+<p>Servern måste kontrollera, för vem som helst kan anropa API:et utan appen, till exempel med <a href="0054-curl.html">curl</a>. Bokningsappen i <a href="0066-swagger-ui.html">förra lektionen</a> skickade alltid en token. Därför kontrollerade ingen att anrop som <code>/bookings/42</code> krävde den, och 184 000 bokningar hämtades utan token. <span class="src">(kursens lektion sida 24–25)</span></p>
+
+<p>401 till alla utan token hade räckt för att stoppa läckan. Därför är första åtgärden att kräva token på servern. <span class="src">(kursens lektion sida 27–28)</span></p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Lägg till ett <a href="0063-negativt-test.html">negativt test</a>: samma anrop utan <code>Authorization</code> ska få 401.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Ett anrop till <code>/bookings/42</code> saknar token. Vad ska servern svara?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Utan token vet servern inte vem som anropar, så den svarar 401 och hämtar ingenting.">401, och servern hämtar ingenting alls</button>
+    <button class="opt" data-why="200 betyder att det gick bra; utan token ska servern svara 401 och inte visa bokningen.">200, och bokningen visas som vanligt</button>
+    <button class="opt" data-why="Det är token som saknas, inte bokningen; servern ska svara 401.">404, för att bokningen inte hittades</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Appen skickar alltid en token. Måste servern ändå kontrollera den?</p>
+  <div class="options">
+    <button class="opt" data-why="Appen kan inte kontrollera anrop som inte går genom den, till exempel från curl.">Nej, appen har redan gjort det</button>
+    <button class="opt" data-why="Swagger UI skyddar ingenting; kontrollen behövs oavsett om sidan finns.">Bara när sidan /docs är öppnad</button>
+    <button class="opt" data-correct data-why="Vem som helst kan anropa API:et med curl utan appen, så bara servern kan stoppa det.">Ja, man kan anropa utan appen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 50: 401 börjar på 4. Vem ska ändra något?</p>
+  <div class="options">
+    <button class="opt" data-why="Fel i servern ger en 5xx; 401 är en 4xx, så klienten ska ändra anropet.">Servern, som har kraschat i koden</button>
+    <button class="opt" data-why="401 betyder att anropet stoppades; det gick inte bra.">Ingen, eftersom anropet gick ju bra</button>
+    <button class="opt" data-correct data-why="4xx är klientens fel; här ska klienten logga in och skicka med token.">Klienten, som ska skicka med token</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Autentisering är att servern kontrollerar vem som anropar. Appen skickar en token som den fick vid inloggningen.</li>
+    <li>Token står i headern <code>Authorization: Bearer ...</code>. Saknas den eller är ogiltig svarar servern 401 och hämtar ingenting.</li>
+    <li>Kontrollen måste ligga på servern, för vem som helst kan anropa API:et utan appen.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401">MDN: 401 Unauthorized</a>.</p>
+<p>Om token i headern: <a href="https://www.rfc-editor.org/rfc/rfc6750.html#section-2.1">RFC 6750: Bearer token</a>. Översikt: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication">MDN: HTTP authentication</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0066-swagger-ui.html">Förra: Swagger UI</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0068-agarkontroll.html">Nästa: Ägarkontroll</a>
+</nav>
+
+</main>
+</body>
+</html>

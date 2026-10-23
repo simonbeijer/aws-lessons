@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AccessDeniedException</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 102 · v42, 32 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 102</p>
+<h1>AccessDeniedException</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Hur du läser felet: vem som nekades, vilken handling och på vilken resurs. Du vet också att felet betyder att rollen saknar en behörighet.
+</div>
+
+<section class="explain">
+<h2>Vad är AccessDeniedException?</h2>
+
+<p>AccessDeniedException är felet AWS svarar med när den som anropar saknar behörighet. Tar du bort tabellens policy från funktionens <a href="0087-execution-role.html">execution role</a> och kör en <a href="0092-dynamodb-operationer.html">Scan</a>, kastar anropet felet. Det hamnar i <a href="0082-cloudwatch-logs.html">CloudWatch Logs</a>: <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/troubleshoot_access-denied.html">AWS: Troubleshoot access denied error messages</a>)</span></p>
+
+<pre><code>AccessDeniedException: User: arn:aws:sts::123456789012:assumed-role/v42-api-role-abc123/v42-api
+is not authorized to perform: dynamodb:Scan on resource:
+arn:aws:dynamodb:eu-north-1:123456789012:table/v42-customers
+because no identity-based policy allows the dynamodb:Scan action</code></pre>
+
+<p>Via API Gateway får klienten bara ett <a href="0098-svar-till-api-gateway.html">5xx-fel med Internal Server Error</a>, utan detaljer.</p>
+</section>
+
+<section class="explain">
+<h2>Vem, vad och på vad?</h2>
+
+<p>Felet säger vem som nekades, vilken handling och på vilken resurs. Klicka på delarna. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/troubleshoot_access-denied.html#access-denied-error-examples">AWS: Access denied error message examples</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="ad-vem">Vem</button>
+    <button class="chip" data-target="ad-vad">Vad</button>
+    <button class="chip" data-target="ad-resurs">På vad</button>
+  </div>
+  <div class="picker-panel" id="ad-vem">
+    <p><code>assumed-role/v42-api-role-abc123/v42-api</code> är en roll som någon tagit på sig, här funktionens execution role. Lambda tar på sig den med <code>sts:AssumeRole</code>, därav <code>sts</code> i ARN:et. Först står rollens namn och sist sessionens, här funktionens. En session är en gång då rollen används. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-arns">AWS: IAM ARNs</a>)</span></p>
+  </div>
+  <div class="picker-panel" id="ad-vad">
+    <p><code>dynamodb:Scan</code> är handlingen som nekades, skriven tjänst:operation som i <a href="0093-minsta-mojliga-behorighet.html">policyn</a>.</p>
+  </div>
+  <div class="picker-panel" id="ad-resurs">
+    <p>Resursen är tabellens <a href="0076-arn.html">ARN</a>. Samma ARN ska stå i policyns <code>Resource</code>.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad betyder felet?</h2>
+
+<p>Felet betyder alltid att rollen saknar en behörighet. Slutet säger att ingen identity-based policy, alltså ingen policy som sitter på rollen, tillåter Scan. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/troubleshoot_access-denied.html#access-denied-identity-based-policy-examples-implicit">AWS: Identity-based policies, implicit denial</a>)</span></p>
+
+<p>Två orsaker är vanligast: policyn sitter inte på rollen, eller ARN:et i policyn pekar på fel tabell. Jämför ARN:et i felet med det i policyn, tecken för tecken. Behörigheten läggs till i rollen i IAM. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/permissions-executionrole-update.html">AWS: Update the execution role</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Felet börjar med <code>User: arn:aws:sts::123456789012:assumed-role/v42-api-role-abc123/v42-api</code>. Vem nekades?</p>
+  <div class="options">
+    <button class="opt" data-why="Din IAM user syns inte här; det är rollen som funktionen har tagit på sig.">Din IAM user som är inloggad</button>
+    <button class="opt" data-why="Tabellen är resursen och står sist i felet; den som nekades står först.">Tabellen som har nekat ett anrop</button>
+    <button class="opt" data-correct data-why="assumed-role visar en roll som någon tagit på sig, här funktionens execution role.">Rollen som Lambda tagit på sig</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Felet slutar med <code>because no identity-based policy allows the dynamodb:Scan action</code>. Vad betyder det?</p>
+  <div class="options">
+    <button class="opt" data-why="Saknas items ger Scan ett tomt svar, inget fel; felet handlar om behörighet.">Tabellen saknar items som Scan hittar</button>
+    <button class="opt" data-why="Felet säger inget om att DynamoDB är nere eller långsam; det säger att rollen saknar behörighet.">DynamoDB svarar inte alls för stunden</button>
+    <button class="opt" data-correct data-why="Ingen policy på rollen tillåter dynamodb:Scan, så rollen saknar en behörighet.">Ingen policy på rollen tillåter Scan</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 93: varför får rollen bara fem operationer på en tabell?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Rollen är det enda som begränsar vad en bugg i koden kan ställa till med.">En bugg kan bara göra det rollen tillåter</button>
+    <button class="opt" data-why="Handlingar i en policy kostar inget; skälet är att begränsa vad en bugg kan göra.">Rollen kostar mer per handling som den har</button>
+    <button class="opt" data-why="Det finns ingen sådan gräns; policyn listar de fem som funktionen behöver.">En policy får som mest ha fem handlingar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>AccessDeniedException syns i CloudWatch Logs. Klienten får bara ett 5xx-fel.</li>
+    <li>Felet säger vem (<code>assumed-role/...</code>, funktionens execution role), vad (<code>dynamodb:Scan</code>) och på vad (tabellens ARN).</li>
+    <li>Det betyder alltid att rollen saknar en behörighet. Kontrollera att policyn sitter på rollen och att ARN:et i policyn är rätt.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/troubleshoot_access-denied.html">AWS IAM: Troubleshoot access denied error messages</a>.</p>
+<p>Om ARN för en roll som tagits på sig: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-arns">AWS IAM: IAM identifiers</a>. Om att ändra rollen: <a href="https://docs.aws.amazon.com/lambda/latest/dg/permissions-executionrole-update.html">AWS Lambda: Viewing and updating permissions in the execution role</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0101-conditionexpression.html">Förra: ConditionExpression</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0103-http-api.html">Nästa: HTTP API</a>
+</nav>
+
+</main>
+</body>
+</html>

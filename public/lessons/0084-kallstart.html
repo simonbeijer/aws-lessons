@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kallstart</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 84 · v42, 14 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 84</p>
+<h1>Kallstart</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en kallstart är ett anrop där Lambda först måste skapa en ny exekveringsmiljö, och att du ser den som <code>Init Duration</code> på REPORT-raden i loggen.
+</div>
+
+<section class="explain">
+<h2>Vad är en kallstart?</h2>
+
+<p>Ett anrop där Lambda först måste skapa en ny <a href="0083-exekveringsmiljo.html">exekveringsmiljö</a>. På engelska heter det cold start. Lambda laddar in koden, startar runtime och kör koden utanför handlern. Först därefter körs handlern, så anropet tar längre tid. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#cold-start-latency">AWS: Cold starts and latency</a>)</span></p>
+
+<p>Motsatsen är ett varmt anrop, warm start. Då finns en fryst miljö som Lambda återanvänder, och bara handlern körs. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#cold-start-latency">AWS: Cold starts and latency</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>När blir det en kallstart?</h2>
+
+<p>När ingen ledig miljö finns. Det händer vid första anropet, efter att du har <a href="0078-lambda-funktion.html">ändrat funktionen</a>, när Lambda har tagit bort miljön efter en tid utan anrop, och när flera anrop pågår samtidigt. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#runtimes-lifecycle-shutdown">AWS: Shutdown phase</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html#nodejs-logging-cwconsole">AWS: Viewing logs</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html#understanding-concurrency">AWS: Understanding concurrency</a>)</span></p>
+
+<p>En kallstart tar från under 100 millisekunder till över en sekund. Den sker i under 1 % av anropen, men oftare i en funktion du testar, eftersom den anropas sällan. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#cold-start-latency">AWS: Cold starts and latency</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Var syns kallstarten?</h2>
+
+<p>På REPORT-raden, den sista raden Lambda skriver i loggen för varje anrop. Vid en kallstart har den fältet <code>Init Duration</code>: tiden det tog att ladda koden och köra koden utanför handlern. Saknas fältet var anropet varmt. Övriga fält kommer i nästa lektion. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html#node-logging-output">AWS: REPORT line data fields</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="kall-forsta">Första anropet</button>
+    <button class="chip" data-target="kall-andra">Andra anropet, direkt efter</button>
+  </div>
+  <div class="picker-panel" id="kall-forsta">
+<pre><code>REPORT RequestId: 3f1c7a2e-…  Duration: 14.21 ms  Billed Duration: … ms  Memory Size: 128 MB  Max Memory Used: 67 MB  Init Duration: 182.47 ms</code></pre>
+    <p>Init Duration finns. Det var en kallstart. ms betyder millisekunder.</p>
+  </div>
+  <div class="picker-panel" id="kall-andra">
+<pre><code>REPORT RequestId: …  Duration: … ms  Billed Duration: … ms  Memory Size: 128 MB  Max Memory Used: … MB</code></pre>
+    <p>Init Duration saknas. Miljön återanvändes, anropet var varmt.</p>
+  </div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. REPORT-raden visar <code>Init Duration: 182.47 ms</code>. Vad mäter fältet?</p>
+  <div class="options">
+    <button class="opt" data-why="Tiden handlern tar står i ett annat fält; Init Duration mäter det som körs före handlern.">Tiden det tog att köra hela handlern</button>
+    <button class="opt" data-correct data-why="Init Duration är tiden att ladda koden och köra koden utanför handlern i en ny miljö.">Tiden för allt som sker före handlern</button>
+    <button class="opt" data-why="Lambda väntar inte på en ledig miljö; finns ingen skapas en ny, och det är det Init Duration mäter.">Tiden Lambda väntade på en ledig miljö</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du testar funktionen två gånger direkt efter varandra. Andra REPORT-raden saknar Init Duration. Varför?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Miljön från första anropet återanvändes, så anropet var varmt och bara handlern kördes.">Miljön fanns kvar, så bara handlern kördes</button>
+    <button class="opt" data-why="Raden är skriven klart; Init Duration finns bara med när anropet var en kallstart.">Lambda skrev inte färdigt raden till loggen</button>
+    <button class="opt" data-why="Init Duration saknas för att miljön återanvändes, inte för att något gick fel.">Koden utanför handlern stoppades av ett fel</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 82: vad är en loggström?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="En loggström är rader i tidsordning från en kopia av funktionen, alltså från en exekveringsmiljö.">Raderna från en kopia av funktionen</button>
+    <button class="opt" data-why="Ett anrop får ingen egen grupp; alla anrop skrivs till funktionens logggrupp, uppdelad i strömmar.">En separat logggrupp för varje anrop</button>
+    <button class="opt" data-why="Varje funktion har en egen logggrupp, och en ström kommer bara från en kopia av en funktion.">Alla funktioners rader i samma region</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En kallstart är ett anrop där Lambda först skapar en ny exekveringsmiljö: laddar koden, startar runtime och kör koden utanför handlern. Ett varmt anrop återanvänder en miljö, och bara handlern körs.</li>
+    <li>Kallstart blir det när ingen ledig miljö finns: första anropet, efter en ändring, efter en tid utan anrop, eller vid samtidiga anrop.</li>
+    <li>Kallstarten syns som <code>Init Duration</code> på REPORT-raden. Saknas fältet var anropet varmt.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#cold-start-latency">AWS Lambda: Cold starts and latency</a>.</p>
+<p>Om REPORT-raden: <a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html">AWS Lambda: Log and monitor Node.js Lambda functions</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0083-exekveringsmiljo.html">Förra: Exekveringsmiljö</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0085-duration-och-billed-duration.html">Nästa: Duration och Billed Duration</a>
+</nav>
+
+</main>
+</body>
+</html>

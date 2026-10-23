@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resource-based policy</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 107 · v42, 37 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 107</p>
+<h1>Resource-based policy</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att policyn på funktionen säger vem som får anropa den, och att rollen säger vad funktionen själv får göra.
+</div>
+
+<section class="explain">
+<h2>Vad är en resource-based policy?</h2>
+
+<p>En resource-based policy är en policy som sitter på själva resursen, här din <a href="0078-lambda-funktion.html">Lambda-funktion</a>, och säger vem som får använda den. Det är samma idé som en <a href="0015-bucket-policy.html">bucket policy</a>: policyn säger själv vem den gäller, i <code>Principal</code>. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html">AWS: Resource-based policies in Lambda</a>)</span></p>
+
+<p>I konsolen ser du den under Configuration → Permissions, längre ned under <strong>Resource-based policy statements</strong>. Varje statement är en regel. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html#access-control-resource-based-view">AWS: Viewing a function's resource-based policy</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad står i regeln?</h2>
+
+<p>Regeln släpper in API Gateway. API Gateway-konsolen lägger till den när du skapar <a href="0105-integration.html">integrationen</a>. Förenklad ser den ut så här: <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#apigateway-permissions">AWS: API Gateway permissions</a>)</span></p>
+
+<pre><code>{
+  "Effect": "Allow",
+  "Principal": { "Service": "apigateway.amazonaws.com" },
+  "Action": "lambda:InvokeFunction",
+  "Resource": "arn:aws:lambda:eu-north-1:123456789012:function:v42-api"
+}</code></pre>
+
+<p><code>apigateway.amazonaws.com</code> är API Gateways namn som tjänst. <code>lambda:InvokeFunction</code> betyder att anropa funktionen. Regeln har också ett villkor: bara anrop från ditt API räknas. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#apigateway-permissions">AWS: API Gateway permissions</a>)</span></p>
+
+<p>Saknas regeln körs funktionen aldrig. Klienten får bara <a href="0098-svar-till-api-gateway.html"><code>{"message":"Internal Server Error"}</code></a>. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-troubleshooting-lambda.html#http-api-troubleshooting-lambda-internal-server-error">AWS: Troubleshooting HTTP API Lambda integrations</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad skiljer den från rollen?</h2>
+
+<p>Skillnaden är riktningen. <a href="0087-execution-role.html">Execution role</a> säger vad funktionen får göra, till exempel läsa tabellen. Resource-based policy säger vem som får köra funktionen. Två riktningar, två policyer.</p>
+
+<div class="two-col">
+  <div>
+    <h3>Resource-based policy</h3>
+    <p>Sitter på funktionen. Svarar på: vem får anropa? Här API Gateway, med <code>lambda:InvokeFunction</code>.</p>
+  </div>
+  <div>
+    <h3>Execution role</h3>
+    <p>Sitter på rollen. Svarar på: vad får funktionen göra? Här fem operationer på <code>v42-customers</code>.</p>
+  </div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. API Gateway får inte anropa <code>v42-api</code>. Var lägger du till behörigheten?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Vem som får anropa funktionen står i policyn som sitter på funktionen.">På funktionen, i dess resource-based policy</button>
+    <button class="opt" data-why="Integrationen säger vart anropet går; vem som får anropa står på funktionen.">I integrationen, på API:ets sida Integrations</button>
+    <button class="opt" data-why="Rollen säger vad funktionen får göra, inte vem som får anropa den.">I execution role:n, under fliken Permissions</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad betyder <code>"Principal": { "Service": "apigateway.amazonaws.com" }</code> i regeln?</p>
+  <div class="options">
+    <button class="opt" data-why="Vad som får göras står i Action, inte i Principal.">Att funktionen får anropa API Gateway själv</button>
+    <button class="opt" data-why="Principal säger vem, och här är det en tjänst, inte alla på internet.">Att alla på internet får anropa funktionen</button>
+    <button class="opt" data-correct data-why="Principal säger vem regeln gäller, och här är det tjänsten API Gateway.">Att tjänsten API Gateway får köra funktionen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 87: vem står i <code>Principal</code> i execution role:ns trust policy?</p>
+  <div class="options">
+    <button class="opt" data-why="API Gateway står i funktionens resource-based policy, inte i rollens trust policy.">Tjänsten API Gateway, som får anropa den</button>
+    <button class="opt" data-why="Trust policy säger vem som får ta på sig rollen; det gör tjänsten Lambda, inte din IAM user.">Din egen IAM user, som skapade rollen</button>
+    <button class="opt" data-correct data-why="Trust policy säger vem som får ta på sig rollen, och det är lambda.amazonaws.com.">Tjänsten Lambda, som tar på sig rollen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En resource-based policy sitter på funktionen och säger vem som får använda den. Du ser den under Configuration → Permissions → Resource-based policy statements.</li>
+    <li>Regeln ger <code>apigateway.amazonaws.com</code> rätt till <code>lambda:InvokeFunction</code>, bara från ditt API. Konsolen lägger till den åt dig. Saknas den får klienten Internal Server Error.</li>
+    <li>Rollen säger vad funktionen får göra. Policyn på funktionen säger vem som får köra den. Två riktningar, två policyer.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html">AWS Lambda: Working with resource-based policies in Lambda</a>.</p>
+<p>Om regeln för API Gateway: <a href="https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#apigateway-permissions">AWS Lambda: Invoking a Lambda function using an Amazon API Gateway endpoint</a> (Permissions).</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0106-stage-och-invoke-url.html">Förra: Stage och Invoke URL</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0108-preflight.html">Nästa: Preflight</a>
+</nav>
+
+</main>
+</body>
+</html>

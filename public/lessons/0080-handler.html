@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handler</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 80 · v42, 10 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 80</p>
+<h1>Handler</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att handlern är den exporterade funktionen Lambda anropar (<code>index.handler</code>), att den får <code>event</code> och <code>context</code>, och att det den returnerar blir svaret.
+</div>
+
+<section class="explain">
+<h2>Vad är en handler?</h2>
+
+<p>Handlern är funktionen i din kod som Lambda anropar när din <a href="0078-lambda-funktion.html">Lambda-funktion</a> körs. En funktion i JavaScript är kod med ett namn, som körs när något anropar den. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html">AWS: Define Lambda function handler in Node.js</a>)</span></p>
+
+<pre><code>export const handler = async (event, context) =&gt; {
+  return { message: "Hej!" };
+};</code></pre>
+
+<p><code>export</code> gör att kod utanför filen, här Lambda, kan anropa funktionen. Det är inte samma <code>export</code> som i <a href="0044-miljovariabel.html">bash</a>. <code>async</code> låter funktionen vänta på annat, till exempel en annan AWS-tjänst. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html#nodejs-handler-async">AWS: async function handlers</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad betyder index.handler?</h2>
+
+<p><code>index.handler</code> är filnamnet och funktionens namn, med en punkt emellan. Konsolen skapar filen <code>index.mjs</code> med en funktion som heter <code>handler</code>. Inställningen Handler under <a href="0079-runtime.html">Runtime settings</a> är därför <code class="copyable">index.handler</code>. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html#nodejs-handler-naming">AWS: Handler naming conventions</a>)</span></p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Byter du namn på filen eller funktionen hittar Lambda inte handlern. Felet blir <code>Runtime.HandlerNotFound</code>. Ändra tillbaka, eller ändra Handler så att den stämmer.</p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad får och returnerar handlern?</h2>
+
+<p>Handlern får <code>event</code> och <code>context</code>, och det den returnerar blir svaret. <code>event</code> är indata, det anroparen skickar med. <code>context</code> är information om själva anropet, till exempel ett id för det. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html#nodejs-handler-async">AWS: async function handlers</a>)</span></p>
+
+<p>Det du skriver efter <code>return</code> skickas tillbaka till den som anropade. I <a href="0057-express.html">Express</a> skickade du svaret med <code>res.json</code>. Här returnerar du det. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html">AWS: Define Lambda function handler in Node.js</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Inställningen Handler är <code>index.handler</code>. Vad pekar den på?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Före punkten står filnamnet, efter punkten funktionens namn.">Funktionen handler i index.mjs</button>
+    <button class="opt" data-why="Före punkten står filen, efter punkten funktionen; det är filen index och funktionen handler.">Filen handler.mjs, mappen index</button>
+    <button class="opt" data-why="Det är ingen webbsida; index är filen index.mjs och handler är funktionen.">Webbsidan index.html visar koden</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Handlern slutar med <code>return { message: "Hej!" };</code>. Vad händer med det som returneras?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Det handlern returnerar blir svaret till den som anropade.">Det blir svaret till den som anropade</button>
+    <button class="opt" data-why="return skriver inget till loggen; det blir svaret till anroparen.">Det skrivs bara i loggen i konsolen</button>
+    <button class="opt" data-why="event är indata från anroparen; det som returneras blir svaret.">Det sparas i event till nästa anrop</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 79: vilken runtime ska handlern köras i?</p>
+  <div class="options">
+    <button class="opt" data-why="Node.js 20 stöds inte längre och går inte att välja i konsolen.">Node.js 20.x, den äldsta och stabilaste</button>
+    <button class="opt" data-why="Node.js 26.x är en förhandsversion och ska inte användas på riktigt.">Node.js 26.x, nyast men en förhandsversion</button>
+    <button class="opt" data-correct data-why="Välj den senaste version konsolen föreslår, 22.x eller nyare.">Den senaste konsolen föreslår, minst 22.x</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Handlern är den exporterade funktionen som Lambda anropar när funktionen körs.</li>
+    <li><code>index.handler</code> betyder funktionen <code>handler</code> i filen <code>index.mjs</code>. Stämmer inte namnen hittar Lambda inte handlern.</li>
+    <li>Handlern får <code>event</code>, indata från anroparen, och <code>context</code>, information om anropet. Det den returnerar blir svaret.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html">AWS Lambda: Define Lambda function handler in Node.js</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0079-runtime.html">Förra: Runtime</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0081-event-och-testhandelse.html">Nästa: Event och testhändelse</a>
+</nav>
+
+</main>
+</body>
+</html>

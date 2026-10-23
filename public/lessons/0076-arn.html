@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARN</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 76 · v42, 6 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 76</p>
+<h1>ARN</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad delarna i ett ARN betyder: tjänst, region, konto och resurs. Och varför ett ARN för en bucket saknar region och konto.
+</div>
+
+<section class="explain">
+<h2>Vad är ett ARN?</h2>
+
+<p>Ett ARN, Amazon Resource Name, är en resurs fullständiga namn i AWS. Det pekar ut exakt en resurs bland alla konton och regioner. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference-arns.html">AWS: ARNs</a>)</span></p>
+
+<p>Du såg ett i <code>Resource</code> i <a href="0015-bucket-policy.html">bucket policyn</a>. Står ett ARN i <code>Resource</code> gäller regeln bara den resursen. Står <code>*</code> där gäller den alla resurser, som i <a href="0005-iam-policy.html">AdministratorAccess</a>. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_resource.html">AWS: Resource</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad betyder delarna?</h2>
+
+<p>Delarna anger tjänst, region, konto och resurs, skilda med kolon. Före dem står alltid <code>arn:aws:</code> i dina ARN. Klicka på delarna nedan. Det hör till en tabell i DynamoDB, en databastjänst i AWS. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference-arns.html#arns-syntax">AWS: ARN format</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/using-identity-based-policies.html">AWS: DynamoDB policies</a>)</span></p>
+
+<pre>arn:aws:dynamodb:eu-north-1:123456789012:table/v42-customers</pre>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="arn-tjanst">dynamodb</button>
+    <button class="chip" data-target="arn-region">eu-north-1</button>
+    <button class="chip" data-target="arn-konto">123456789012</button>
+    <button class="chip" data-target="arn-resurs">table/v42-customers</button>
+  </div>
+  <div class="picker-panel" id="arn-tjanst"><p>Tjänsten som resursen hör till, här DynamoDB.</p></div>
+  <div class="picker-panel" id="arn-region"><p><a href="0008-region.html">Regionen</a> där resursen finns, här Stockholm.</p></div>
+  <div class="picker-panel" id="arn-konto"><p><a href="0004-iam-user.html">Kontonumret</a>, tolv siffror, för kontot som äger resursen. I ditt ARN står ditt eget.</p></div>
+  <div class="picker-panel" id="arn-resurs"><p>Själva resursen: först typen, <code>table</code> (tabell), sedan namnet.</p></div>
+</div>
+</section>
+
+<section class="explain">
+<h2>ARN i andra tjänster</h2>
+
+<p>Andra tjänster följer samma mönster, men vissa ARN saknar region eller konto. Jämför en <a href="0075-application-load-balancer.html">lastbalanserare</a> och en bucket: <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference-arns.html#arns-syntax">AWS: ARN format</a>, <a href="https://docs.aws.amazon.com/cli/latest/reference/elbv2/describe-load-balancers.html">AWS CLI: describe-load-balancers</a>)</span></p>
+
+<pre>arn:aws:elasticloadbalancing:eu-north-1:123456789012:loadbalancer/app/v42-lb-test/50dc6c495c0c9188
+arn:aws:s3:::v39-fornamn-efternamn</pre>
+
+<p>Lastbalanseraren har alla delarna. Resursen är typen <code>loadbalancer/app</code>, sedan namnet och ett id som AWS ger den.</p>
+
+<p>Bucketen saknar region och konto, så tre kolon står i rad. Bucketnamnet räcker, eftersom det är <a href="0012-s3-bucket-objekt.html">unikt i hela AWS</a>. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html">AWS: Bucket naming rules</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad säger <code>123456789012</code> i <code>arn:aws:dynamodb:eu-north-1:123456789012:table/v42-customers</code>?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Delen efter regionen är kontonumret för kontot som äger resursen.">Vilket konto som äger tabellen</button>
+    <button class="opt" data-why="Regionen står före kontonumret, här eu-north-1.">Vilken region tabellen ligger i</button>
+    <button class="opt" data-why="Tabellen pekas ut med table/v42-customers sist, inte med ett nummer.">Vilket nummer tabellen har fått</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. En policy har tabellens ARN i <code>Resource</code>. Vilka tabeller gäller regeln?</p>
+  <div class="options">
+    <button class="opt" data-why="Det hade krävt * i Resource; ett ARN pekar ut exakt en resurs.">Alla tabeller som ditt AWS-konto äger</button>
+    <button class="opt" data-why="ARN:et anger både region och tabell, så det gäller en enda tabell.">Alla tabeller i samtliga dina regioner</button>
+    <button class="opt" data-correct data-why="Ett ARN pekar ut exakt en resurs, så regeln gäller bara den tabellen.">Bara den tabell som heter v42-customers</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 15: vad betyder <code>/*</code> i <code>arn:aws:s3:::v39-fornamn-efternamn/*</code>?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="/* efter bucketnamnet betyder alla objekt i bucketen.">Alla objekt som ligger i bucketen</button>
+    <button class="opt" data-why="ARN:et pekar på en enda bucket; /* betyder objekten i den.">Alla buckets som ditt konto har</button>
+    <button class="opt" data-why="Det är ARN:et utan /* som pekar på bara bucketen.">Bara bucketen, inte objekten i den</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett ARN pekar ut exakt en resurs i hela AWS. Står det i <code>Resource</code> gäller regeln bara den resursen.</li>
+    <li>Efter <code>arn:aws:</code> kommer tjänst, region, konto och resurs, skilda med kolon.</li>
+    <li>Vissa ARN saknar delar. Ett ARN för en bucket saknar region och konto, eftersom bucketnamnet är unikt i hela AWS.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference-arns.html">AWS IAM: Identify AWS resources with ARNs</a>.</p>
+<p>Om ARN i policyer: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_resource.html">AWS IAM: Resource</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0075-application-load-balancer.html">Förra: Application Load Balancer</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0077-serverlost.html">Nästa: Serverlöst</a>
+</nav>
+
+</main>
+</body>
+</html>

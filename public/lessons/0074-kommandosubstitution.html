@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kommandosubstitution</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 74 · v42, 4 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 74</p>
+<h1>Kommandosubstitution</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att <code>SUBNETS=$(aws ...)</code> kör kommandot och sparar det som kommandot skriver ut i variabeln.
+</div>
+
+<section class="explain">
+<h2>Vad gör $(...)?</h2>
+
+<p><code>$(kommando)</code> kör kommandot och byts sedan ut mot texten som kommandot skrev ut. Det kallas kommandosubstitution. Bash gör det innan resten av raden körs, precis som med <a href="0073-skalvariabel.html"><code>$API</code></a>. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Command-Substitution.html">GNU Bash: Command Substitution</a>)</span></p>
+
+<p>Står <code>$(...)</code> efter ett likhetstecken, hamnar texten i en <a href="0073-skalvariabel.html">skalvariabel</a>.</p>
+
+<pre><code>SUBNETS=$(aws ec2 describe-subnets \
+  --region eu-north-1 \
+  --query 'Subnets[].SubnetId' \
+  --output text)</code></pre>
+
+<p>Kommandot inuti är samma som i <a href="0072-aws-cli.html">lektion 72</a>: det hämtar id:na för dina subnät. Bash kör det och sparar texten i <code>SUBNETS</code> i stället för att visa den.</p>
+</section>
+
+<section class="explain">
+<h2>Varför --output text?</h2>
+
+<p>Med <code>--output text</code> får variabeln bara id:na, eftersom den får exakt det som kommandot skriver ut. Utan det hamnar hela JSON-listan i variabeln, med citattecken runt varje id. <span class="src">(<a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-output-format.html">AWS: Output format</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Med --output text</h3>
+    <p><code>subnet-0a1b2c3d4e5f60001 subnet-0a1b2c3d4e5f60002</code></p>
+  </div>
+  <div>
+    <h3>Utan --output text</h3>
+    <p><code>[ "subnet-0a1b2c3d4e5f60001", "subnet-0a1b2c3d4e5f60002" ]</code></p>
+  </div>
+</div>
+
+<p>Bash tar bara bort radbrytningar sist i texten. Resten sparas som den är. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Command-Substitution.html">GNU Bash: Command Substitution</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur används variabeln sedan?</h2>
+
+<p>Som vilken skalvariabel som helst: <code>$SUBNETS</code> byts mot id:na innan nästa kommando körs.</p>
+
+<pre><code>echo "Subnets: $SUBNETS"</code></pre>
+
+<p>Så slipper du kopiera id:na för hand. Svaret från ett kommando går rakt in i nästa, till exempel efter flaggan <code>--subnets</code> när du skapar en <a href="0072-aws-cli.html">lastbalanserare</a>. <span class="src">(<a href="https://docs.aws.amazon.com/cli/latest/reference/elbv2/create-load-balancer.html">AWS CLI: create-load-balancer</a>)</span></p>
+</section>
+
+<h3>Prova själv (valfritt)</h3>
+
+<p><code>date</code> skriver ut datum och tid. Fungerar i CloudShell och i terminalen på din Mac.</p>
+
+<pre><code>NU=$(date)
+echo "Klockan var: $NU"</code></pre>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad hamnar i <code>SUBNETS</code> efter <code>SUBNETS=$(aws ec2 describe-subnets ... --output text)</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Bash kör kommandot direkt och sparar det som det skriver ut, inte kommandot självt.">Kommandot självt, som text att köra</button>
+    <button class="opt" data-why="Kommandot körs, men det som skrivs ut sparas i variabeln i stället för att visas.">Ingen text, kommandot körs aldrig här</button>
+    <button class="opt" data-correct data-why="$(...) kör kommandot, och texten det skriver ut blir variabelns värde.">Texten som kommandot skrev ut: id:na</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du glömmer <code>--output text</code>. Vad hamnar i variabeln?</p>
+  <div class="options">
+    <button class="opt" data-why="Kommandot fungerar utan --output text; svaret blir bara JSON i stället.">Inget, för kommandot avbryts med fel</button>
+    <button class="opt" data-why="Bash ändrar inte texten; bara radbrytningar sist tas bort.">Id:na, bash tar bort alla JSON-tecken</button>
+    <button class="opt" data-correct data-why="Variabeln får exakt det som skrivs ut, och utan --output text är det JSON.">JSON, med citattecken runt varje id</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 72: vad gör <code>--query 'Subnets[].SubnetId'</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Det gör --output text; --query väljer bara ut vilken del av svaret du får.">Formaterar svaret som vanlig text</button>
+    <button class="opt" data-correct data-why="--query tar SubnetId från varje subnät i listan Subnets och släpper resten.">Plockar SubnetId från varje subnät</button>
+    <button class="opt" data-why="Regionen väljs med --region; --query väljer ut en del av svaret.">Väljer region för just kommandot</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>$(kommando)</code> kör kommandot och byts ut mot texten det skriver ut, innan resten av raden körs.</li>
+    <li><code>SUBNETS=$(aws ...)</code> sparar den texten i variabeln. Med <code>--output text</code> blir det bara id:na, utan det JSON.</li>
+    <li><code>$SUBNETS</code> för sedan id:na vidare till nästa kommando, så du slipper kopiera dem.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://www.gnu.org/software/bash/manual/html_node/Command-Substitution.html">GNU Bash Reference Manual: Command Substitution</a>.</p>
+<p>Om <code>--output text</code>: <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-output-format.html">AWS CLI: Setting the output format</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0073-skalvariabel.html">Förra: Skalvariabel</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0075-application-load-balancer.html">Nästa: Application Load Balancer</a>
+</nav>
+
+</main>
+</body>
+</html>

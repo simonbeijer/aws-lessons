@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minsta möjliga behörighet</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 93 · v42, 23 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 93</p>
+<h1>Minsta möjliga behörighet</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Varför funktionens roll får fem operationer på en tabell i stället för <code>AmazonDynamoDBFullAccess</code>, och att det begränsar vad en bugg kan ställa till med.
+</div>
+
+<section class="explain">
+<h2>Vad är minsta möjliga behörighet?</h2>
+
+<p>Minsta möjliga behörighet betyder att du bara ger den behörighet som uppgiften kräver, inget mer. Du anger exakt vilka handlingar som får göras på vilka resurser. På engelska heter det least privilege. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege">AWS: Apply least-privilege permissions</a>)</span></p>
+
+<p>Funktionens <a href="0087-execution-role.html">execution role</a> avgör vad koden får göra i AWS. Rollen som konsolen skapar får bara skriva loggar. Kundfunktionen behöver också de fem <a href="0092-dynamodb-operationer.html">operationerna från lektion 92</a>, men bara på en enda tabell.</p>
+</section>
+
+<section class="explain">
+<h2>Hur ser policyn ut?</h2>
+
+<p>Policyn är en <a href="0005-iam-policy.html">IAM policy</a> med fem handlingar och ett ARN. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/using-identity-based-policies.html">AWS: Identity-based policies for DynamoDB</a>)</span></p>
+
+<pre>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:Scan"
+      ],
+      "Resource": "arn:aws:dynamodb:eu-north-1:123456789012:table/v42-customers"
+    }
+  ]
+}</pre>
+
+<p>Varje handling skrivs tjänst:operation, som <code>s3:GetObject</code> i <a href="0015-bucket-policy.html">bucket policyn</a>. <code>Resource</code> är tabellens <a href="0076-arn.html">ARN</a>, så regeln gäller bara den tabellen. I ditt ARN står ditt eget kontonummer.</p>
+</section>
+
+<section class="explain">
+<h2>Vad kan en bugg göra?</h2>
+
+<p>En bugg kan bara göra det som rollen tillåter. Rollen är det enda som begränsar vad en bugg i koden kan ställa till med.</p>
+
+<p><code>AmazonDynamoDBFullAccess</code> är en <a href="0005-iam-policy.html">AWS managed policy</a> med <code>dynamodb:*</code> på <code>"Resource": "*"</code>, alltså alla DynamoDB-operationer på alla resurser. <span class="src">(<a href="https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AmazonDynamoDBFullAccess.html">AWS: AmazonDynamoDBFullAccess</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>AmazonDynamoDBFullAccess</h3>
+    <p>En bugg kan ändra och ta bort items i alla tabeller i kontot, och ta bort hela tabeller.</p>
+  </div>
+  <div>
+    <h3>Fem operationer, en tabell</h3>
+    <p>En bugg rör bara <code>v42-customers</code>. Allt annat nekas. <span class="tag good">Gör så här</span></p>
+  </div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad betyder minsta möjliga behörighet?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är för mycket: rollen ska bara få de operationer och den tabell som behövs.">Allt i DynamoDB, men inga andra tjänster</button>
+    <button class="opt" data-why="Kundfunktionen måste också skriva, så den får PutItem, UpdateItem och DeleteItem.">Bara läsa i tabellen, aldrig skriva något</button>
+    <button class="opt" data-correct data-why="Du ger exakt de handlingar på de resurser som uppgiften kräver.">Bara det som uppgiften kräver, inte mer</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. En bugg i koden anropar DeleteItem på en annan tabell i kontot. Vad händer med policyn i lektionen?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Resource är ARN:et för v42-customers, så regeln tillåter inget på andra tabeller.">Anropet nekas, policyn gäller bara en tabell</button>
+    <button class="opt" data-why="DeleteItem är tillåtet, men bara på tabellen i Resource.">Anropet går, för DeleteItem står i policyn</button>
+    <button class="opt" data-why="Funktionen fortsätter att köras; bara just det anropet nekas.">Funktionen stängs av tills du rättat koden</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 92: vilken operation ersätter ett item med samma id?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="PutItem sparar ett helt item, och samma id ersätter det gamla.">PutItem, som sparar hela itemet</button>
+    <button class="opt" data-why="DeleteItem tar bort itemet och sparar inget nytt.">DeleteItem, som raderar ett item</button>
+    <button class="opt" data-why="GetItem läser bara itemet; den ändrar ingenting.">GetItem, som läser bara itemet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Minsta möjliga behörighet betyder att du bara ger den behörighet som uppgiften kräver: vissa handlingar på vissa resurser.</li>
+    <li>Funktionens roll får fem operationer i <code>Action</code> och tabellens ARN i <code>Resource</code>, inte <code>AmazonDynamoDBFullAccess</code> med alla operationer på alla resurser.</li>
+    <li>Rollen är det enda som begränsar vad en bugg kan göra. Med den smala policyn rör en bugg bara den tabellen.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege">AWS IAM: Apply least-privilege permissions</a>.</p>
+<p>Om DynamoDB-policyer: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/using-identity-based-policies.html">Amazon DynamoDB: Using identity-based policies</a>.</p>
+<p>Hela policyn: <a href="https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AmazonDynamoDBFullAccess.html">AWS Managed Policy Reference: AmazonDynamoDBFullAccess</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0092-dynamodb-operationer.html">Förra: DynamoDB-operationer</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0094-miljovariabel-i-lambda.html">Nästa: Miljövariabel i Lambda</a>
+</nav>
+
+</main>
+</body>
+</html>

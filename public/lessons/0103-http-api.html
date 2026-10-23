@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTTP API</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 103 · v42, 33 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 103</p>
+<h1>HTTP API</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vilka fyra saker API Gateway gör med ett anrop på väg till din funktion, och varför du bygger ett HTTP API och inte ett REST API.
+</div>
+
+<section class="explain">
+<h2>Vad är ett HTTP API?</h2>
+
+<p>Ett HTTP API är en av API-typerna i API Gateway. Det tar emot anrop och skickar dem vidare till en <a href="0078-lambda-funktion.html">Lambda-funktion</a> eller till en annan server. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html">AWS: API Gateway HTTP APIs</a>)</span></p>
+
+<p>I <a href="0070-mixed-content.html">lektion 70</a> gav API Gateway ditt API en HTTPS-adress. Här ser du vad som händer med anropet när det kommer fram.</p>
+</section>
+
+<section class="explain">
+<h2>Vad händer med anropet?</h2>
+
+<p>API Gateway gör fyra saker med varje anrop, här <code>PUT /customers/abc-123</code>: <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-routes.html">AWS: Routes for HTTP APIs</a>, <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html">AWS: HTTP API och Lambda</a>)</span></p>
+
+<ol>
+  <li><strong>Matchar en route.</strong> En route är metod plus sökväg, som i <a href="0057-express.html">Express</a>.</li>
+  <li><strong>Gör ett event.</strong> Anropet görs om till ett <a href="0097-handelse-fran-api-gateway.html">event i JSON</a>, med samma form som testhändelsen.</li>
+  <li><strong>Anropar funktionen.</strong> Lambda kör funktionen, och <a href="0080-handler.html">handlern</a> får eventet.</li>
+  <li><strong>Gör ett HTTP-svar.</strong> Objektet som handlern <a href="0098-svar-till-api-gateway.html">returnerar</a> blir HTTP-svaret till klienten.</li>
+</ol>
+</section>
+
+<section class="explain">
+<h2>HTTP API eller REST API?</h2>
+
+<p>Du bygger ett HTTP API, inte ett REST API. Båda är API-typer i API Gateway, och båda bygger <a href="0053-rest-api.html">REST-API:er</a>. Namnen är alltså förvirrande. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html">AWS: Choose between REST APIs and HTTP APIs</a>)</span></p>
+
+<p>REST API har fler funktioner, som du inte behöver här. HTTP API har färre och kostar under en tredjedel så mycket per anrop. Det räcker för ditt API. I konsolen väljer du <strong>HTTP API</strong> och klickar <strong>Build</strong>. <span class="src">(<a href="https://aws.amazon.com/api-gateway/pricing/">AWS: API Gateway pricing</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad gör API Gateway med objektet som handlern returnerar?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är DynamoDB som sparar items; API Gateway gör om objektet till ett HTTP-svar.">Sparar det som ett item i tabellen</button>
+    <button class="opt" data-why="Eventet går till funktionen; objektet som funktionen returnerar blir HTTP-svaret.">Skickar det åter som ett nytt event</button>
+    <button class="opt" data-correct data-why="API Gateway gör om objektet med statusCode, headers och body till HTTP-svaret.">Gör om det till svaret till klienten</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Varför bygger du ett HTTP API och inte ett REST API?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="REST API har fler funktioner som inte behövs, och HTTP API kostar mindre per anrop.">Det kostar mindre och räcker gott</button>
+    <button class="opt" data-why="Båda API-typerna bygger REST-API:er; skillnaden är funktioner och pris.">Bara det bygger API:er med REST</button>
+    <button class="opt" data-why="API Gateway ger båda API-typerna HTTPS-adresser; skillnaden är funktioner och pris.">Bara det ger API:et en HTTPS-adress</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 70: varför får sidan på Amplify inte anropa API:et på EC2 över HTTP?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är CORS som handlar om headers; mixed content stoppas oavsett headers.">Servern skickar fel headers i svaret</button>
+    <button class="opt" data-correct data-why="Webbläsaren stoppar anrop över HTTP från en sida som laddats över HTTPS.">Sidan har HTTPS, API:et bara HTTP</button>
+    <button class="opt" data-why="EC2 tar emot anrop över HTTP; det är webbläsaren som stoppar anropet.">EC2 stoppar alla anrop från Amplify</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett HTTP API är en API-typ i API Gateway som skickar anrop vidare, här till din Lambda-funktion.</li>
+    <li>API Gateway matchar anropet mot en route, gör om det till ett event, anropar funktionen och gör om svaret till HTTP.</li>
+    <li>Du bygger ett HTTP API, inte ett REST API. Båda bygger REST-API:er, men HTTP API är enklare, kostar mindre och räcker här.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html">Amazon API Gateway: Choose between REST APIs and HTTP APIs</a>.</p>
+<p>Om hur anropet går till funktionen: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html">Amazon API Gateway: Create AWS Lambda proxy integrations for HTTP APIs</a>. Om priset: <a href="https://aws.amazon.com/api-gateway/pricing/">Amazon API Gateway pricing</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0102-accessdeniedexception.html">Förra: AccessDeniedException</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0104-route-i-api-gateway.html">Nästa: Route i API Gateway</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preflight</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 108 · v42, 38 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 108</p>
+<h1>Preflight</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att webbläsaren skickar ett <code>OPTIONS</code>-anrop före en POST med JSON, och att POST:en skickas först om svaret tillåter den.
+</div>
+
+<section class="explain">
+<h2>Vad är preflight?</h2>
+
+<p>Preflight är ett anrop som webbläsaren skickar före det riktiga anropet, för att fråga servern om det är tillåtet. Det gäller bara anrop till ett annat <a href="0069-cors.html">ursprung</a>. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS#preflighted_requests">MDN: CORS, Preflighted requests</a>)</span></p>
+
+<p>Preflight använder <a href="0049-http-metod.html">HTTP-metoden</a> <code>OPTIONS</code>. Den hämtar och ändrar ingen data. Den frågar bara vad som är tillåtet. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/OPTIONS">MDN: OPTIONS</a>)</span></p>
+
+<p>Skapar sidan på <code>http://localhost:5173</code> en kund, ser du två rader i <a href="0056-network-fliken.html">Network-fliken</a>: först <code>OPTIONS /customers</code> med <a href="0050-statuskod.html">204</a>, sedan <code>POST /customers</code> med 201. <span class="src">(kursmaterialet v42)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vilka anrop får preflight?</h2>
+
+<p>Anrop som ett vanligt formulär inte kan skicka får preflight. Ett vanligt GET skickas direkt, som i <a href="0069-cors.html">lektion 69</a>. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS#simple_requests">MDN: CORS, Simple requests</a>)</span></p>
+
+<p>Två saker ger preflight. Den ena är metoden: PUT och DELETE får alltid preflight. Den andra är <a href="0051-header.html"><code>Content-Type</code></a>: bara tre värden slipper, bland annat <code>text/plain</code>, vanlig text. <code>application/json</code> är inte ett av dem. Därför får en POST med JSON preflight. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS#simple_requests">MDN: CORS, Simple requests</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad frågar webbläsaren?</h2>
+
+<p>Webbläsaren frågar om en POST med <code>Content-Type: application/json</code> från <code>localhost:5173</code> är tillåten. Frågan står i tre headers: <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS#preflighted_requests">MDN: CORS, Preflighted requests</a>)</span></p>
+
+<pre><code>Origin: http://localhost:5173
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: content-type</code></pre>
+
+<p><code>Origin</code> är sidans ursprung. De andra två säger vilken metod och vilka headers det riktiga anropet använder. Servern svarar med <code>Access-Control-Allow-Origin</code>, <code>Access-Control-Allow-Methods</code> och <code>Access-Control-Allow-Headers</code>. Finns allt med, skickar webbläsaren POST:en. Annars skickas den aldrig. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS#preflighted_requests">MDN: CORS, Preflighted requests</a>)</span></p>
+</section>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-ja">Svaret tillåter POST</button>
+    <button class="chip" data-target="p-nej">Svaret saknar POST</button>
+  </div>
+  <div class="picker-panel" id="p-ja">
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Rad i Network-fliken</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><code>OPTIONS /customers</code></td><td>204</td></tr>
+        <tr><td><code>POST /customers</code></td><td>201</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><span class="tag good">Fungerar</span> Kunden skapas.</p>
+  </div>
+  <div class="picker-panel" id="p-nej">
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Rad i Network-fliken</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><code>OPTIONS /customers</code></td><td></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><span class="tag bad">Stoppad</span> Ingen POST-rad. Servern fick aldrig POST:en, och sidans kod får bara ett fel.</p>
+  </div>
+</div>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Sidan på <code>http://localhost:5173</code> skickar en POST med JSON till ditt API. Vilka rader syns i Network-fliken?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="JSON ger preflight, så OPTIONS kommer först och POST:en efter att svaret tillåtit den.">Först OPTIONS /customers, sedan POST /customers</button>
+    <button class="opt" data-why="application/json är inte ett av de tre värdena som slipper preflight, så OPTIONS kommer först.">Bara POST /customers, utan något OPTIONS-anrop</button>
+    <button class="opt" data-why="Preflight kommer före det riktiga anropet, aldrig efter.">Först POST /customers, sedan OPTIONS /customers</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Preflight-svaret saknar <code>POST</code> i <code>Access-Control-Allow-Methods</code>. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Svaret tillåter inte POST, så webbläsaren skickar den aldrig.">POST:en skickas aldrig, och koden får ett fel</button>
+    <button class="opt" data-why="Webbläsaren skickar POST:en bara om svaret tillåter den, och här gör det inte det.">POST:en skickas, men koden får inte läsa svaret</button>
+    <button class="opt" data-why="Webbläsaren väljer aldrig en annan metod själv; den stoppar anropet.">Webbläsaren skickar ett GET i stället för POST</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 69: ett vanligt GET går till ett annat ursprung, och svaret saknar <code>Access-Control-Allow-Origin</code>. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Anropet når servern; det är svaret som webbläsaren håller undan från koden.">Anropet stoppas innan det når fram till servern</button>
+    <button class="opt" data-why="Ett vanligt GET får ingen preflight; det skickas direkt och servern svarar.">Först går ett OPTIONS-anrop, och sedan ett GET</button>
+    <button class="opt" data-correct data-why="Ett vanligt GET skickas direkt, men webbläsaren lämnar inte svaret till koden utan headern.">Servern svarar, men koden får inte läsa svaret</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Preflight är ett <code>OPTIONS</code>-anrop som webbläsaren skickar före det riktiga anropet till ett annat ursprung, för att fråga om det är tillåtet.</li>
+    <li>En POST med <code>Content-Type: application/json</code> får preflight, liksom PUT och DELETE. Ett vanligt GET skickas direkt.</li>
+    <li>Tillåter svaret ursprunget, metoden och headern, skickas POST:en. Annars skickas den aldrig, och Network-fliken visar bara OPTIONS.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS#preflighted_requests">MDN: Cross-Origin Resource Sharing (CORS), Preflighted requests</a>.</p>
+<p>Om metoden: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/OPTIONS">MDN: OPTIONS request method</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0107-resource-based-policy.html">Förra: Resource-based policy</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0109-cors-i-api-gateway.html">Nästa: CORS i API Gateway</a>
+</nav>
+
+</main>
+</body>
+</html>

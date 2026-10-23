@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Miljövariabel i Vite</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 111 · v42, 41 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 111</p>
+<h1>Miljövariabel i Vite</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att <code>VITE_API_URL</code> i <code>.env.local</code> och i Amplify byggs in i sidans JavaScript, så att adressen syns för alla som öppnar sidan.
+</div>
+
+<section class="explain">
+<h2>Var står variabeln?</h2>
+
+<p>En miljövariabel i Vite är ett namn med ett värde som sidans kod får, här <code>VITE_API_URL</code> med API:ets <a href="0106-stage-och-invoke-url.html">Invoke URL</a>. Bara namn som börjar på <code>VITE_</code> når sidans kod. <span class="src">(<a href="https://vite.dev/guide/env-and-mode">Vite: Env Variables and Modes</a>)</span></p>
+
+<p>Lokalt står den i filen <code>.env.local</code>:</p>
+
+<pre><code>VITE_API_URL=https://ab12cd34ef.execute-api.eu-north-1.amazonaws.com</code></pre>
+
+<p>Filen ska inte med i någon commit, så den når aldrig GitHub. <a href="0017-amplify-hosting.html">Amplify</a> får därför ett eget värde, under <strong>Hosting → Environment variables → Manage variables</strong>. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/setting-env-vars.html">AWS: Setting environment variables</a>)</span></p>
+
+<p>Koden läser den med <code>import.meta.env</code>, som <code>process.env</code> i <a href="0044-miljovariabel.html">lektion 44</a>:</p>
+
+<pre><code>const API = import.meta.env.VITE_API_URL;</code></pre>
+
+<p>Byter du API, byter du värdet, inte koden. <span class="src">(kursmaterialet v42)</span></p>
+</section>
+
+<section class="explain">
+<h2>När läses den?</h2>
+
+<p>Värdet läses när Vite startar. <code>npm run dev</code> startar Vites utvecklingsserver, ett program som visar sidan på <code>http://localhost:5173</code>. Ändrar du filen: starta om. <span class="src">(<a href="https://vite.dev/guide/env-and-mode">Vite: Env Variables and Modes</a>)</span></p>
+
+<p>Vid <a href="0016-bygge.html">bygget</a> byter Vite ut <code>import.meta.env.VITE_API_URL</code> mot adressen i filerna i <code>dist/</code>. Amplify bygger med sitt värde, så ett nytt gäller efter nästa bygge. Saknas variabeln blir värdet <code>undefined</code>, som i <a href="0094-miljovariabel-i-lambda.html">lektion 94</a>.</p>
+</section>
+
+<section class="explain">
+<h2>Vem kan se den?</h2>
+
+<p>Alla som öppnar sidan ser den. Adressen står i sidans JavaScript, och anropen syns i <a href="0056-network-fliken.html">Network-fliken</a>. <span class="src">(<a href="https://vite.dev/guide/env-and-mode">Vite: Env Variables and Modes</a>)</span></p>
+
+<p>I lektion 44 fanns lösenordet bara på servern. Här får varje webbläsare värdet.</p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Lägg aldrig ett lösenord eller en nyckel i en <code>VITE_</code>-variabel. Adressen till API:et får synas. <span class="src">(<a href="https://docs.aws.amazon.com/amplify/latest/userguide/environment-variables.html">AWS: Amplify environment variables</a>)</span></p>
+</div>
+</section>
+
+<div class="picker">
+  <p>Du byter värdet på <code>VITE_API_URL</code>. Välj var:</p>
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-lokal">I .env.local</button>
+    <button class="chip" data-target="p-amplify">I Amplify</button>
+    <button class="chip" data-target="p-kod">I App.jsx</button>
+  </div>
+  <div class="picker-panel" id="p-lokal">
+    <p>Utvecklingsservern läste filen när den startade. Stoppa <code>npm run dev</code> och starta den igen.</p>
+    <p><span class="tag good">Gäller efter omstart</span></p>
+  </div>
+  <div class="picker-panel" id="p-amplify">
+    <p>Sidan på Amplify har den gamla adressen inbyggd i <code>dist/</code>. Den nya kommer med i nästa bygge.</p>
+    <p><span class="tag good">Gäller efter bygget</span></p>
+  </div>
+  <div class="picker-panel" id="p-kod">
+    <p>Då står adressen i koden, inte i en variabel. Varje byte blir en ny commit.</p>
+  </div>
+</div>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du ändrar <code>VITE_API_URL</code> i <code>.env.local</code> medan <code>npm run dev</code> körs. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Vite läser filen när servern startar, inte medan den körs.">Sidan byter adress så fort filen sparas</button>
+    <button class="opt" data-why="Amplify ser aldrig filen; utvecklingsservern läser den, men bara vid start.">Inget, för filen läses bara av Amplify</button>
+    <button class="opt" data-correct data-why="Vite läser .env.local vid start, så servern måste startas om.">Inget, förrän du startar om servern igen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du sparar ett nytt värde på <code>VITE_API_URL</code> i Amplify. När når det sidan?</p>
+  <div class="options">
+    <button class="opt" data-why="Save sparar bara värdet; sidan har det gamla inbyggt tills nästa bygge.">Direkt, när du trycker Save</button>
+    <button class="opt" data-why="Lambda har inget med sidans variabel att göra; den byggs in av Vite.">När Lambda startar en miljö</button>
+    <button class="opt" data-correct data-why="Vite bygger in värdet i dist/, så det behövs ett nytt bygge.">Efter nästa bygge av dist/</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 44: <code>DB_PASSWORD</code> låg i en miljövariabel på servern. Varför får lösenordet inte ligga i en <code>VITE_</code>-variabel?</p>
+  <div class="options">
+    <button class="opt" data-why="Vite läser vilket värde som helst; det som gör det farligt är att värdet byggs in i sidan.">Vite kan bara läsa in värden med https</button>
+    <button class="opt" data-correct data-why="Värdet byggs in i sidans JavaScript, som varje besökare laddar ner.">Värdet byggs in i sidan som alla laddar</button>
+    <button class="opt" data-why="Amplify läser variabler från konsolen; problemet är att värdet hamnar i sidan.">Amplify kan inte läsa en fil med lösenord</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>VITE_API_URL</code> står i <code>.env.local</code> på din dator och under Hosting → Environment variables i Amplify. Koden läser den med <code>import.meta.env.VITE_API_URL</code>. Bara namn som börjar på <code>VITE_</code> når sidan.</li>
+    <li>Vite läser värdet vid start och bygger in det i filerna i <code>dist/</code>. Ändrar du <code>.env.local</code>: starta om <code>npm run dev</code>. Ändrar du i Amplify: värdet gäller efter nästa bygge.</li>
+    <li>Värdet står i sidans JavaScript och syns för alla. Adressen får synas, men aldrig ett lösenord eller en nyckel.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://vite.dev/guide/env-and-mode">Vite: Env Variables and Modes</a>.</p>
+<p>Om Amplify: <a href="https://docs.aws.amazon.com/amplify/latest/userguide/setting-env-vars.html">AWS Amplify: Setting environment variables</a> och <a href="https://docs.aws.amazon.com/amplify/latest/userguide/environment-variables.html">AWS Amplify: Using environment variables</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0110-throttling.html">Förra: Throttling</a>
+  <a href="../index.html">Alla lektioner</a>
+  <span class="disabled">Nästa: Synkront och asynkront</span>
+</nav>
+
+</main>
+</body>
+</html>

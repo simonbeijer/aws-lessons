@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS CLI</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 72 · v42, 2 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 72</p>
+<h1>AWS CLI</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Hur ett kommando som <code>aws elbv2 create-load-balancer --region eu-north-1</code> är byggt: tjänst, åtgärd och flaggor. Och vad <code>--query</code> och <code>--output text</code> gör med svaret.
+</div>
+
+<section class="explain">
+<h2>Vad är AWS CLI?</h2>
+
+<p>AWS CLI är programmet <code>aws</code>. Med det styr du AWS med kommandon i en terminal, i stället för att klicka i konsolen. <span class="src">(<a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html">AWS: What is the AWS CLI?</a>)</span></p>
+
+<p>I <a href="0071-aws-cloudshell.html">CloudShell</a> finns <code>aws</code> redan, inloggat som samma IAM user som i konsolen. <span class="src">(<a href="https://docs.aws.amazon.com/cloudshell/latest/userguide/working-with-aws-cli.html">AWS: CLI in CloudShell</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur är ett kommando byggt?</h2>
+
+<p>Delarna kommer alltid i samma ordning: <code>aws</code>, tjänst, åtgärd och flaggor. <span class="src">(<a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-commandstructure.html">AWS: Command structure</a>)</span></p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Del</th><th>I exemplet</th><th>Vad den gör</th></tr>
+  <tr><td>Program</td><td><code>aws</code></td><td>Startar AWS CLI.</td></tr>
+  <tr><td>Tjänst</td><td><code>elbv2</code></td><td>Tjänsten, här Elastic Load Balancing: <a href="0071-aws-cloudshell.html">lastbalanserare</a>. <span class="src">(<a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html">AWS: What is ELB?</a>)</span></td></tr>
+  <tr><td>Åtgärd</td><td><code>create-load-balancer</code></td><td>Vad tjänsten ska göra: skapa en lastbalanserare.</td></tr>
+  <tr><td>Flagga</td><td><code>--region eu-north-1</code></td><td>Skickar just det här kommandot till Europe (Stockholm).</td></tr>
+</table>
+</div>
+
+<p><a href="0054-curl.html">Flaggorna</a> börjar med <code>--</code> och får stå i vilken ordning som helst efter åtgärden. <span class="src">(<a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-options.html">AWS: Command line options</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad gör --query och --output?</h2>
+
+<p><code>--query</code> väljer ut den del av svaret du vill ha, och <code>--output text</code> skriver den som vanlig text. Utan dem kommer hela svaret som <a href="0052-json.html">JSON</a>. <span class="src">(<a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-filter.html">AWS: Filtering output</a>, <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-output-format.html">AWS: Output format</a>)</span></p>
+
+<pre><code>aws ec2 describe-subnets \
+  --region eu-north-1 \
+  --query 'Subnets[].SubnetId' \
+  --output text</code></pre>
+
+<p>Åtgärden <code>describe-subnets</code> visar dina <a href="0023-subnat.html">subnät</a>. <code>Subnets[].SubnetId</code> betyder: ta <code>SubnetId</code> från varje subnät i listan <code>Subnets</code>. Ett <code>\</code> sist på raden betyder att kommandot fortsätter, som i <a href="0054-curl.html">curl</a>. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/bash.html#Escape-Character">Bash: Escape Character</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="cli-utan">Utan båda</button>
+    <button class="chip" data-target="cli-query">Bara --query</button>
+    <button class="chip" data-target="cli-text">Båda</button>
+  </div>
+  <div class="picker-panel" id="cli-utan">
+    <p>JSON med alla fält för varje subnät (här förkortat):</p>
+<pre><code>{
+    "Subnets": [
+        {
+            "AvailabilityZone": "eu-north-1a",
+            "CidrBlock": "172.31.16.0/20",
+            "SubnetId": "subnet-0a1b2c3d4e5f60001",
+            ...</code></pre>
+  </div>
+  <div class="picker-panel" id="cli-query">
+    <p>Fortfarande JSON, men bara id:na:</p>
+<pre><code>[
+    "subnet-0a1b2c3d4e5f60001",
+    "subnet-0a1b2c3d4e5f60002"
+]</code></pre>
+  </div>
+  <div class="picker-panel" id="cli-text">
+    <p>Bara id:na, som vanlig text:</p>
+<pre><code>subnet-0a1b2c3d4e5f60001	subnet-0a1b2c3d4e5f60002</code></pre>
+  </div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad säger <code>elbv2</code> i <code>aws elbv2 create-load-balancer</code>?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Delen efter aws är tjänsten, här Elastic Load Balancing.">Vilken tjänst kommandot ska till</button>
+    <button class="opt" data-why="Det säger åtgärden create-load-balancer, som står efter tjänsten.">Vilken åtgärd tjänsten ska utföra</button>
+    <button class="opt" data-why="Regionen väljs med flaggan --region, som står sist.">Vilken region kommandot körs inom</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du kör <code>describe-subnets</code> med <code>--query 'Subnets[].SubnetId'</code> men utan <code>--output text</code>. Hur ser svaret ut?</p>
+  <div class="options">
+    <button class="opt" data-why="Vanlig text kräver --output text; utan den kommer svaret som JSON.">Som vanlig text, id:na på en rad</button>
+    <button class="opt" data-correct data-why="--query väljer ut id:na, men utan --output text skrivs de fortfarande som JSON.">Som JSON, en lista med bara id:na</button>
+    <button class="opt" data-why="--query har redan valt ut id:na, så de andra fälten är borta.">Som JSON, med alla fält i svaret</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 71: CloudShell står på Europe (Ireland). Du skapar något med <code>--region eu-north-1</code>. Var hamnar det?</p>
+  <div class="options">
+    <button class="opt" data-why="Flaggan --region går före regionen från konsolen, för just det kommandot.">I Europe (Ireland), där konsolen står</button>
+    <button class="opt" data-correct data-why="--region väljer region för just det här kommandot, och eu-north-1 är Stockholm.">I Europe (Stockholm), som flaggan säger</button>
+    <button class="opt" data-why="Ett kommando skickas till en region, den som --region anger.">I bägge regionerna samtidigt, som kopior</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>AWS CLI är programmet <code>aws</code>. Det styr AWS med kommandon och finns redan i CloudShell.</li>
+    <li>Ett kommando är byggt som <code>aws</code>, tjänst, åtgärd och flaggor, till exempel <code>aws elbv2 create-load-balancer --region eu-north-1</code>.</li>
+    <li><code>--query</code> väljer ut en del av svaret. <code>--output text</code> skriver den som vanlig text i stället för JSON.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-commandstructure.html">AWS CLI: Command structure</a>.</p>
+<p>Om svaret: <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-filter.html">AWS CLI: Filtering output</a> och <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-output-format.html">AWS CLI: Setting the output format</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0071-aws-cloudshell.html">Förra: AWS CloudShell</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0073-skalvariabel.html">Nästa: Skalvariabel</a>
+</nav>
+
+</main>
+</body>
+</html>

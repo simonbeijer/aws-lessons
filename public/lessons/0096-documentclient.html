@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DocumentClient</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 96 · v42, 26 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 96</p>
+<h1>DocumentClient</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att <code>DynamoDBDocumentClient</code> låter dig skicka vanliga JavaScript-objekt till DynamoDB i stället för att skriva varje värde som <code>{ "S": "Alice" }</code>.
+</div>
+
+<section class="explain">
+<h2>Hur vill DynamoDB ha värdena?</h2>
+
+<p>DynamoDB, databastjänsten från <a href="0088-dynamodb.html">lektion 88</a>, vill ha en typ runt varje värde. Den tar emot <a href="0052-json.html">JSON</a>. Varje värde ligger i ett eget objekt, där namnet är en bokstav som säger <a href="0089-item-och-attribut.html">typen</a>: <code>S</code> för text (String), <code>N</code> för tal (Number). Namnet Alice skrivs <code>{ "S": "Alice" }</code>. Även tal skickas som text: <code>{ "N": "34" }</code>. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.LowLevelAPI.html#Programming.LowLevelAPI.DataTypeDescriptors">AWS: Data type descriptors</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad gör DocumentClient?</h2>
+
+<p>DocumentClient skriver typerna åt dig. <code>DynamoDBDocumentClient</code> är en klient ur paketet <code>@aws-sdk/lib-dynamodb</code>. Du ger den ett vanligt JavaScript-objekt, par av namn och värde inom <code>{ }</code> som ett JSON-objekt. Klienten lägger till <code>S</code>, <code>N</code> och de andra typerna innan anropet skickas. Svaret översätts tillbaka, så du får vanliga objekt ut också. <span class="src">(<a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/migrate-dynamodb-doc-client.html">AWS: DynamoDB document client</a>, <a href="https://github.com/aws/aws-sdk-js-v3/blob/main/lib/lib-dynamodb/README.md">AWS SDK: lib-dynamodb README</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="dc-med">Med DocumentClient</button>
+    <button class="chip" data-target="dc-utan">Utan DocumentClient</button>
+  </div>
+  <div class="picker-panel" id="dc-med">
+<pre><code>{ id: "demo-1", name: "Alice" }</code></pre>
+    <p>Ett vanligt objekt. I JavaScript behövs inga citattecken runt namnen. Klienten lägger till typerna.</p>
+  </div>
+  <div class="picker-panel" id="dc-utan">
+<pre><code>{ id: { S: "demo-1" }, name: { S: "Alice" } }</code></pre>
+    <p>Samma data. Du skriver typen runt varje värde själv.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Hur skapas den?</h2>
+
+<p>Den skapas av en vanlig <code>DynamoDBClient</code>. <code>DynamoDBDocumentClient.from</code> tar klienten från <a href="0095-aws-sdk.html">lektion 95</a> och lägger DocumentClient runt den. Kommandona hämtas ur samma paket, till exempel <code>PutCommand</code>, som sparar ett <a href="0089-item-och-attribut.html">item</a>, som <a href="0092-dynamodb-operationer.html">PutItem</a>. <span class="src">(<a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/migrate-dynamodb-doc-client.html">AWS: DynamoDB document client</a>)</span></p>
+
+<pre><code>import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+
+const db = DynamoDBDocumentClient.from(new DynamoDBClient({})); // en gång per miljö
+
+export const handler = async (event) =&gt; {
+  await db.send(new PutCommand({
+    TableName: "v42-customers",              // tabellens namn
+    Item: { id: "demo-1", name: "Alice" },   // itemet som sparas
+  }));
+};</code></pre>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du använder bara <code>DynamoDBClient</code>, utan DocumentClient. Hur skickas namnet Alice?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Utan DocumentClient skriver du typen själv, så Alice blir { &quot;S&quot;: &quot;Alice&quot; }.">Som ett objekt med bokstaven S kring värdet</button>
+    <button class="opt" data-why="DynamoDB tar emot JSON, inte SQL, och värdet ligger i ett objekt med typen S.">Som en sträng i en SQL-fråga mot tabellen</button>
+    <button class="opt" data-why="DynamoDB vill ha en typ runt varje värde, så bara texten räcker inte.">Som texten Alice, helt utan något runt den</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du skickar <code>{ id: "demo-1", name: "Alice" }</code> med DocumentClient. Vad gör klienten med objektet?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="DocumentClient lägger till S, N och de andra typerna innan anropet skickas.">Lägger till en typ runt varje värde</button>
+    <button class="opt" data-why="Objektet blir inte en sträng; varje värde får sin typ, som S för text.">Gör hela objektet till en enda sträng</button>
+    <button class="opt" data-why="DynamoDB vill ha typer runt värdena, och dem lägger klienten till innan anropet.">Skickar hela objektet som det redan är</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 95: vad gör <code>db.send(...)</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="send startar inte om miljön; det skickar kommandot till tjänsten.">Startar om hela exekveringsmiljön</button>
+    <button class="opt" data-correct data-why="send skickar kommandot, här PutCommand, till tjänsten, och await väntar på svaret.">Skickar kommandot till DynamoDB</button>
+    <button class="opt" data-why="send skriver inget i loggen; det skickar kommandot till tjänsten.">Skriver kommandot i CloudWatch</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>DynamoDB vill ha en typ runt varje värde, till exempel <code>{ "S": "Alice" }</code> för text och <code>{ "N": "34" }</code> för tal.</li>
+    <li><code>DynamoDBDocumentClient</code> låter dig skicka vanliga JavaScript-objekt. Den lägger till typerna innan anropet och tar bort dem ur svaret.</li>
+    <li>Den skapas med <code>DynamoDBDocumentClient.from(new DynamoDBClient({}))</code>, och kommandona som <code>PutCommand</code> hämtas ur <code>@aws-sdk/lib-dynamodb</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/migrate-dynamodb-doc-client.html">AWS SDK for JavaScript v3: DynamoDB document client</a>.</p>
+<p>Om typerna: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.LowLevelAPI.html#Programming.LowLevelAPI.DataTypeDescriptors">Amazon DynamoDB: Data type descriptors</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0095-aws-sdk.html">Förra: AWS SDK</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0097-handelse-fran-api-gateway.html">Nästa: Händelse från API Gateway</a>
+</nav>
+
+</main>
+</body>
+</html>

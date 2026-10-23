@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exekveringsmiljö</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 83 · v42, 13 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 83</p>
+<h1>Exekveringsmiljö</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att exekveringsmiljön är den isolerade plats där Lambda kör din kod, att den återanvänds mellan anrop, och att en miljö bara kör ett anrop i taget.
+</div>
+
+<section class="explain">
+<h2>Vad är en exekveringsmiljö?</h2>
+
+<p>Den isolerade plats där Lambda kör din funktion. På engelska heter den execution environment. Isolerad betyder avskild från andra miljöer. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html">AWS: Execution environment lifecycle</a>)</span></p>
+
+<p>Miljön innehåller din <a href="0079-runtime.html">runtime</a>, till exempel Node.js 22.x, och din kod. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html">AWS: Execution environment lifecycle</a>)</span></p>
+
+<p>Miljön är kopian av funktionen från <a href="0082-cloudwatch-logs.html">lektion 82</a>. Varje miljö skriver till en egen loggström. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html">AWS: Viewing Lambda logs</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad händer vid ett anrop?</h2>
+
+<p>Vid första anropet skapar Lambda en ny miljö. Den laddar in koden, startar runtime och kör koden utanför <a href="0080-handler.html">handlern</a>, sedan handlern. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#cold-start-latency">AWS: Cold starts and latency</a>)</span></p>
+
+<pre><code>console.log("Ny miljö"); // körs en gång per miljö
+
+export const handler = async (event) =&gt; {
+  console.log("Anrop"); // körs vid varje anrop
+  return { message: "Hej!" };
+};</code></pre>
+
+<p>Efter anropet fryser Lambda miljön: den står still men finns kvar. Kommer ett nytt anrop återanvänds den, och bara handlern körs. Därför skapar man det som ska återanvändas, till exempel en databasanslutning, utanför handlern. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#runtimes-lifecycle-shutdown">AWS: Shutdown phase</a>)</span></p>
+
+<p>Efter en tid utan anrop, och alltid efter några timmar, tar Lambda bort miljön. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#runtimes-lifecycle-shutdown">AWS: Shutdown phase</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur många miljöer blir det?</h2>
+
+<p>En för varje anrop som pågår samtidigt. En miljö kör bara ett anrop i taget. Är alla miljöer upptagna när ett anrop kommer skapar Lambda en ny. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html#understanding-concurrency">AWS: Understanding concurrency</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="miljo-efter">Två anrop efter varandra</button>
+    <button class="chip" data-target="miljo-samtidigt">Två anrop samtidigt</button>
+  </div>
+  <div class="picker-panel" id="miljo-efter"><p>Första anropet skapar miljö A. Det andra kommer när A är ledig och återanvänder den. En loggström.</p></div>
+  <div class="picker-panel" id="miljo-samtidigt"><p>Miljö A är upptagen med första anropet. Lambda skapar miljö B för det andra. Två loggströmmar.</p></div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. En rad står ovanför handlern i <code>index.mjs</code>. Hur ofta körs den?</p>
+  <div class="options">
+    <button class="opt" data-why="Vid varje anrop körs bara handlern; koden utanför körs när miljön skapas.">Vid varje anrop, precis som handlern</button>
+    <button class="opt" data-why="Koden utanför handlern körs varje gång Lambda skapar en ny miljö, inte bara när funktionen skapas.">Bara när funktionen skapas i konsolen</button>
+    <button class="opt" data-correct data-why="Koden utanför handlern körs när miljön skapas, och sedan återanvänds miljön.">En gång i varje ny exekveringsmiljö</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Två anrop kommer samtidigt, och funktionen har en ledig miljö. Vad gör Lambda?</p>
+  <div class="options">
+    <button class="opt" data-why="Lambda låter inte anropet vänta; finns ingen ledig miljö skapas en ny.">Ställer anrop två i kö tills miljön är klar</button>
+    <button class="opt" data-correct data-why="En miljö kör ett anrop i taget, så det andra anropet får en ny miljö.">Kör ett anrop där och startar en ny miljö</button>
+    <button class="opt" data-why="En miljö kör bara ett anrop i taget, aldrig två på en gång.">Kör båda anropen i den miljön på en gång</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 79: vad bestämmer runtime i exekveringsmiljön?</p>
+  <div class="options">
+    <button class="opt" data-why="Antalet miljöer beror på hur många anrop som pågår samtidigt, inte på runtime.">Hur många miljöer funktionen får ha</button>
+    <button class="opt" data-why="Regionen väljer du när du skapar funktionen; runtime är språket och versionen.">Vilken region som funktionen körs i</button>
+    <button class="opt" data-correct data-why="Runtime är språket och versionen, till exempel Node.js 22.x, som miljön kör koden med.">Språket och versionen koden körs med</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Exekveringsmiljön är den isolerade plats där Lambda kör din funktion, med runtime och kod. Varje miljö har en egen loggström.</li>
+    <li>Koden utanför handlern körs en gång per miljö. Miljön fryses efter anropet och återanvänds, så då körs bara handlern. Lambda tar bort den efter en tid.</li>
+    <li>En miljö kör ett anrop i taget. Anrop som pågår samtidigt får var sin miljö.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html">AWS Lambda: Understanding the Lambda execution environment lifecycle</a>.</p>
+<p>Om flera miljöer samtidigt: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html">AWS Lambda: Understanding Lambda function scaling</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0082-cloudwatch-logs.html">Förra: CloudWatch Logs</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0084-kallstart.html">Nästa: Kallstart</a>
+</nav>
+
+</main>
+</body>
+</html>

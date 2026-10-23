@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ConditionExpression</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 101 · v42, 31 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 101</p>
+<h1>ConditionExpression</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att <code>attribute_exists(id)</code> hindrar UpdateItem och DeleteItem från att gälla ett item som inte finns, och att felet då görs om till 404.
+</div>
+
+<section class="explain">
+<h2>Vad är ett villkor?</h2>
+
+<p>Ett villkor är ett <a href="0100-platshallare-i-uttryck.html">uttryck</a> som måste vara sant för att en skrivning ska göras. Det skickas i <code>ConditionExpression</code>. DynamoDB testar villkoret mot itemet med id:t i Key. Är villkoret falskt ändras inget, och anropet misslyckas. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html">AWS: Condition expressions</a>)</span></p>
+
+<p><code>attribute_exists(id)</code> är sant bara om itemet har attributet id. Varje item har id, eftersom det är <a href="0090-partitionsnyckel.html">partitionsnyckeln</a>. Villkoret betyder alltså: itemet måste finnas. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html#Expressions.ConditionExpressions.CheckingForAttributes">AWS: Checking for attributes</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför behövs villkoret?</h2>
+
+<p>Villkoret behövs eftersom UpdateItem och DeleteItem annars inte märker att id:t saknas. <a href="0092-dynamodb-operationer.html">UpdateItem</a> skapar då ett nytt item med bara id och name. DeleteItem tar inte bort något men ger inget fel, så koden svarar som om kunden togs bort. Med villkoret misslyckas båda i stället. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html">AWS: UpdateItem</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteItem.html">AWS: DeleteItem</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="villkor-utan">Utan villkor</button>
+    <button class="chip" data-target="villkor-med">Med villkor</button>
+  </div>
+  <div class="picker-panel" id="villkor-utan">
+<pre><code>PUT /customers/finns-inte   { "name": "Carol" }
+
+Nytt item: { id: "finns-inte", name: "Carol" }</code></pre>
+    <p><span class="tag bad">Fel</span> En kund som aldrig fanns skapas.</p>
+  </div>
+  <div class="picker-panel" id="villkor-med">
+<pre><code>PUT /customers/finns-inte   { "name": "Carol" }
+
+ConditionalCheckFailedException</code></pre>
+    <p><span class="tag good">Fungerar</span> Inget skapas, och klienten får 404.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Hur blir felet 404?</h2>
+
+<p>När villkoret är falskt kastar anropet ett fel med namnet <code>ConditionalCheckFailedException</code>. Ett <a href="0098-svar-till-api-gateway.html">try/catch</a> fångar felet och returnerar <a href="0050-statuskod.html">404</a>, att kunden inte finns. Alla andra fel kastas vidare med throw och blir ett 5xx-fel. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html#Programming.Errors.MessagesAndCodes.http400">AWS: Error handling with DynamoDB</a>)</span></p>
+
+<pre><code>try {
+  await db.send(new UpdateCommand({
+    TableName: "v42-customers",
+    Key: { id },
+    UpdateExpression: "SET #n = :n",
+    ExpressionAttributeNames: { "#n": "name" },
+    ExpressionAttributeValues: { ":n": name },
+    ConditionExpression: "attribute_exists(id)",   // itemet måste finnas
+  }));
+} catch (err) {
+  if (err.name === "ConditionalCheckFailedException") {
+    return {
+      statusCode: 404,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "customer not found" })
+    };
+  }
+  throw err;   // allt annat blir ett 5xx-fel
+}</code></pre>
+
+<p>DeleteItem får samma villkor och samma catch. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteItem.html">AWS: DeleteItem</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad gör <code>attribute_exists(id)</code> i ett UpdateItem?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Villkoret är falskt när itemet saknas, så inget ändras och inget skapas.">Stoppar ändringen om inget item har id:t</button>
+    <button class="opt" data-why="Det är det UpdateItem gör utan villkor; villkoret stoppar just det.">Skriver ett nytt item med kundens id:t</button>
+    <button class="opt" data-why="Villkoret läser inget åt dig; det avgör bara om ändringen görs.">Hämtar itemet och skickar det i svaret</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Villkoret är falskt och catch fångar ConditionalCheckFailedException. Vilken statuskod returnerar handlern?</p>
+  <div class="options">
+    <button class="opt" data-why="Felet kastas inte vidare; catch fångar det och returnerar 404.">5xx, eftersom felet kastas vidare</button>
+    <button class="opt" data-correct data-why="Villkoret föll eftersom itemet saknas, och 404 betyder att resursen inte finns.">404, eftersom kunden inte finns</button>
+    <button class="opt" data-why="Inget ändrades, så anropet gick inte bra; kunden saknas och det ger 404.">200, eftersom anropet gick bra</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 98: vad får klienten om ett kastat fel inte fångas?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Ett fel som inget fångar ger ett 5xx-fel med bara Internal Server Error.">Ett 5xx-fel med Internal Server Error</button>
+    <button class="opt" data-why="404 kommer bara om koden fångar felet och returnerar det själv.">Ett 404-svar med felet som JSON-kropp</button>
+    <button class="opt" data-why="Ett fel som inte fångas ger aldrig 200; klienten får ett 5xx-fel.">Ett 200-svar med en tom JSON-kropp</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett villkor i <code>ConditionExpression</code> måste vara sant, annars ändras inget och anropet misslyckas.</li>
+    <li>UpdateItem skapar ett item om det inte finns. <code>attribute_exists(id)</code> förhindrar det, eftersom det kräver att itemet finns. DeleteItem använder samma villkor.</li>
+    <li>Felet som kastas heter ConditionalCheckFailedException. try/catch gör om det till 404. Andra fel blir 5xx.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html">Amazon DynamoDB: Condition expressions</a>.</p>
+<p>Om operationerna: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html">Amazon DynamoDB API: UpdateItem</a> och <a href="https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteItem.html">DeleteItem</a>. Om felet: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html">Amazon DynamoDB: Error handling</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0100-platshallare-i-uttryck.html">Förra: Platshållare i uttryck</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0102-accessdeniedexception.html">Nästa: AccessDeniedException</a>
+</nav>
+
+</main>
+</body>
+</html>

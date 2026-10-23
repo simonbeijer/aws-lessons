@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UUID</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 99 · v42, 29 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 99</p>
+<h1>UUID</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att id:t för en ny kund blir ett slumpat UUID från <code>randomUUID()</code> i stället för ett löpnummer, och varför ingen kan räkna sig fram till andras id.
+</div>
+
+<section class="explain">
+<h2>Vad är ett UUID?</h2>
+
+<p>Ett UUID är ett id på 32 tecken, bara 0–9 och a–f, i fem grupper med bindestreck. Grupperna har 8, 4, 4, 4 och 12 tecken. <span class="src">(<a href="https://www.rfc-editor.org/rfc/rfc9562.html#section-4">RFC 9562: UUID Format</a>)</span></p>
+
+<pre><code>9b801085-b120-4eba-b9ed-5b7841385dd4</code></pre>
+
+<p>I version 4 slumpas nästan alla tecken. Siffran 4 först i tredje gruppen visar versionen. <span class="src">(<a href="https://www.rfc-editor.org/rfc/rfc9562.html#section-5.4">RFC 9562: UUID Version 4</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur skapas id:t?</h2>
+
+<p>Det skapas med <code>randomUUID()</code>, som ger ett nytt UUID version 4 som sträng vid varje anrop. Slumpen kommer från en kryptografisk slumpgenerator, som är gjord för att inte gå att förutse. <span class="src">(<a href="https://nodejs.org/api/crypto.html#cryptorandomuuidoptions">Node.js: crypto.randomUUID()</a>)</span></p>
+
+<pre><code>import { randomUUID } from "node:crypto";
+
+const kund = { id: randomUUID(), name: "Carol" };</code></pre>
+
+<p><code>node:crypto</code> är en modul som finns inbyggd i Node.js, så ingen <code>npm install</code> behövs. <code>import</code> hämtar funktionen, som i <a href="0095-aws-sdk.html">lektion 95</a>. Koden skapar alltså <a href="0090-partitionsnyckel.html">id:t</a> själv, inte databasen. <span class="src">(<a href="https://nodejs.org/api/modules.html#built-in-modules">Node.js: Built-in modules</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför inte löpnummer?</h2>
+
+<p>Ett löpnummer går att räkna fram. I <a href="0068-agarkontroll.html">lektion 68</a> var id:n 1, 2, 3 i tur och ordning. Den som ser sitt id 42 kan prova 43. Ett UUID har ingen ordning. Nästa id säger inget om förra, och det finns ungefär 5 × 10<sup>36</sup> möjliga. Att prova id efter id hittar i praktiken inget. <span class="src">(<a href="https://www.rfc-editor.org/rfc/rfc9562.html#section-5.4">RFC 9562: UUID Version 4</a>, <a href="https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization">OWASP: Broken Object Level Authorization</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="id-lop">Löpnummer</button>
+    <button class="chip" data-target="id-uuid">UUID</button>
+  </div>
+  <div class="picker-panel" id="id-lop">
+<pre><code>/customers/42  ditt
+/customers/43  nästa kund</code></pre>
+  </div>
+  <div class="picker-panel" id="id-uuid">
+<pre><code>/customers/9b801085-b120-4eba-b9ed-5b7841385dd4  ditt
+/customers/???  går inte att räkna fram</code></pre>
+  </div>
+</div>
+
+<p>UUID stoppar att någon hämtar allt genom att räkna. Ägarkontrollen behövs ändå, för ett id kan läcka, till exempel i en länk. <span class="src">(<a href="https://www.rfc-editor.org/rfc/rfc9562.html#section-8">RFC 9562: Security Considerations</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Ett API ger kunderna id 41, 42 och 43 i tur och ordning. Vad är problemet?</p>
+  <div class="options">
+    <button class="opt" data-why="Ett löpnummer är kort; problemet är att det går att räkna fram.">Talen blir för långa för en sökväg</button>
+    <button class="opt" data-correct data-why="Löpnummer går att räkna, så den som har 42 kan prova 43.">Alla kan räkna fram andra kunders id</button>
+    <button class="opt" data-why="Ett löpnummer delas ut en gång; problemet är att det går att räkna fram.">Två kunder kan få samma id ibland</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad ger <code>randomUUID()</code>?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Varje anrop ger ett nytt slumpat UUID version 4 som sträng.">Ett nytt slumpat UUID varje anrop</button>
+    <button class="opt" data-why="randomUUID räknar inte; det slumpar ett nytt UUID vid varje anrop.">Nästa lediga nummer i hela tabellen</button>
+    <button class="opt" data-why="Varje anrop slumpar ett nytt UUID, inte samma som förra.">Samma id varje gång funktionen körs</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 97: anropet är <code>GET /customers/9b801085-b120-4eba-b9ed-5b7841385dd4</code>. Var står id:t i eventet?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Routen /customers/{id} gör id till en sökvägsparameter i pathParameters."><code>event.pathParameters.id</code></button>
+    <button class="opt" data-why="Id:t står inte bland headers; det står i event.pathParameters.id."><code>event.headers.customerId</code></button>
+    <button class="opt" data-why="Ett GET-anrop har ingen kropp; id:t står i event.pathParameters.id."><code>event.body.customer.id</code></button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett UUID är ett id på 32 tecken i fem grupper. I version 4 slumpas nästan alla tecken.</li>
+    <li><code>randomUUID()</code> ur den inbyggda modulen <code>node:crypto</code> ger ett nytt UUID som sträng, och koden skapar id:t själv, inte databasen.</li>
+    <li>Ett löpnummer går att räkna fram, ett UUID gör det inte. Ägarkontrollen behövs ändå.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://nodejs.org/api/crypto.html#cryptorandomuuidoptions">Node.js: crypto.randomUUID()</a>.</p>
+<p>Om formatet: <a href="https://www.rfc-editor.org/rfc/rfc9562.html">RFC 9562: Universally Unique IDentifiers (UUIDs)</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0098-svar-till-api-gateway.html">Förra: Svar till API Gateway</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0100-platshallare-i-uttryck.html">Nästa: Platshållare i uttryck</a>
+</nav>
+
+</main>
+</body>
+</html>

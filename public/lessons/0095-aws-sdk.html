@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS SDK</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 95 · v42, 25 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 95</p>
+<h1>AWS SDK</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att AWS SDK är biblioteket din kod använder för att anropa AWS-tjänster, att det redan finns i Lambda, och varför klienten skapas utanför handlern.
+</div>
+
+<section class="explain">
+<h2>Vad är AWS SDK?</h2>
+
+<p>AWS SDK är ett bibliotek med färdig kod för att anropa AWS-tjänster. SDK står för software development kit. För Node.js heter det AWS SDK for JavaScript v3. <span class="src">(<a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/welcome.html">AWS: What's the AWS SDK for JavaScript?</a>)</span></p>
+
+<p>SDK:n har ett paket per tjänst. <code>@aws-sdk/client-dynamodb</code> anropar till exempel DynamoDB, databastjänsten från <a href="0088-dynamodb.html">lektion 88</a>. <span class="src">(<a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/getting-started-nodejs.html">AWS: Get started with Node.js</a>)</span></p>
+
+<p>Alla Node.js-runtimes som Lambda stöder har SDK:n med. Därför behövs ingen <code>npm install</code> i konsolens <a href="0079-runtime.html">editor</a>. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html#nodejs-example-sdk-usage">AWS: Using the SDK for JavaScript v3 in your handler</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur anropar koden AWS?</h2>
+
+<p>Koden använder en klient och ett kommando. Klienten skickar anropen till tjänsten, som klienten i ett <a href="0048-http-anrop-och-svar.html">HTTP-anrop</a>. Kommandot säger vad tjänsten ska göra. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html#nodejs-example-sdk-usage">AWS: Using the SDK for JavaScript v3 in your handler</a>)</span></p>
+
+<pre><code>import { DynamoDBClient, ListTablesCommand } from "@aws-sdk/client-dynamodb";
+
+const client = new DynamoDBClient({}); // en gång per miljö
+
+export const handler = async (event) =&gt; {
+  const svar = await client.send(new ListTablesCommand({})); // varje anrop
+  return svar.TableNames;
+};</code></pre>
+
+<p><code>import</code> hämtar klienten och kommandot ur paketet. <code>new DynamoDBClient({})</code> skapar klienten, och <code>{}</code> betyder standardinställningar. <code>client.send</code> skickar kommandot, här att lista tabellerna, och <code>await</code> väntar på svaret. <span class="src">(<a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_dynamodb_code_examples.html">AWS: DynamoDB examples, ListTables</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_ListTables.html">AWS: ListTables</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför utanför handlern?</h2>
+
+<p>Utanför handlern skapas klienten en gång per miljö, inte vid varje anrop. Koden utanför handlern körs bara när en ny <a href="0083-exekveringsmiljo.html">exekveringsmiljö</a> startar, vid en <a href="0084-kallstart.html">kallstart</a>. Sedan återanvänds den i varje anrop. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html#nodejs-handler-state">AWS: Using global state</a>)</span></p>
+
+<p>Inuti handlern skapas klienten om vid varje anrop. Anropen tar längre tid, och Lambda tar betalt för <a href="0085-duration-och-billed-duration.html">tiden funktionen kör</a>. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html#function-code">AWS: Best practices, function code</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="sdk-utanfor">Klienten utanför</button>
+    <button class="chip" data-target="sdk-inuti">Klienten inuti</button>
+  </div>
+  <div class="picker-panel" id="sdk-utanfor"><p>Tre anrop: klienten skapas en gång, vid kallstarten, och återanvänds.</p></div>
+  <div class="picker-panel" id="sdk-inuti"><p>Tre anrop: klienten skapas tre gånger, en gång i varje anrop.</p></div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Koden i en Lambda-funktion ska hämta data från DynamoDB. Vad använder den för att skicka anropet?</p>
+  <div class="options">
+    <button class="opt" data-why="AWS CLI körs i terminalen; koden i funktionen anropar AWS med SDK:ns klient.">Ett anrop med AWS CLI i terminalen</button>
+    <button class="opt" data-why="console.log skriver bara till funktionens logg; anropet till DynamoDB skickas av SDK:ns klient.">En rad du själv skriver i loggen</button>
+    <button class="opt" data-correct data-why="AWS SDK är biblioteket koden använder för att anropa AWS, med ett paket och en klient per tjänst.">En klient ur AWS SDK för tjänsten</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du flyttar <code>new DynamoDBClient({})</code> in i handlern. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Det gäller när klienten skapas utanför handlern, eftersom den koden körs en gång per miljö.">Den skapas en gång i varje miljö</button>
+    <button class="opt" data-correct data-why="Allt inuti handlern körs vid varje anrop, så klienten skapas om varje gång och anropen tar längre tid.">Den skapas på nytt vid varje anrop</button>
+    <button class="opt" data-why="Klienten fungerar inuti handlern också, men den skapas om vid varje anrop.">Den kan inte nå någon tjänst alls</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 84: när körs koden utanför handlern?</p>
+  <div class="options">
+    <button class="opt" data-why="Vid ett varmt anrop körs bara handlern; koden utanför körs när en ny miljö startar.">Under varje anrop, innan handlern</button>
+    <button class="opt" data-why="Deploy sparar ny kod, men koden utanför handlern körs först när en ny miljö startar.">När du klickar på Deploy-knappen</button>
+    <button class="opt" data-correct data-why="Vid en kallstart laddar Lambda koden och kör det som står utanför handlern, sedan handlern.">Vid en kallstart, före handlern</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>AWS SDK är biblioteket din kod använder för att anropa AWS-tjänster. Det är uppdelat i ett paket per tjänst, till exempel <code>@aws-sdk/client-dynamodb</code>.</li>
+    <li>SDK:n finns redan i Lambdas Node.js-runtimes. Ingen <code>npm install</code> behövs i konsolens editor.</li>
+    <li>Koden skapar en klient och skickar kommandon med <code>client.send</code>. Klienten skapas utanför handlern: en gång per miljö, och återanvänds i varje anrop.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html#nodejs-example-sdk-usage">AWS Lambda: Using the SDK for JavaScript v3 in your handler</a>.</p>
+<p>Om SDK:n i allmänhet: <a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/welcome.html">AWS SDK for JavaScript v3 Developer Guide</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0094-miljovariabel-i-lambda.html">Förra: Miljövariabel i Lambda</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0096-documentclient.html">Nästa: DocumentClient</a>
+</nav>
+
+</main>
+</body>
+</html>

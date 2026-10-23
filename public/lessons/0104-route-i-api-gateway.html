@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Route i API Gateway</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 104 · v42, 34 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 104</p>
+<h1>Route i API Gateway</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en route är metod plus sökväg, att <code>{id}</code> blir <code>pathParameters.id</code>, och att ett anrop utan matchande route får 404 utan att funktionen körs.
+</div>
+
+<section class="explain">
+<h2>Var ligger routen?</h2>
+
+<p>Routen ligger i API Gateway, inte i koden. I <a href="0057-express.html">Express</a> skrev du routen i koden med <code>app.get</code>. Nu skriver du den i ditt <a href="0103-http-api.html">HTTP API</a>, som metod plus sökväg. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-routes.html">AWS: Routes for HTTP APIs</a>)</span></p>
+
+<p>Ditt API får fem routes. I konsolen ser du dem under <strong>Develop → Routes</strong>.</p>
+
+<pre><code>GET    /customers
+POST   /customers
+GET    /customers/{id}
+PUT    /customers/{id}
+DELETE /customers/{id}</code></pre>
+</section>
+
+<section class="explain">
+<h2>Vad gör <code>{id}</code>?</h2>
+
+<p>Klammerparenteserna gör <code>id</code> till en sökvägsparameter, som <code>:id</code> i Express. Det som står på den platsen i anropet hamnar i <code>event.pathParameters.id</code>, som du såg i <a href="0097-handelse-fran-api-gateway.html">eventet</a>. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-routes.html#http-api-routes-path-variables">AWS: Path variables</a>)</span></p>
+
+<p>Anropet <code>GET /customers/abc-123</code> matchar <code>GET /customers/{id}</code>, och koden får <code>"abc-123"</code>. Saknas klammerparenteserna i routen blir <code>pathParameters</code> tom, och koden hittar inget id.</p>
+</section>
+
+<section class="explain">
+<h2>Ingen matchande route</h2>
+
+<p>Matchar ingen route svarar API Gateway själv 404 med <code>{"message":"Not Found"}</code>, och funktionen körs inte. Anropet syns därför inte i funktionens logg i <a href="0082-cloudwatch-logs.html">CloudWatch Logs</a>. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-routes.html#http-api-develop-routes.evaluation">AWS: Routing API requests</a>; statuskoden och loggen: kursmaterialet v42)</span></p>
+
+<p>Både API Gateway och koden kan svara 404. Kroppen visar vem som svarade.</p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-abc">GET /customers/abc</button>
+    <button class="chip" data-target="p-products">GET /products</button>
+    <button class="chip" data-target="p-delete">DELETE /customers</button>
+  </div>
+  <div class="picker-panel" id="p-abc">
+    <p><span class="tag good">Route matchar</span> <code>GET /customers/{id}</code>. Funktionen körs, hittar ingen kund och svarar 404 med <code>{"error":"customer abc not found"}</code>.</p>
+  </div>
+  <div class="picker-panel" id="p-products">
+    <p><span class="tag bad">Ingen route</span> Sökvägen <code>/products</code> finns inte. API Gateway svarar 404 med <code>{"message":"Not Found"}</code>.</p>
+  </div>
+  <div class="picker-panel" id="p-delete">
+    <p><span class="tag bad">Ingen route</span> Sökvägen finns, men inte med metoden DELETE. API Gateway svarar 404 med <code>{"message":"Not Found"}</code>.</p>
+  </div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. <code>GET /products</code> får 404 med <code>{"message":"Not Found"}</code>. Vad har hänt?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Ingen route har den metoden och sökvägen, så API Gateway svarar själv utan att anropa funktionen.">Ingen route matchar och funktionen körs inte</button>
+    <button class="opt" data-why="Funktionen körs inte, eftersom ingen route i API Gateway matchar anropet.">Funktionen kördes och svarade själv med 404</button>
+    <button class="opt" data-why="Routen ligger i API Gateway, och där fanns ingen route för anropet.">Koden saknar någon route för sökvägen /products</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Routen är <code>GET /customers/{id}</code>. Var hamnar <code>abc-123</code> i anropet <code>GET /customers/abc-123</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Id:t står i sökvägen, inte i kroppen, och hamnar därför i pathParameters.">Som text i event.body</button>
+    <button class="opt" data-why="req.params.id finns i Express; i Lambda står id:t i eventets pathParameters.">Som id i req.params.id</button>
+    <button class="opt" data-correct data-why="Klammerparenteserna gör id till en sökvägsparameter, och värdet hamnar i pathParameters.id.">Som id i pathParameters</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 57: vad svarar Express om ingen route matchar anropet?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Express svarar själv 404 med texten Cannot och metoden och sökvägen.">404 med texten Cannot GET /kunder</button>
+    <button class="opt" data-why="Servern kraschar inte; Express svarar 404 när ingen route matchar.">500 för att servern har kraschat</button>
+    <button class="opt" data-why="Ingen route svarade, och då svarar Express 404, inte 200.">200 med tom kropp utan felmeddelande</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En route i API Gateway är metod plus sökväg. Den ligger i API Gateway, inte i koden.</li>
+    <li><code>{id}</code> i routen gör id till en sökvägsparameter, som hamnar i <code>event.pathParameters.id</code>.</li>
+    <li>Matchar ingen route svarar API Gateway 404 med <code>{"message":"Not Found"}</code>, och funktionen körs inte.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-routes.html">Amazon API Gateway: Create routes for HTTP APIs</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0103-http-api.html">Förra: HTTP API</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0105-integration.html">Nästa: Integration</a>
+</nav>
+
+</main>
+</body>
+</html>

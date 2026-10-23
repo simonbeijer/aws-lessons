@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ägarkontroll</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 68 · v41, 21 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 68</p>
+<h1>Ägarkontroll</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en inloggad bara får sina egna resurser, till exempel sina egna bokningar, och att någon annans ska ge 404, samma svar som om den inte fanns.
+</div>
+
+<section class="explain">
+<h2>Vad är ägarkontroll?</h2>
+
+<p>Ägarkontroll är att servern kontrollerar att det du hämtar är ditt. <a href="0067-autentisering.html">Autentisering</a> svarar på vem du är. Att kontrollera vad du får hämta kallas auktorisering. Ägarkontroll är auktorisering per bokning. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403">MDN: 403 Forbidden</a>, kursens lektion sida 27)</span></p>
+
+<p>Anna loggar in och hämtar sin bokning med <code>GET /bookings/42</code>. Ändrar hon <a href="0053-rest-api.html">sökvägen</a> till <code>/bookings/43</code> är hennes token fortfarande giltig. Utan ägarkontroll får hon då någon annans bokning. <span class="src">(<a href="https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization">OWASP: Broken Object Level Authorization</a>)</span></p>
+
+<p>Därför ska servern kontrollera ägaren i varje anrop som hämtar något med ett id. <span class="src">(<a href="https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization">OWASP: Broken Object Level Authorization</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vilket svar ska ges?</h2>
+
+<p>Någon annans bokning ska ge <code>404 Not Found</code>, samma svar som om bokningen inte fanns. Så svarar servern på tre anrop: <span class="src">(kursens lektion sida 29)</span></p>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Anrop</th><th>Svar</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>GET /bookings/43</code> utan token</td><td><code>401</code></td></tr>
+    <tr><td><code>GET /bookings/43</code> med Annas token, bokningen är Bennys</td><td><code>404</code></td></tr>
+    <tr><td><code>GET /bookings/42</code> med Annas token, bokningen är hennes</td><td><code>200</code></td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<section class="explain">
+<h2>Varför samma svar?</h2>
+
+<p>Samma svar gör att ingen kan räkna bokningarna. Id:n är 1, 2, 3 i tur och ordning. Om andras bokningar gav <a href="0014-static-website-hosting.html">403 Forbidden</a> och saknade gav 404, kunde vem som helst prova id efter id och se vilka som finns. <span class="src">(kursens lektion sida 25 och 29, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403">MDN: 403 Forbidden</a>)</span></p>
+
+<p>403 är alltså ett korrekt svar, men det avslöjar att bokningen finns. Statuskoden är en del av säkerheten. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication#access_forbidden">MDN: Access forbidden</a>, kursens lektion sida 29)</span></p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Lägg till ett <a href="0063-negativt-test.html">negativt test</a>: Annas token och Bennys bokning ska få 404.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Anna är inloggad och hämtar Bennys bokning. Vad ska servern svara?</p>
+  <div class="options">
+    <button class="opt" data-why="Annas token är giltig, så hon är autentiserad; det som saknas är rätten till just den bokningen.">401, för Anna saknar giltig token</button>
+    <button class="opt" data-why="200 skulle visa Bennys bokning för Anna, och det är precis det ägarkontrollen ska stoppa.">200, för hennes token är giltig</button>
+    <button class="opt" data-correct data-why="Bokningen är inte Annas, så hon får samma svar som om den inte fanns.">404, som om bokningen inte fanns</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Varför svara 404 och inte 403 på någon annans bokning?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Med 403 syns vilka id som finns, och då kan vem som helst räkna bokningarna.">403 avslöjar att bokningen faktiskt finns</button>
+    <button class="opt" data-why="Servrar får skicka 403; problemet är att den avslöjar att bokningen finns.">Servrar får aldrig skicka statuskoden 403</button>
+    <button class="opt" data-why="404 är en 4xx och betyder att resursen inte finns, inte att något har kraschat.">404 betyder att databasen kraschade helt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 53: Var står det vilken bokning <code>GET /bookings/43</code> hämtar?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="I REST står resursen i sökvägen, så 43 är bokningens id.">I sökvägen, sist i adressen</button>
+    <button class="opt" data-why="Efter Bearer står token, som säger vem som anropar, inte vilken bokning.">I headern, efter ordet Bearer</button>
+    <button class="opt" data-why="Ett GET-anrop har ingen kropp, så bokningens id står i sökvägen.">I kroppen, som ett JSON-objekt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ägarkontroll är att servern kontrollerar att det du hämtar är ditt. Autentisering säger vem du är, ägarkontrollen vad du får hämta.</li>
+    <li>En giltig token räcker inte. Servern ska kontrollera ägaren i varje anrop som hämtar något med ett id.</li>
+    <li>Någon annans bokning ger 404, samma svar som om den inte fanns, så att ingen kan räkna vilka som finns.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization">OWASP API Security: Broken Object Level Authorization</a>.</p>
+<p>Om 403 och 404: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403">MDN: 403 Forbidden</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0067-autentisering.html">Förra: Autentisering</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0069-cors.html">Nästa: CORS</a>
+</nav>
+
+</main>
+</body>
+</html>

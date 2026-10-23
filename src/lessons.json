@@ -147,7 +147,7 @@
           "nr": 20,
           "file": "0020-vpc.html",
           "title": "VPC",
-          "goal": "Att en VPC är ditt eget avgränsade nätverk i en region, och att default VPC redan finns men inte används i kursen.",
+          "goal": "Att en VPC är ditt eget avgränsade nätverk i en region, och att default VPC redan finns men inte används.",
           "tag": "labb 1"
         },
         {
@@ -161,7 +161,7 @@
           "nr": 22,
           "file": "0022-availability-zone.html",
           "title": "Availability Zone",
-          "goal": "Vad en zon är, hur den skiljer sig från en region, och varför kursens nätverk byggs i två zoner.",
+          "goal": "Vad en zon är, hur den skiljer sig från en region, och varför nätverket byggs i två zoner.",
           "tag": "labb 1"
         },
         {
@@ -370,14 +370,14 @@
           "nr": 51,
           "file": "0051-header.html",
           "title": "Header",
-          "goal": "Att en header är en rad med nyckel och värde om anropet eller svaret, och att kursens server inte läser kroppen om anropet saknar <code>Content-Type: application/json</code>.",
+          "goal": "Att en header är en rad med nyckel och värde om anropet eller svaret, och att servern inte läser kroppen om anropet saknar <code>Content-Type: application/json</code>.",
           "tag": "labb 1–2"
         },
         {
           "nr": 52,
           "file": "0052-json.html",
           "title": "JSON",
-          "goal": "Att JSON är formatet som kroppen skrivs i, både i anropet och i svaret, och att JSON är strikt: ett enda fel tecken gör att kursens server svarar 400.",
+          "goal": "Att JSON är formatet som kroppen skrivs i, både i anropet och i svaret, och att JSON är strikt: ett enda fel tecken gör att servern svarar 400.",
           "tag": "labb 1–2"
         },
         {
@@ -462,6 +462,341 @@
           "file": "0064-yaml.html",
           "title": "YAML",
           "goal": "Att YAML är ett textformat där indraget bär betydelse, och att ett fel indrag stoppar servern.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 65,
+          "file": "0065-openapi.html",
+          "title": "OpenAPI",
+          "goal": "Att en OpenAPI-fil beskriver API:ets sökvägar, metoder, kroppar och svar, och att du själv måste hålla den i takt med koden.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 66,
+          "file": "0066-swagger-ui.html",
+          "title": "Swagger UI",
+          "goal": "Att Swagger UI ritar en webbsida ur OpenAPI-filen där varje anrop går att prova, och att alla som når sidan ser hela API:et.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 67,
+          "file": "0067-autentisering.html",
+          "title": "Autentisering",
+          "goal": "Att autentisering kontrollerar vem som anropar, och att ett anrop utan token ska få 401.",
+          "tag": "case"
+        },
+        {
+          "nr": 68,
+          "file": "0068-agarkontroll.html",
+          "title": "Ägarkontroll",
+          "goal": "Att en inloggad bara får sina egna resurser, till exempel sina egna bokningar, och att någon annans ska ge 404, samma svar som om den inte fanns.",
+          "tag": "case"
+        },
+        {
+          "nr": 69,
+          "file": "0069-cors.html",
+          "title": "CORS",
+          "goal": "Att webbläsaren blockerar svaret från ett annat ursprung tills servern skickar headern <code>Access-Control-Allow-Origin</code>.",
+          "tag": "labb 5"
+        },
+        {
+          "nr": 70,
+          "file": "0070-mixed-content.html",
+          "title": "Mixed content",
+          "goal": "Varför din sida på Amplify, som har HTTPS, inte får anropa ditt API över HTTP, och att API Gateway löser det i v42.",
+          "tag": "labb 5"
+        }
+      ]
+    },
+    {
+      "code": "v42",
+      "title": "V42 – Serverlösa lösningar",
+      "lessons": [
+        {
+          "nr": 71,
+          "file": "0071-aws-cloudshell.html",
+          "title": "AWS CloudShell",
+          "goal": "Att CloudShell är en terminal i konsolen som redan är inloggad som din IAM user, och att regionen du valt i konsolen gäller där.",
+          "tag": "labb 0"
+        },
+        {
+          "nr": 72,
+          "file": "0072-aws-cli.html",
+          "title": "AWS CLI",
+          "goal": "Hur ett kommando som <code>aws elbv2 create-load-balancer --region eu-north-1</code> är byggt: tjänst, åtgärd och flaggor. Och vad <code>--query</code> och <code>--output text</code> gör med svaret.",
+          "tag": "labb 0"
+        },
+        {
+          "nr": 73,
+          "file": "0073-skalvariabel.html",
+          "title": "Skalvariabel",
+          "goal": "Att <code>API=https://...</code> sparar ett värde som <code>$API</code> läser i nästa kommando, och att variabeln utan <code>export</code> bara finns i skalet.",
+          "tag": "labb 0, 3"
+        },
+        {
+          "nr": 74,
+          "file": "0074-kommandosubstitution.html",
+          "title": "Kommandosubstitution",
+          "goal": "Att <code>SUBNETS=$(aws ...)</code> kör kommandot och sparar det som kommandot skriver ut i variabeln.",
+          "tag": "labb 0"
+        },
+        {
+          "nr": 75,
+          "file": "0075-application-load-balancer.html",
+          "title": "Application Load Balancer",
+          "goal": "Att en Application Load Balancer tar emot trafiken och fördelar den till servrarna bakom, att den kräver subnät i två zoner, och att ett nytt konto kan vara spärrat för den tills AWS Support hävt spärren.",
+          "tag": "labb 0"
+        },
+        {
+          "nr": 76,
+          "file": "0076-arn.html",
+          "title": "ARN",
+          "goal": "Vad delarna i ett ARN betyder: tjänst, region, konto och resurs. Och varför ett ARN för en bucket saknar region och konto.",
+          "tag": "labb 0, 2"
+        },
+        {
+          "nr": 77,
+          "file": "0077-serverlost.html",
+          "title": "Serverlöst",
+          "goal": "Att serverlöst betyder att du inte har någon server att sköta, och att du betalar per anrop i stället för medan en server står på.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 78,
+          "file": "0078-lambda-funktion.html",
+          "title": "Lambda-funktion",
+          "goal": "Att en Lambda-funktion är kod plus konfiguration som körs när en händelse kommer, utan server, port eller process som väntar, och att ny kod gäller först efter Deploy.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 79,
+          "file": "0079-runtime.html",
+          "title": "Runtime",
+          "goal": "Att runtime är språket och versionen funktionen körs i, till exempel Node.js 22.x, och att den styr vad som redan finns installerat.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 80,
+          "file": "0080-handler.html",
+          "title": "Handler",
+          "goal": "Att handlern är den exporterade funktionen Lambda anropar (<code>index.handler</code>), att den får <code>event</code> och <code>context</code>, och att det den returnerar blir svaret.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 81,
+          "file": "0081-event-och-testhandelse.html",
+          "title": "Event och testhändelse",
+          "goal": "Att event är det som anroparen skickar med, och att en testhändelse är ett event du själv skriver i JSON i konsolen.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 82,
+          "file": "0082-cloudwatch-logs.html",
+          "title": "CloudWatch Logs",
+          "goal": "Att allt <code>console.log</code> skriver hamnar i logggruppen <code>/aws/lambda/&lt;namn&gt;</code>, uppdelat i loggströmmar, och att alla med behörighet kan läsa loggen.",
+          "tag": "labb 1–4"
+        },
+        {
+          "nr": 83,
+          "file": "0083-exekveringsmiljo.html",
+          "title": "Exekveringsmiljö",
+          "goal": "Att exekveringsmiljön är den isolerade plats där Lambda kör din kod, att den återanvänds mellan anrop, och att en miljö bara kör ett anrop i taget.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 84,
+          "file": "0084-kallstart.html",
+          "title": "Kallstart",
+          "goal": "Att en kallstart är ett anrop där Lambda först måste skapa en ny exekveringsmiljö, och att du ser den som <code>Init Duration</code> på REPORT-raden i loggen.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 85,
+          "file": "0085-duration-och-billed-duration.html",
+          "title": "Duration och Billed Duration",
+          "goal": "Vad fälten på REPORT-raden säger om tid och minne, och att Billed Duration är den tid du betalar för, med Init Duration inräknad vid en kallstart.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 86,
+          "file": "0086-timeout.html",
+          "title": "Timeout",
+          "goal": "Att timeout är den längsta tid ett anrop får köra, 3 sekunder om du inte ändrar den, och att Lambda avbryter anropet med <code>Task timed out</code> när tiden går ut.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 87,
+          "file": "0087-execution-role.html",
+          "title": "Execution role",
+          "goal": "Att execution role är den roll Lambda tar på sig när funktionen körs, och att rollen som konsolen skapar bara får skriva loggar tills du ger den mer.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 88,
+          "file": "0088-dynamodb.html",
+          "title": "DynamoDB",
+          "goal": "Att DynamoDB är en managed databas utan server att sköta, och att koden inte håller någon anslutning öppen: varje läsning och skrivning är ett eget anrop.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 89,
+          "file": "0089-item-och-attribut.html",
+          "title": "Item och attribut",
+          "goal": "Att en rad i en DynamoDB-tabell heter item, att den består av attribut, alltså par av namn och värde, och att två items i samma tabell kan ha olika attribut.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 90,
+          "file": "0090-partitionsnyckel.html",
+          "title": "Partitionsnyckel",
+          "goal": "Att partitionsnyckeln, här <code>id</code>, är det enda du bestämmer i förväg om itemen i en DynamoDB-tabell, och att varje item måste ha den med ett eget värde.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 91,
+          "file": "0091-on-demand-lage.html",
+          "title": "On-demand-läge",
+          "goal": "Att on-demand-läge betyder att en DynamoDB-tabell betalas per läsning och skrivning, och att du inte betalar för läsningar och skrivningar när tabellen inte används.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 92,
+          "file": "0092-dynamodb-operationer.html",
+          "title": "DynamoDB-operationer",
+          "goal": "Vad <code>GetItem</code>, <code>PutItem</code>, <code>UpdateItem</code>, <code>DeleteItem</code> och <code>Scan</code> gör med en DynamoDB-tabell, och att <code>Scan</code> läser hela tabellen.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 93,
+          "file": "0093-minsta-mojliga-behorighet.html",
+          "title": "Minsta möjliga behörighet",
+          "goal": "Varför funktionens roll får fem operationer på en tabell i stället för <code>AmazonDynamoDBFullAccess</code>, och att det begränsar vad en bugg kan ställa till med.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 94,
+          "file": "0094-miljovariabel-i-lambda.html",
+          "title": "Miljövariabel i Lambda",
+          "goal": "Att <code>TABLE_NAME</code> sätts i funktionens konfiguration och läses med <code>process.env</code>, och att värdet läses när en ny exekveringsmiljö startar.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 95,
+          "file": "0095-aws-sdk.html",
+          "title": "AWS SDK",
+          "goal": "Att AWS SDK är biblioteket din kod använder för att anropa AWS-tjänster, att det redan finns i Lambda, och varför klienten skapas utanför handlern.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 96,
+          "file": "0096-documentclient.html",
+          "title": "DocumentClient",
+          "goal": "Att <code>DynamoDBDocumentClient</code> låter dig skicka vanliga JavaScript-objekt till DynamoDB i stället för att skriva varje värde som <code>{ \"S\": \"Alice\" }</code>.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 97,
+          "file": "0097-handelse-fran-api-gateway.html",
+          "title": "Händelse från API Gateway",
+          "goal": "Var metoden, sökvägen, id:t och kroppen står i eventet från API Gateway, och att <code>body</code> är en sträng där citattecknen inuti måste escapas.",
+          "tag": "labb 2–3"
+        },
+        {
+          "nr": 98,
+          "file": "0098-svar-till-api-gateway.html",
+          "title": "Svar till API Gateway",
+          "goal": "Att svaret är ett objekt med <code>statusCode</code>, <code>headers</code> och <code>body</code> som sträng, och att ett fel som inte fångas ger klienten ett 5xx-fel med bara ett kort meddelande.",
+          "tag": "labb 2–3"
+        },
+        {
+          "nr": 99,
+          "file": "0099-uuid.html",
+          "title": "UUID",
+          "goal": "Att id:t för en ny kund blir ett slumpat UUID från <code>randomUUID()</code> i stället för ett löpnummer, och varför ingen kan räkna sig fram till andras id.",
+          "tag": "labb 2–3"
+        },
+        {
+          "nr": 100,
+          "file": "0100-platshallare-i-uttryck.html",
+          "title": "Platshållare i uttryck",
+          "goal": "Att <code>#n</code> står för ett attributnamn och <code>:n</code> för ett värde i <code>SET #n = :n</code>, och att <code>name</code> måste ha ett alias eftersom det är ett reserverat ord.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 101,
+          "file": "0101-conditionexpression.html",
+          "title": "ConditionExpression",
+          "goal": "Att <code>attribute_exists(id)</code> hindrar UpdateItem och DeleteItem från att gälla ett item som inte finns, och att felet då görs om till 404.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 102,
+          "file": "0102-accessdeniedexception.html",
+          "title": "AccessDeniedException",
+          "goal": "Hur du läser felet: vem som nekades, vilken handling och på vilken resurs. Du vet också att felet betyder att rollen saknar en behörighet.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 103,
+          "file": "0103-http-api.html",
+          "title": "HTTP API",
+          "goal": "Vilka fyra saker API Gateway gör med ett anrop på väg till din funktion, och varför du bygger ett HTTP API och inte ett REST API.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 104,
+          "file": "0104-route-i-api-gateway.html",
+          "title": "Route i API Gateway",
+          "goal": "Att en route är metod plus sökväg, att <code>{id}</code> blir <code>pathParameters.id</code>, och att ett anrop utan matchande route får 404 utan att funktionen körs.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 105,
+          "file": "0105-integration.html",
+          "title": "Integration",
+          "goal": "Att integrationen är det som står bakom en route, här funktionen <code>v42-api</code>, och att den kan bytas utan att adressen ändras.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 106,
+          "file": "0106-stage-och-invoke-url.html",
+          "title": "Stage och Invoke URL",
+          "goal": "Att en stage är en driftsatt version av API:et med egen adress, och att <code>$default</code> med auto-deploy gör ändringar aktiva direkt.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 107,
+          "file": "0107-resource-based-policy.html",
+          "title": "Resource-based policy",
+          "goal": "Att policyn på funktionen säger vem som får anropa den, och att rollen säger vad funktionen själv får göra.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 108,
+          "file": "0108-preflight.html",
+          "title": "Preflight",
+          "goal": "Att webbläsaren skickar ett <code>OPTIONS</code>-anrop före en POST med JSON, och att POST:en skickas först om svaret tillåter den.",
+          "tag": "labb 3–4"
+        },
+        {
+          "nr": 109,
+          "file": "0109-cors-i-api-gateway.html",
+          "title": "CORS i API Gateway",
+          "goal": "Att API Gateway svarar på CORS själv, med tillåtna ursprung, headers och metoder, utan att funktionen körs. Inställningen ligger i API Gateway, inte i koden.",
+          "tag": "labb 3–4"
+        },
+        {
+          "nr": 110,
+          "file": "0110-throttling.html",
+          "title": "Throttling",
+          "goal": "Att rate och burst sätter en gräns för hur många anrop per sekund API:et tar emot, och att anrop över gränsen får 429 utan att funktionen körs.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 111,
+          "file": "0111-miljovariabel-i-vite.html",
+          "title": "Miljövariabel i Vite",
+          "goal": "Att <code>VITE_API_URL</code> i <code>.env.local</code> och i Amplify byggs in i sidans JavaScript, så att adressen syns för alla som öppnar sidan.",
           "tag": "labb 4"
         }
       ]

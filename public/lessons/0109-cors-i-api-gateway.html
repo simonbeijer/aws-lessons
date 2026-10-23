@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CORS i API Gateway</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 109 · v42, 39 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 109</p>
+<h1>CORS i API Gateway</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att API Gateway svarar på CORS själv, med tillåtna ursprung, headers och metoder, utan att funktionen körs. Inställningen ligger i API Gateway, inte i koden.
+</div>
+
+<section class="explain">
+<h2>Var ställs CORS in?</h2>
+
+<p>CORS ställs in i ditt <a href="0103-http-api.html">HTTP API</a>, under <strong>Develop → CORS</strong> i konsolen. Där fyller du i tre listor, ett värde i taget med <strong>Add</strong>. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html">AWS: Configure CORS for HTTP APIs</a>, kursmaterialet v42)</span></p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Lista</th><th>Exempel</th></tr></thead>
+  <tbody>
+    <tr><td><code>Access-Control-Allow-Origin</code></td><td><code class="copyable">http://localhost:5173</code></td></tr>
+    <tr><td><code>Access-Control-Allow-Headers</code></td><td><code class="copyable">content-type</code></td></tr>
+    <tr><td><code>Access-Control-Allow-Methods</code></td><td><code>GET, POST, PUT, DELETE</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>I <a href="0069-cors.html">lektion 69</a> skickade servern headern från sin egen kod. Här skickar API Gateway den, och funktionens kod behöver inte veta något om CORS.</p>
+</section>
+
+<section class="explain">
+<h2>Vem svarar på preflight?</h2>
+
+<p>API Gateway svarar själv på <a href="0108-preflight.html">preflight</a>, även om API:et inte har någon <a href="0104-route-i-api-gateway.html">route</a> för <code>OPTIONS</code>. Svaret innehåller listorna ovan. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html">AWS: Configure CORS for HTTP APIs</a>)</span></p>
+
+<p>Funktionen körs inte. Lambda tar betalt <a href="0077-serverlost.html">per anrop</a>, så preflight blir inget Lambda-anrop att betala för.</p>
+</section>
+
+<section class="explain">
+<h2>Vad händer med vanliga svar?</h2>
+
+<p>Vid GET och POST körs funktionen som vanligt. API Gateway lägger sedan till CORS-headers på funktionens svar. Skickar funktionen egna CORS-headers, struntar API Gateway i dem. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html">AWS: Configure CORS for HTTP APIs</a>)</span></p>
+
+<p>Står sidans ursprung inte i listan, saknas <code>Access-Control-Allow-Origin</code> i svaret, och webbläsaren blockerar det. Ursprunget måste stavas exakt: rätt schema och inget <code>/</code> sist.</p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Lista exakt de ursprung som ska få läsa, inte <code>*</code>.</p>
+</div>
+</section>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-lista">Origin: http://localhost:5173</button>
+    <button class="chip" data-target="p-annan">Origin: http://exempel.se</button>
+  </div>
+  <div class="picker-panel" id="p-lista">
+    <p>Ursprunget står i listan. Preflight får 204, med headern:</p>
+<pre><code>access-control-allow-origin: http://localhost:5173</code></pre>
+    <p><span class="tag good">Fungerar</span> Webbläsaren skickar POST:en.</p>
+  </div>
+  <div class="picker-panel" id="p-annan">
+    <p>Ursprunget står inte i listan. Svaret saknar <code>access-control-allow-origin</code>.</p>
+    <p><span class="tag bad">Stoppad</span> Webbläsaren på den sidan skickar aldrig POST:en.</p>
+  </div>
+</div>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Din sida på Amplify får CORS-fel mot ditt HTTP API. Var lägger du till sidans adress?</p>
+  <div class="options">
+    <button class="opt" data-why="Med CORS inställt i API Gateway struntar API Gateway i headers som funktionen skickar.">I funktionens kod, som header i svaren</button>
+    <button class="opt" data-correct data-why="Listan med tillåtna ursprung ligger i API Gateway, under Develop → CORS.">I API Gateway, i menyn Develop → CORS</button>
+    <button class="opt" data-why="Sidan bestämmer inte vem som får läsa; det är serverns beslut, här API Gateway.">I sidans kod, innan den anropar API:et</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. CORS är inställt, och webbläsaren skickar preflight till <code>/customers</code>. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Preflight når aldrig funktionen; API Gateway svarar själv.">Funktionen körs och ger själv ett CORS-svar</button>
+    <button class="opt" data-why="Ingen OPTIONS-route behövs; API Gateway svarar på preflight ändå.">Anropet får 404, för det saknas OPTIONS-route</button>
+    <button class="opt" data-correct data-why="API Gateway svarar på preflight med listorna, och funktionen körs inte.">API Gateway svarar själv, funktionen körs inte</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 69: listan har <code>http://localhost:3000</code>, men sidan körs på <code>http://localhost:5173</code>. Får koden läsa svaret?</p>
+  <div class="options">
+    <button class="opt" data-why="Värden är densamma, men porten räknas också, och den skiljer här.">Ja, värden localhost är densamma i båda</button>
+    <button class="opt" data-correct data-why="Porten är en del av ursprunget, så 5173 är ett annat ursprung än 3000.">Nej, porten ger här ett annat ursprung</button>
+    <button class="opt" data-why="Bara serverns svar avgör; webbläsaren läser inte listan själv.">Ja, om sidan skickar Origin i anropet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>CORS för ett HTTP API ställs in i API Gateway, under Develop → CORS, med listor för tillåtna ursprung, headers och metoder. Funktionens kod vet inget om det.</li>
+    <li>API Gateway svarar själv på preflight, även utan en <code>OPTIONS</code>-route. Funktionen körs inte, så det blir inget Lambda-anrop.</li>
+    <li>På vanliga svar lägger API Gateway till CORS-headers och struntar i funktionens egna. Ursprunget måste stå exakt rätt i listan, annars blockerar webbläsaren svaret.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html">Amazon API Gateway: Configure CORS for HTTP APIs</a>.</p>
+<p>Om CORS i allmänhet: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS">MDN: Cross-Origin Resource Sharing (CORS)</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0108-preflight.html">Förra: Preflight</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0110-throttling.html">Nästa: Throttling</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event och testhändelse</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 81 · v42, 11 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 81</p>
+<h1>Event och testhändelse</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att event är det som anroparen skickar med, och att en testhändelse är ett event du själv skriver i JSON i konsolen.
+</div>
+
+<section class="explain">
+<h2>Hur ser ett event ut?</h2>
+
+<p>Ett event är <a href="0052-json.html">JSON</a> som anroparen skickar med när den kör funktionen, till exempel: <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/concepts-event-driven-architectures.html">AWS: Event-driven architectures</a>)</span></p>
+
+<pre><code>{ "name": "Alice" }</code></pre>
+
+<p>Lambda gör om JSON:en så att koden kan läsa den, och ger den till <a href="0080-handler.html">handlern</a> som <code>event</code>. Koden läser värdet med <code>event.name</code> och får <code>"Alice"</code>. Efter punkten står namnet i JSON-objektet. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html">AWS: Testing functions in the console</a>)</span></p>
+
+<p>Vad eventet innehåller bestämmer anroparen. En AWS-tjänst som anropar funktionen skickar JSON i sitt eget format. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/concepts-event-driven-architectures.html">AWS: Event-driven architectures</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad är en testhändelse?</h2>
+
+<p>En testhändelse är ett event du själv skriver i JSON i konsolen. Då är du anroparen. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html">AWS: Testing functions in the console</a>)</span></p>
+
+<p>Klicka Test i <a href="0078-lambda-funktion.html">editorn</a>. Skriv ett namn under Event name och JSON:en i rutan Event JSON. Klicka Save och sedan Test. Lambda kör funktionen med din JSON som <code>event</code> och visar svaret. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html#invoke-with-event">AWS: Invoking with test events</a>)</span></p>
+
+<p>Behöver funktionen ingen indata räcker ett tomt JSON-objekt: <code class="copyable">{}</code> <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html">AWS: Testing functions in the console</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför spara testhändelser?</h2>
+
+<p>En sparad testhändelse kan du köra igen med ett klick. Du kan spara upp till 10 privata testhändelser per funktion, till exempel en för varje fall du vill pröva. Privata ser bara du. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html#creating-private-events">AWS: Creating private test events</a>)</span></p>
+
+<p>Klickar du Test utan att spara finns händelsen bara kvar tills du lämnar konsolen. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html#invoke-with-event">AWS: Invoking with test events</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du skriver en testhändelse i konsolen. Vad är den?</p>
+  <div class="options">
+    <button class="opt" data-why="Svaret kommer från handlern; testhändelsen är det du skickar in som event.">Det svar som du får från handlern</button>
+    <button class="opt" data-why="Koden ligger i filen; testhändelsen är JSON som skickas in som event.">Koden som Lambda kör i din fil</button>
+    <button class="opt" data-correct data-why="En testhändelse är ett event i JSON som du själv skriver, och du är då anroparen.">Ett event som du skriver i JSON</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Testhändelsen är <code>{ "name": "Alice" }</code>. Vad får koden av <code>event.name</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="name är namnet i paret; event.name ger värdet som hör till namnet, alltså Alice.">Texten name, namnet i JSON:en</button>
+    <button class="opt" data-why="event är hela objektet; event.name ger bara värdet för name, alltså Alice.">Hela JSON-objektet med Alice i</button>
+    <button class="opt" data-correct data-why="Efter punkten står namnet i JSON-objektet, och koden får värdet som hör till det.">Texten Alice, värdet i paret</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 52: du skriver testhändelsen <code>{ 'name': 'Alice' }</code>. Vad är fel?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="JSON tillåter bara dubbla citattecken runt text och namn; enkla citattecken gör att det inte är JSON.">JSON kräver dubbla citattecken runt text</button>
+    <button class="opt" data-why="Namnet i ett JSON-objekt står alltid inom dubbla citattecken.">JSON kräver namn utan några citattecken</button>
+    <button class="opt" data-why="Ett komma efter sista paret är tvärtom ett fel i JSON.">JSON kräver ett avslutande komma sist</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett event är JSON som anroparen skickar med. Handlern får det som <code>event</code>, och <code>event.name</code> ger värdet för <code>name</code>.</li>
+    <li>En testhändelse är ett event du själv skriver i JSON i konsolen. Då är du anroparen.</li>
+    <li>Spara testhändelser, upp till 10 privata per funktion, så kan du köra dem igen med ett klick.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html">AWS Lambda: Testing functions in the console</a>.</p>
+<p>Om event: <a href="https://docs.aws.amazon.com/lambda/latest/dg/concepts-event-driven-architectures.html">AWS Lambda: Creating event-driven architectures with Lambda</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0080-handler.html">Förra: Handler</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0082-cloudwatch-logs.html">Nästa: CloudWatch Logs</a>
+</nav>
+
+</main>
+</body>
+</html>

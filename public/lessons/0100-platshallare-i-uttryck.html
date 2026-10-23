@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Platshållare i uttryck</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 100 · v42, 30 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 100</p>
+<h1>Platshållare i uttryck</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att <code>#n</code> står för ett attributnamn och <code>:n</code> för ett värde i <code>SET #n = :n</code>, och att <code>name</code> måste ha ett alias eftersom det är ett reserverat ord.
+</div>
+
+<section class="explain">
+<h2>Vad är ett uttryck?</h2>
+
+<p>Ett uttryck är en kort text som säger vad DynamoDB ska göra med ett item. <a href="0092-dynamodb-operationer.html">UpdateItem</a> vill ha ett uttryck med <a href="0089-item-och-attribut.html">attributet</a> som ändras och dess nya värde. Det börjar med <code>SET</code>, som lägger till attributet eller skriver över det som finns. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html">AWS: Update expressions</a>)</span></p>
+
+<p>I koden skickas UpdateItem med <code>UpdateCommand</code>, från samma paket som PutCommand i <a href="0096-documentclient.html">lektion 96</a>. <span class="src">(<a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/dynamodb-example-dynamodb-utilities.html">AWS SDK: DynamoDB utilities</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad står #n och :n för?</h2>
+
+<p><code>#n</code> står för ett attributnamn och <code>:n</code> för ett värde. Båda är platshållare. <code>#n</code> kallas ett alias, ett ersättningsnamn för attributet. Två objekt bredvid uttrycket säger vad som ska stå där. <code>ExpressionAttributeNames</code> säger att <code>#n</code> betyder attributet name. <code>ExpressionAttributeValues</code> säger att <code>:n</code> betyder det nya namnet, som Carol. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ExpressionAttributeNames.html">AWS: Expression attribute names</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ExpressionAttributeValues.html">AWS: Expression attribute values</a>)</span></p>
+
+<pre><code>await db.send(new UpdateCommand({
+  TableName: "v42-customers",
+  Key: { id },                                  // itemet med det här id:t
+  UpdateExpression: "SET #n = :n",
+  ExpressionAttributeNames: { "#n": "name" },   // #n = attributet name
+  ExpressionAttributeValues: { ":n": name },    // :n = det nya namnet
+}));</code></pre>
+
+<p>Bokstaven n är samma, men tecknet först avgör: <code>#</code> gör det till ett namn, <code>:</code> till ett värde. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ExpressionAttributeNames.html">AWS: Expression attribute names</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ExpressionAttributeValues.html">AWS: Expression attribute values</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför behöver name ett alias?</h2>
+
+<p>Ordet name är reserverat i DynamoDB. DynamoDB använder ordet själv, så det får inte stå som attributnamn i ett uttryck. Listan har flera hundra ord, till exempel status och date. Med <code>#n</code> står name inte i uttrycket, bara i ExpressionAttributeNames. Attributet i itemet heter fortfarande name. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html">AWS: Reserved words</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ExpressionAttributeNames.html#Expressions.ExpressionAttributeNames.ReservedWords">AWS: Expression attribute names</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="alias-utan">Utan alias</button>
+    <button class="chip" data-target="alias-med">Med alias</button>
+  </div>
+  <div class="picker-panel" id="alias-utan">
+<pre><code>UpdateExpression: "SET name = :n"
+
+ValidationException: Invalid UpdateExpression:
+Attribute name is a reserved keyword</code></pre>
+    <p><span class="tag bad">Fel</span> Anropet stoppas och inget ändras.</p>
+  </div>
+  <div class="picker-panel" id="alias-med">
+<pre><code>UpdateExpression: "SET #n = :n"
+ExpressionAttributeNames: { "#n": "name" }</code></pre>
+    <p><span class="tag good">Fungerar</span> Attributet name får det nya värdet.</p>
+  </div>
+</div>
+<p class="src">(felmeddelandet: kursmaterialet v42)</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad står <code>#n</code> för i <code>SET #n = :n</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Värdet står i :n; #n står för ett attributnamn.">Det nya värdet för attributet</button>
+    <button class="opt" data-why="Tabellen anges i TableName; #n står för ett attributnamn.">Tabellen där kundens item ligger</button>
+    <button class="opt" data-correct data-why="Ett # gör det till ett alias för ett attributnamn, här name.">Namnet på attributet som ändras</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Varför står det <code>#n</code> i stället för <code>name</code> i uttrycket?</p>
+  <div class="options">
+    <button class="opt" data-why="Längden spelar ingen roll; name är ett reserverat ord i DynamoDB.">Ordet name blir alldeles för långt</button>
+    <button class="opt" data-why="Bara vissa namn behöver alias; name gör det eftersom det är reserverat.">Alla attribut måste alltid ha alias</button>
+    <button class="opt" data-correct data-why="name är reserverat, så det får inte stå direkt i ett uttryck.">Ordet name är reserverat i DynamoDB</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 92: vad gör UpdateItem om inget item har id:t?</p>
+  <div class="options">
+    <button class="opt" data-why="UpdateItem letar inte upp ett annat item; den skapar ett nytt med id:t.">Ändrar ett annat item i tabellen</button>
+    <button class="opt" data-correct data-why="Finns id:t inte, skapar UpdateItem ett nytt item med det.">Skapar ett nytt item med id:t</button>
+    <button class="opt" data-why="UpdateItem tar inte bort något; den skapar ett nytt item med id:t.">Tar bort alla items i tabellen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett uttryck är en kort text som säger vad DynamoDB ska göra. <code>SET</code> i UpdateItem ger ett attribut ett nytt värde.</li>
+    <li><code>#n</code> står för ett attributnamn och förklaras i ExpressionAttributeNames. <code>:n</code> står för ett värde och förklaras i ExpressionAttributeValues.</li>
+    <li>name är ett reserverat ord, liksom status och date. I ett uttryck måste det ha ett alias, som <code>#n</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ExpressionAttributeNames.html">Amazon DynamoDB: Expression attribute names (aliases)</a>.</p>
+<p>Om värdena: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ExpressionAttributeValues.html">Amazon DynamoDB: Expression attribute values</a>. Hela listan: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html">Amazon DynamoDB: Reserved words</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0099-uuid.html">Förra: UUID</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0101-conditionexpression.html">Nästa: ConditionExpression</a>
+</nav>
+
+</main>
+</body>
+</html>

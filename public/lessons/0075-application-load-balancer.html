@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Application Load Balancer</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 75 · v42, 5 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 75</p>
+<h1>Application Load Balancer</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en Application Load Balancer tar emot trafiken och fördelar den till servrarna bakom, att den kräver subnät i två zoner, och att ett nytt konto kan vara spärrat för den tills AWS Support hävt spärren.
+</div>
+
+<section class="explain">
+<h2>Vad gör en lastbalanserare?</h2>
+
+<p>En Application Load Balancer, kort ALB, tar emot alla anrop och fördelar dem på servrarna bakom, till exempel <a href="0029-ec2-instans.html">EC2-instanser</a>. Den som anropar ser bara ALB:n. <span class="src">(<a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html">AWS: What is an Application Load Balancer?</a>)</span></p>
+
+<p>Den skickar bara anrop till servrar som svarar när den kollar dem. Application betyder att den hanterar <a href="0048-http-anrop-och-svar.html">HTTP-anrop</a>. <span class="src">(<a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html">AWS: How ELB works</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför två zoner?</h2>
+
+<p>För att trafiken ska komma fram även om en zon går ner. En ALB kräver därför <a href="0023-subnat.html">subnät</a> i minst två <a href="0022-availability-zone.html">Availability Zones</a>, ett per zon. <span class="src">(<a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#availability-zones">AWS: Subnets for your load balancer</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="alb-ok">Båda zonerna uppe</button>
+    <button class="chip" data-target="alb-ner">eu-north-1a nere</button>
+  </div>
+  <div class="picker-panel" id="alb-ok">
+    <p>Anropen går till servrar i båda zonerna.</p>
+  </div>
+  <div class="picker-panel" id="alb-ner">
+    <p>Alla anrop går till servrarna i eu-north-1b. <span class="src">(<a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html#availability-zones">AWS: Availability Zones and nodes</a>)</span></p>
+  </div>
+</div>
+
+<p>Därför får <code>--subnets</code> flera id:n, som i <a href="0074-kommandosubstitution.html">lektion 74</a>.</p>
+</section>
+
+<section class="explain">
+<h2>Vad är kontospärren?</h2>
+
+<p>Vissa nya konton är spärrade för lastbalanserare. Felet blir:</p>
+
+<pre><code>This AWS account currently does not support creating load balancers.</code></pre>
+
+<p>Felet beror inte på ditt kommando. Bara AWS Support, AWS kundtjänst, kan häva spärren. Det kan ta dagar, så prova tidigt. <span class="src">(<a href="https://repost.aws/questions/QU3nPcv2OES9Kq5aw1QySYZg/aws-free-tier-account-not-sure-why-create-load-balancer-gives">AWS re:Post</a>)</span></p>
+
+<div class="box good">
+  <span class="box-title">Gör så här vid felet</span>
+  <p>Öppna Support Center i konsolen. Välj Create case, sedan Account and billing support, som inte kräver supportplan. <span class="src">(<a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-get-answers.html#billing-support">AWS: Contacting Support</a>)</span></p>
+</div>
+
+<div class="box note">
+  <span class="box-title">Ej bekräftat</span>
+  <p>Spärren beskrivs bara på forumet re:Post, inte i AWS dokumentation. Om ALB:ns timkostnad dras från Free plans krediter är oklart. <span class="src">(<a href="https://aws.amazon.com/elasticloadbalancing/pricing/">AWS: ELB pricing</a>, <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html">AWS: Choosing a plan</a>)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du får <code>This AWS account currently does not support creating load balancers</code>. Vad gör du?</p>
+  <div class="options">
+    <button class="opt" data-why="Felet beror inte på kommandot; spärren sitter på kontot tills AWS Support hävt den.">Kör kommandot igen om en stund</button>
+    <button class="opt" data-correct data-why="Spärren sitter på kontot, och bara AWS Support kan häva den.">Öppnar ett ärende hos AWS Support</button>
+    <button class="opt" data-why="Mer behörighet hjälper inte; spärren sitter på hela kontot.">Ger din IAM user mer behörighet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du anger bara ett subnät i <code>--subnets</code>. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="En ALB skapas aldrig i bara en zon; den kräver subnät i minst två.">ALB:n skapas, men finns i en zon</button>
+    <button class="opt" data-correct data-why="En ALB kräver subnät i minst två zoner, så skapandet avbryts.">Det blir fel, ALB kräver två zoner</button>
+    <button class="opt" data-why="AWS väljer inga subnät åt dig; du måste ange minst två i olika zoner.">AWS lägger då till ett andra subnät</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 23: varför räcker inte två subnät i samma zon?</p>
+  <div class="options">
+    <button class="opt" data-why="Ett subnät ligger i exakt en zon; det kan inte sträcka sig över två.">Ett subnät når redan båda zonerna</button>
+    <button class="opt" data-why="Två subnät i samma VPC får inte överlappa, men det är inte skälet här.">Subnäten får då dela på adresserna</button>
+    <button class="opt" data-correct data-why="Ett subnät ligger i exakt en zon, så båda försvinner om den zonen går ner.">Båda försvinner om zonen går ner</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En ALB tar emot alla anrop och skickar varje anrop till en server bakom som svarar.</li>
+    <li>Den kräver subnät i minst två zoner, så att trafiken kommer fram även om en zon går ner.</li>
+    <li>Vissa nya konton får inte skapa lastbalanserare förrän AWS Support hävt spärren. Det kan ta dagar, så prova tidigt.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html">AWS: What is an Application Load Balancer?</a></p>
+<p>Om zonerna: <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html">AWS: How Elastic Load Balancing works</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0074-kommandosubstitution.html">Förra: Kommandosubstitution</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0076-arn.html">Nästa: ARN</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Execution role</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 87 · v42, 17 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 87</p>
+<h1>Execution role</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att execution role är den roll Lambda tar på sig när funktionen körs, och att rollen som konsolen skapar bara får skriva loggar tills du ger den mer.
+</div>
+
+<section class="explain">
+<h2>Vad är en execution role?</h2>
+
+<p>En execution role är den <a href="0018-service-role.html">IAM role</a> som säger vad en <a href="0078-lambda-funktion.html">Lambda-funktion</a> får göra i AWS. Lambda tar på sig rollen när funktionen anropas, så koden behöver inte göra det själv. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html">AWS: Execution role</a>)</span></p>
+
+<p>I konsolen ser du rollens namn under Configuration → Permissions, under Execution role. Klickar du på namnet öppnas rollen i IAM. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/permissions-executionrole-update.html#view-execution-role">AWS: Viewing the execution role</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad får rollen göra?</h2>
+
+<p>Rollen får bara skriva loggar. När du skapar en funktion i konsolen skapar Lambda en roll med <code class="copyable">AWSLambdaBasicExecutionRole</code>. Det är en <a href="0005-iam-policy.html">AWS managed policy</a> som tillåter tre saker: <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html#permissions-executionrole-console">AWS: Creating an execution role</a>, <a href="https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSLambdaBasicExecutionRole.html">AWS: AWSLambdaBasicExecutionRole</a>)</span></p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Action</th><th>Betyder</th></tr>
+  <tr><td><code>logs:CreateLogGroup</code></td><td>skapa <a href="0082-cloudwatch-logs.html">logggruppen</a></td></tr>
+  <tr><td><code>logs:CreateLogStream</code></td><td>skapa en loggström</td></tr>
+  <tr><td><code>logs:PutLogEvents</code></td><td>skriva rader i loggen</td></tr>
+</table>
+</div>
+
+<p>Därför hamnar <code>console.log</code> i CloudWatch Logs. Ska funktionen läsa en tabell eller en fil måste du lägga till den behörigheten i rollen. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs.html#monitoring-cloudwatchlogs-prereqs">AWS: Required IAM permissions</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/permissions-executionrole-update.html#update-execution-role">AWS: Updating the execution role</a>)</span></p>
+
+<div class="box note">
+  <span class="box-title">Ej bekräftat</span>
+  <p>I IAM kan policyn heta <code>AWSLambdaBasicExecutionRole-</code> följt av ett id. AWS dokumentation visar bara namnet utan ändelse. Det är samma tre actions.</p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vem får ta på sig rollen?</h2>
+
+<p>Bara tjänsten Lambda får det. Det står i rollens trust policy, under fliken Trust relationships i IAM: <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_update-role-trust-policy.html#id_roles_update-trust-policy-console">AWS: Update a role trust policy</a>)</span></p>
+
+<pre><code>{
+  "Effect": "Allow",
+  "Principal": { "Service": "lambda.amazonaws.com" },
+  "Action": "sts:AssumeRole"
+}</code></pre>
+
+<p><code>lambda.amazonaws.com</code> är Lambdas namn som tjänst. <code>sts:AssumeRole</code> betyder att ta på sig rollen. Saknas Lambda här kan funktionen inte använda rollen. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html">AWS: Execution role</a>)</span></p>
+
+<p>Det är samma mönster som i <a href="0018-service-role.html">lektion 18</a>: trust policy säger vem som får ta på sig rollen, rollens policyer säger vad den får göra.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du skapar en funktion i konsolen och ändrar inte rollen. Vad får funktionen göra i AWS?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Rollen får AWSLambdaBasicExecutionRole, som bara tillåter att skriva loggar.">Skriva loggar i CloudWatch Logs</button>
+    <button class="opt" data-why="Rollen får bara skriva loggar; tabeller måste du ge den behörighet till.">Läsa och skriva alla tabeller</button>
+    <button class="opt" data-why="Rollen får bara skriva loggar; S3 måste du ge den behörighet till.">Skapa och radera alla S3-buckets</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad säger trust policy i en execution role?</p>
+  <div class="options">
+    <button class="opt" data-why="Vad rollen får göra säger rollens policyer, inte trust policy.">Vad rollen får göra i ditt konto</button>
+    <button class="opt" data-correct data-why="Trust policy anger lambda.amazonaws.com som den som får ta på sig rollen.">Att Lambda får ta på sig rollen</button>
+    <button class="opt" data-why="Vem som får anropa funktionen står inte i rollens trust policy.">Vem som får anropa den i konsolen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 82: var hamnar det funktionen skriver med <code>console.log</code>?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Loggen hamnar i CloudWatch Logs, i logggruppen /aws/lambda/ följd av funktionens namn.">I en logggrupp i CloudWatch Logs</button>
+    <button class="opt" data-why="Det finns ingen server att logga in på; loggen hamnar i CloudWatch Logs.">I en fil på funktionens server</button>
+    <button class="opt" data-why="Med Lambda syns loggen inte i någon terminal, utan i CloudWatch Logs.">I terminalen på din egen dator</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Execution role är den IAM role Lambda tar på sig när funktionen körs. Den syns under Configuration → Permissions.</li>
+    <li>Rollen som konsolen skapar har <code>AWSLambdaBasicExecutionRole</code> och får bara skriva loggar. Allt annat måste du lägga till i rollen.</li>
+    <li>Rollens trust policy säger att bara <code>lambda.amazonaws.com</code> får ta på sig rollen. Rollens policyer säger vad den får göra.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html">AWS Lambda: Defining Lambda function permissions with an execution role</a>.</p>
+<p>Om policyn: <a href="https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSLambdaBasicExecutionRole.html">AWS Managed Policy Reference: AWSLambdaBasicExecutionRole</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0086-timeout.html">Förra: Timeout</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0088-dynamodb.html">Nästa: DynamoDB</a>
+</nav>
+
+</main>
+</body>
+</html>

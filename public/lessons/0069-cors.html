@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CORS</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 69 · v41, 22 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 69</p>
+<h1>CORS</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att webbläsaren blockerar svaret från ett annat ursprung tills servern skickar headern <code>Access-Control-Allow-Origin</code>.
+</div>
+
+<section class="explain">
+<h2>Vad är ett ursprung?</h2>
+
+<p>Ett ursprung är tre delar av en adress: schemat, värden och <a href="0033-port.html">porten</a>. I <code>http://localhost:5173</code>, adressen till en webbsida som anropar API:et, är schemat <code>http</code>, värden <code>localhost</code> och porten <code>5173</code>. Schemat är början, <code>http</code> eller <code>https</code>. Värden är namnet eller IP-adressen. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Same-origin_policy">MDN: Same-origin policy</a>, kursmaterialet v41)</span></p>
+
+<p>Skiljer en av de tre delarna är det ett annat ursprung. Sökvägen räknas inte. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Same-origin_policy">MDN: Same-origin policy</a>)</span></p>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Jämfört med <code>http://localhost:5173</code></th><th>Ursprung</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>http://localhost:5173/customers</code></td><td>Samma</td></tr>
+    <tr><td><code>http://localhost:3000</code></td><td>Annat, porten</td></tr>
+    <tr><td><code>http://16.170.12.34:3000</code></td><td>Annat, värden och porten</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad blockerar webbläsaren?</h2>
+
+<p>Webbläsaren låter inte sidans JavaScript läsa svar från ett annat ursprung. Regeln heter same-origin policy. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS">MDN: CORS</a>)</span></p>
+
+<p>Ett vanligt GET-anrop skickas ändå, och servern svarar. I <a href="0056-network-fliken.html">Network-fliken</a> syns statuskoden 200. Men webbläsaren lämnar inte svaret till koden. Koden får bara ett fel, till exempel <a href="0066-swagger-ui.html">Failed to fetch</a>. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS">MDN: CORS</a>, kursmaterialet v41)</span></p>
+
+<p><a href="0054-curl.html">curl</a> och <a href="0055-postman.html">Postman</a> blockerar inget. Regeln finns bara i webbläsare. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur släpper servern in sidan?</h2>
+
+<p>Servern skickar <a href="0051-header.html">headern</a> <code>Access-Control-Allow-Origin</code> i svaret, med det ursprung som får läsa. Då lämnar webbläsaren över svaret. Det kallas CORS, Cross-Origin Resource Sharing. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Allow-Origin">MDN: Access-Control-Allow-Origin</a>)</span></p>
+
+<pre><code>Access-Control-Allow-Origin: http://localhost:5173</code></pre>
+
+<p>Värdet <code>*</code> släpper in alla ursprung. Det passar ett öppet API, men inte ett API som bara din egen sida ska använda. Vilka ursprung som får läsa är serverns beslut, inte sidans. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS">MDN: CORS</a>, kursmaterialet v41)</span></p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Tillåt exakt de ursprung som ska få läsa, inte alla.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. En sida på <code>http://localhost:5173</code> hämtar från <code>http://localhost:3000</code>. Är det samma ursprung?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Schema, värd och port måste vara lika, och här skiljer porten.">Nej, porten är olika</button>
+    <button class="opt" data-why="Värden är densamma, men porten skiljer sig, och då är det ett annat ursprung.">Ja, värden är densamma</button>
+    <button class="opt" data-why="Schemat är http i båda, men porten skiljer sig, och då är det ett annat ursprung.">Nej, schemat är olika</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Network-fliken visar 200, men sidans kod får Failed to fetch. Vem måste ändra något?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Servern ska skicka Access-Control-Allow-Origin med sidans ursprung.">Servern, som måste skicka en header</button>
+    <button class="opt" data-why="Sidan kan inte ge sig själv rätt att läsa; det beslutet tar servern.">Sidan, som måste skicka sin token</button>
+    <button class="opt" data-why="Regeln går inte att slå av för användarna; servern måste tillåta sidans ursprung.">Webbläsaren, som måste slå av allt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 58: Du öppnar <code>http://localhost:5173</code> i webbläsaren på din Mac. Vart går anropet?</p>
+  <div class="options">
+    <button class="opt" data-why="localhost är alltid samma dator som anropet görs från, här din Mac.">Till port 5173 på servern i AWS</button>
+    <button class="opt" data-correct data-why="localhost betyder samma dator, så anropet går till port 5173 på din Mac.">Till port 5173 på din egen dator</button>
+    <button class="opt" data-why="localhost är alltid samma dator som anropet görs från, här din Mac.">Till port 5173 på databasen i RDS</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett ursprung är schema, värd och port. Skiljer en av dem är det ett annat ursprung.</li>
+    <li>Webbläsaren låter inte sidans JavaScript läsa svar från ett annat ursprung. Servern svarar ändå, men koden får ett fel. curl och Postman påverkas inte.</li>
+    <li>Servern släpper in sidan med headern <code>Access-Control-Allow-Origin</code>. Tillåt exakt de ursprung som ska få läsa, inte <code>*</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS">MDN: Cross-Origin Resource Sharing (CORS)</a>.</p>
+<p>Om ursprung: <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Same-origin_policy">MDN: Same-origin policy</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0068-agarkontroll.html">Förra: Ägarkontroll</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0070-mixed-content.html">Nästa: Mixed content</a>
+</nav>
+
+</main>
+</body>
+</html>

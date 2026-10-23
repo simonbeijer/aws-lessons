@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS CloudShell</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 71 · v42, 1 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 71</p>
+<h1>AWS CloudShell</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att CloudShell är en terminal i konsolen som redan är inloggad som din IAM user, och att regionen du valt i konsolen gäller där.
+</div>
+
+<section class="explain">
+<h2>Vad är CloudShell?</h2>
+
+<p>CloudShell är en <a href="0036-ec2-instance-connect.html">terminal</a> i webbläsaren som du öppnar från konsolen. Du klickar på ikonen <code>&gt;_</code> i menyraden överst. <span class="src">(<a href="https://docs.aws.amazon.com/cloudshell/latest/userguide/getting-started.html#launch-region-shell">AWS: Getting started with CloudShell</a>)</span></p>
+
+<p>Terminalen körs på en dator som AWS startar åt dig, inte på din Mac. Programmet <code>aws</code>, som styr AWS med kommandon, finns redan installerat. Det är nästa lektion. <span class="src">(<a href="https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html">AWS: What is CloudShell?</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3><a href="0036-ec2-instance-connect.html">EC2 Instance Connect</a></h3>
+    <p>Terminal på din server. Kommandona körs där.</p>
+  </div>
+  <div>
+    <h3>CloudShell</h3>
+    <p>Terminal hos AWS. Kommandona styr ditt konto.</p>
+  </div>
+</div>
+
+<p>API Gateway från <a href="0070-mixed-content.html">lektion 70</a> kommer längre fram. Först skapar du saker med kommandon här, till exempel en lastbalanserare, som fördelar trafik mellan servrar (<a href="0075-application-load-balancer.html">lektion 75</a>).</p>
+</section>
+
+<section class="explain">
+<h2>Vem är du i CloudShell?</h2>
+
+<p>Samma som i konsolen. Loggade du in som din <a href="0004-iam-user.html">IAM user</a>, körs kommandona som den, med samma behörigheter. Du loggar inte in en gång till. <span class="src">(<a href="https://docs.aws.amazon.com/cloudshell/latest/userguide/working-with-aws-cli.html">AWS: Manage AWS services from CLI in CloudShell</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vilken region gäller?</h2>
+
+<p>Den <a href="0008-region.html">region</a> som konsolen står på när du öppnar CloudShell. Står den på Europe (Stockholm), hamnar det du skapar i <code>eu-north-1</code>. Regionen syns på terminalens flik. <span class="src">(<a href="https://docs.aws.amazon.com/cloudshell/latest/userguide/working-with-aws-cloudshell.html#region-selection">AWS: Working in AWS Regions</a>)</span></p>
+
+<p>Kontrollera därför regionen innan du öppnar CloudShell. Byter du region får du en ny terminal i den regionen. Flaggan <code>--region</code> i ett kommando väljer region för just det kommandot. <span class="src">(<a href="https://docs.aws.amazon.com/cloudshell/latest/userguide/working-with-aws-cloudshell.html#environment-variaiables-regions">AWS: Default Region for AWS CLI</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du loggade in i konsolen som din IAM user och öppnar CloudShell. Som vem körs kommandona?</p>
+  <div class="options">
+    <button class="opt" data-why="CloudShell använder inloggningen från konsolen, och där loggade du in som din IAM user.">Som root user, som äger själva kontot</button>
+    <button class="opt" data-why="CloudShell är redan inloggad med samma inloggning som konsolen.">Som ingen, tills du loggar in igen</button>
+    <button class="opt" data-correct data-why="CloudShell får inloggningen från konsolen, så kommandona har din IAM users behörigheter.">Som din IAM user och dess behörighet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Konsolen står på Europe (Ireland). Du öppnar CloudShell och skapar något utan <code>--region</code>. Var hamnar det?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Utan --region gäller regionen som konsolen stod på när du öppnade CloudShell.">I Europe (Ireland), där konsolen står</button>
+    <button class="opt" data-why="CloudShell använder regionen konsolen står på, inte en region du brukar använda.">I Europe (Stockholm), som är vanligast</button>
+    <button class="opt" data-why="Det du skapar hör till en region; CloudShell använder den som konsolen står på.">I alla regionerna samtidigt, som kopior</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 4: Vad får en ny IAM user göra innan du gett den behörighet?</p>
+  <div class="options">
+    <button class="opt" data-why="En ny IAM user får ingenting från början, och den blir aldrig root user.">Allt som root</button>
+    <button class="opt" data-why="Även att läsa kräver behörighet; en ny IAM user får ingenting från början.">Bara läsa allt</button>
+    <button class="opt" data-correct data-why="En ny IAM user får inte göra något förrän den fått behörighet, varken i konsolen eller i CloudShell.">Inget alls ännu</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>CloudShell är en terminal i konsolen, som körs på en dator hos AWS. Du öppnar den med ikonen <code>&gt;_</code>.</li>
+    <li>Den är redan inloggad som du i konsolen, till exempel din IAM user, och har samma behörigheter.</li>
+    <li>Regionen som konsolen står på gäller i CloudShell. Kontrollera den innan du öppnar terminalen.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html">AWS: What is AWS CloudShell?</a></p>
+<p>Om regioner: <a href="https://docs.aws.amazon.com/cloudshell/latest/userguide/working-with-aws-cloudshell.html#region-selection">AWS: Working in AWS Regions</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0070-mixed-content.html">Förra: Mixed content</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0072-aws-cli.html">Nästa: AWS CLI</a>
+</nav>
+
+</main>
+</body>
+</html>

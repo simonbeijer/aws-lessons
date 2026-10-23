@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Partitionsnyckel</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 90 · v42, 20 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 90</p>
+<h1>Partitionsnyckel</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att partitionsnyckeln, här <code>id</code>, är det enda du bestämmer i förväg om itemen i en DynamoDB-tabell, och att varje item måste ha den med ett eget värde.
+</div>
+
+<section class="explain">
+<h2>Vad är en partitionsnyckel?</h2>
+
+<p>Partitionsnyckeln är det attribut som varje item i en DynamoDB-tabell måste ha, till exempel <code>id</code>. Ett item är en rad i tabellen, och dess attribut är par av namn och värde, som i <a href="0089-item-och-attribut.html">lektion 89</a>. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html#HowItWorks.CoreComponents.TablesItemsAttributes">AWS: Tables, items, and attributes</a>)</span></p>
+
+<pre><code>{ "id": "demo-1", "name": "Alice" }</code></pre>
+
+<p>Namnet kommer av att DynamoDB använder värdet för att välja var itemet lagras, i en partition. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html#HowItWorks.CoreComponents.PrimaryKey">AWS: Primary key</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad bestäms i förväg?</h2>
+
+<p>Om itemen bestäms bara partitionsnyckeln. När du skapar tabellen anger du nyckelns namn och typ, till exempel <code>id</code> med typen String. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html#HowItWorks.CoreComponents.PrimaryKey">AWS: Primary key</a>)</span></p>
+
+<p>Alla andra attribut väljer varje item själv, så två items kan ha olika attribut, som i <a href="0089-item-och-attribut.html">lektion 89</a>. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html#HowItWorks.CoreComponents.TablesItemsAttributes">AWS: Tables, items, and attributes</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vilka items går att spara?</h2>
+
+<p>Bara items som har partitionsnyckeln går att spara. Värdet skiljer itemet från alla andra, och med det hämtar du itemet direkt. Sparar du ett item med ett <code>id</code> som redan finns, ersätter det nya det gamla helt. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html">AWS: PutItem</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="pk-tva">Två attribut</button>
+    <button class="chip" data-target="pk-tre">Tre attribut</button>
+    <button class="chip" data-target="pk-utan">Utan id</button>
+  </div>
+  <div class="picker-panel" id="pk-tva">
+<pre><code>{ "id": "demo-1", "name": "Alice" }</code></pre>
+    <p><span class="tag good">Sparas</span> Itemet har <code>id</code>.</p>
+  </div>
+  <div class="picker-panel" id="pk-tre">
+<pre><code>{ "id": "demo-2", "name": "Carol", "created_at": "2026-10-22" }</code></pre>
+    <p><span class="tag good">Sparas</span> Ett attribut till är tillåtet. Bara <code>id</code> är obligatoriskt.</p>
+  </div>
+  <div class="picker-panel" id="pk-utan">
+<pre><code>{ "name": "Alice" }</code></pre>
+    <p><span class="tag bad">Nekas</span> Partitionsnyckeln saknas, så DynamoDB sparar inte itemet.</p>
+  </div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du skapar en tabell i DynamoDB. Vad bestämmer du i förväg om dess items?</p>
+  <div class="options">
+    <button class="opt" data-why="Bara partitionsnyckeln bestäms i förväg; övriga attribut väljer varje item själv.">Alla namnen och värden itemen innehåller</button>
+    <button class="opt" data-why="Du anger inget antal items, bara partitionsnyckelns namn och typ.">Antalet items som tabellen högst rymmer</button>
+    <button class="opt" data-correct data-why="Partitionsnyckeln är det enda som bestäms i förväg, med namn och typ.">Bara namn och typ på partitionsnyckeln</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Ett item med <code>"id": "demo-1"</code> finns redan. Du sparar ett nytt item med samma <code>id</code>. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Värdet på partitionsnyckeln pekar ut ett enda item, så det nya ersätter det gamla helt.">Det nya ersätter det gamla helt</button>
+    <button class="opt" data-why="DynamoDB hittar inte på något id; det nya itemet ersätter det gamla.">Det nya sparas under nytt id</button>
+    <button class="opt" data-why="Två items kan inte ha samma värde på partitionsnyckeln, så det nya ersätter det gamla.">Båda ligger kvar med samma id</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 76: vad säger <code>table/v42-customers</code> i ett ARN?</p>
+  <div class="options">
+    <button class="opt" data-why="Regionen står i en egen del före kontonumret, till exempel eu-north-1.">Regionen som tabellen finns i</button>
+    <button class="opt" data-why="Kontot står som tolv siffror i en egen del före resursen.">Kontot som tabellen finns i</button>
+    <button class="opt" data-correct data-why="Sista delen är resursen: först typen table, sedan namnet.">Resursens typ och sedan namn</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Partitionsnyckeln är det attribut som varje item måste ha. DynamoDB använder värdet för att välja partition.</li>
+    <li>Partitionsnyckeln, här <code>id</code> med typen String, är det enda du bestämmer i förväg. Övriga attribut väljer varje item själv.</li>
+    <li>Ett item utan partitionsnyckeln sparas inte. Värdet pekar ut ett enda item, och ett nytt item med samma värde ersätter det gamla.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html">Amazon DynamoDB: Core components</a>.</p>
+<p>Om att spara items: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html">DynamoDB API Reference: PutItem</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0089-item-och-attribut.html">Förra: Item och attribut</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0091-on-demand-lage.html">Nästa: On-demand-läge</a>
+</nav>
+
+</main>
+</body>
+</html>

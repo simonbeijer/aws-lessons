@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runtime</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 79 · v42, 9 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 79</p>
+<h1>Runtime</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att runtime är språket och versionen funktionen körs i, till exempel Node.js 22.x, och att den styr vad som redan finns installerat.
+</div>
+
+<section class="explain">
+<h2>Vad är en runtime?</h2>
+
+<p>En runtime är språket och versionen som Lambda kör din kod i, till exempel Node.js 22.x. Du väljer den under Runtime när du skapar funktionen. Senare ändrar du den under Runtime settings på funktionens sida. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html">AWS: Lambda runtimes</a>)</span></p>
+
+<p>På din server körde du koden med <a href="0060-process-i-bakgrunden.html"><code>node server.js</code></a>, och <a href="0033-port.html">Node.js</a> fanns installerat där. I Lambda har AWS redan installerat Node.js åt dig. Du väljer bara vilken version.</p>
+</section>
+
+<section class="explain">
+<h2>Vilken version ska du välja?</h2>
+
+<p>Välj den senaste Node.js-version som konsolen föreslår, 22.x eller nyare. Lambda stöder nu Node.js 22.x och 24.x. Node.js 26.x är en förhandsversion och ska inte användas på riktigt. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-nodejs.html">AWS: Building with Node.js</a>)</span></p>
+
+<p>Äldre versioner, som Node.js 20, stöder AWS inte längre. Dem kan du inte välja i konsolen. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-deprecation-levels">AWS: Runtime use after deprecation</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad finns redan installerat?</h2>
+
+<p>Runtime bestämmer vilka <a href="0066-swagger-ui.html">paket</a>, alltså färdig kod, som redan finns när funktionen körs. I Node.js-runtime finns AWS SDK, färdig kod för att prata med andra AWS-tjänster. Därför behövs ingen <code>npm install</code> när du skriver koden i konsolens editor. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-nodejs.html#nodejs-sdk-included">AWS: Runtime-included SDK versions</a>)</span></p>
+
+<p>Andra paket, som <a href="0057-express.html">Express</a>, finns inte. Dem måste du skicka med koden själv. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html">AWS: Lambda runtimes</a>)</span></p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Står det <code>Cannot find package</code> i felet och paketet hör till AWS SDK: kontrollera runtime under Runtime settings. Byt till Node.js 22.x eller nyare.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad är en Lambda-funktions runtime?</p>
+  <div class="options">
+    <button class="opt" data-why="Det finns ingen server att starta; runtime är språket och versionen koden körs i.">Servern som Lambda startar åt dig</button>
+    <button class="opt" data-why="Minnet är en annan inställning; runtime är språket och versionen.">Hur mycket minne den får använda</button>
+    <button class="opt" data-correct data-why="Runtime är språket och versionen, till exempel Node.js 22.x.">Språket och versionen koden körs i</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Koden använder AWS SDK. Varför behövs ingen <code>npm install</code> när du skriver den i konsolen?</p>
+  <div class="options">
+    <button class="opt" data-why="Deploy sparar koden i funktionen men installerar inga paket.">Deploy kör alltid npm install först</button>
+    <button class="opt" data-correct data-why="AWS SDK finns redan i Node.js-runtime, så paketet behöver inte installeras.">AWS SDK finns redan i Node.js-runtime</button>
+    <button class="opt" data-why="Editorn installerar inget; AWS SDK finns redan i Node.js-runtime.">Editorn installerar alla paketen åt dig</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 57: vad är Express?</p>
+  <div class="options">
+    <button class="opt" data-why="Express är ingen AWS-tjänst; det är ett ramverk för Node.js.">Den AWS-tjänst som kör serverlös kod</button>
+    <button class="opt" data-correct data-why="Express är ett ramverk för Node.js, färdig kod för att svara på HTTP-anrop.">Färdig kod som svarar på HTTP-anrop</button>
+    <button class="opt" data-why="Express startar inte om något; det är färdig kod för att svara på HTTP-anrop.">Programmet som startar om din server</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Runtime är språket och versionen Lambda kör koden i, till exempel Node.js 22.x. Du väljer den när du skapar funktionen och ändrar den under Runtime settings.</li>
+    <li>Välj den senaste Node.js-versionen som konsolen föreslår, 22.x eller nyare.</li>
+    <li>Runtime styr vad som redan finns installerat. AWS SDK finns i Node.js-runtime, andra paket som Express gör det inte.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html">AWS Lambda: Lambda runtimes</a>.</p>
+<p>Om Node.js i Lambda: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-nodejs.html">AWS Lambda: Building with Node.js</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0078-lambda-funktion.html">Förra: Lambda-funktion</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0080-handler.html">Nästa: Handler</a>
+</nav>
+
+</main>
+</body>
+</html>

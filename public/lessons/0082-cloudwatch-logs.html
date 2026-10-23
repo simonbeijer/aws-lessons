@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CloudWatch Logs</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 82 · v42, 12 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 82</p>
+<h1>CloudWatch Logs</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att allt <code>console.log</code> skriver hamnar i logggruppen <code>/aws/lambda/&lt;namn&gt;</code>, uppdelat i loggströmmar, och att alla med behörighet kan läsa loggen.
+</div>
+
+<section class="explain">
+<h2>Vart tar console.log vägen?</h2>
+
+<p>Till CloudWatch Logs, den del av <a href="0010-cloudwatch-larm.html">CloudWatch</a> som sparar loggar. <code>console.log</code> skriver ut en rad text från JavaScript, till exempel: <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html">AWS: Log Node.js functions</a>)</span></p>
+
+<pre><code>console.log("Hej", event.name);</code></pre>
+
+<p>På en egen server hamnade raden i terminalen, eller i en fil som <code>server.log</code> (<a href="0060-process-i-bakgrunden.html">lektion 60</a>). Lambda har ingen server att logga in på, så allt funktionen skriver går till CloudWatch Logs. Loggen är det enda sättet att se vad funktionen gjorde. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs.html">AWS: Sending Lambda logs to CloudWatch Logs</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Var ligger loggen?</h2>
+
+<p>I logggruppen <code>/aws/lambda/&lt;namn&gt;</code>. Funktionen <code>v42-hello</code> loggar till <code class="copyable">/aws/lambda/v42-hello</code>. En logggrupp samlar loggen för en funktion. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs.html">AWS: Sending Lambda logs to CloudWatch Logs</a>)</span></p>
+
+<p>Gruppen är uppdelad i loggströmmar. En loggström är rader i tidsordning från en kopia av funktionen. Lambda kan köra flera kopior, var och en med egen ström. Varför kommer i nästa lektion. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html">AWS: Viewing Lambda logs</a>, <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatchLogsConcepts.html">AWS: CloudWatch Logs concepts</a>)</span></p>
+
+<p>Efter ett <a href="0081-event-och-testhandelse.html">Test</a> i editorn ser du ett utdrag. Hela loggen ligger under fliken Monitor, sedan View CloudWatch logs. Enligt AWS kan nya rader dröja 5–10 minuter. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html#monitoring-cloudwatchlogs-console">AWS: Access logs using the console</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs.html">AWS: Sending Lambda logs to CloudWatch Logs</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vem kan läsa loggen?</h2>
+
+<p>Alla i kontot vars <a href="0005-iam-policy.html">IAM policy</a> tillåter att läsa CloudWatch Logs. En <a href="0004-iam-user.html">IAM user</a> med AdministratorAccess kan läsa alla loggar. Loggen finns kvar även om du tar bort funktionen. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-identity-based-access-control-cwl.html">AWS: IAM policies for CloudWatch Logs</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html#nodejs-logging-delete">AWS: Deleting logs</a>)</span></p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Skriv aldrig lösenord, nycklar eller personuppgifter med <code>console.log</code>. Allt i loggen kan läsas av alla med behörighet.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Funktionen <code>v42-hello</code> kör <code>console.log("Hej")</code>. Var hamnar raden?</p>
+  <div class="options">
+    <button class="opt" data-why="Lambda har ingen server du loggar in på; raden skickas till CloudWatch Logs.">I terminalen på Lambdas egen dator</button>
+    <button class="opt" data-correct data-why="Allt funktionen skriver hamnar i CloudWatch Logs, i logggruppen /aws/lambda/v42-hello.">I en logggrupp inom CloudWatch Logs</button>
+    <button class="opt" data-why="console.log skriver till loggen; svaret till anroparen är det handlern returnerar.">I svaret som anroparen får direkt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du öppnar logggruppen och ser tre loggströmmar. Vad är en loggström?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Varje kopia av funktionen skriver sina rader i tidsordning till en egen ström.">Rader i tidsordning från en kopia av funktionen</button>
+    <button class="opt" data-why="Logggruppen är en per funktion; strömmarna ligger inuti den.">En egen logggrupp för varje funktion i kontot</button>
+    <button class="opt" data-why="En ström är ingen reservkopia; den är raderna från en kopia av funktionen.">En reservkopia av loggen som AWS alltid sparar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 5: en kollega har en IAM user med AdministratorAccess i ditt konto. Kan kollegan läsa funktionens logg?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är IAM policyn som avgör, inte vem som skapade funktionen.">Nej, endast den som själv skapat funktionen</button>
+    <button class="opt" data-correct data-why="AdministratorAccess tillåter alla handlingar på alla resurser, även att läsa loggar.">Ja, policyn tillåter allt på alla resurser</button>
+    <button class="opt" data-why="Loggen ligger i CloudWatch Logs, och den som har behörighet kan läsa den där.">Nej, loggen kan bara läsas från Lambdasidan</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Allt funktionen skriver med <code>console.log</code> hamnar i CloudWatch Logs. Loggen är det enda sättet att se vad funktionen gjorde.</li>
+    <li>Loggen ligger i logggruppen <code>/aws/lambda/&lt;namn&gt;</code>, uppdelad i loggströmmar: en ström per kopia av funktionen. Du når den via Monitor och View CloudWatch logs.</li>
+    <li>Alla vars IAM policy tillåter det kan läsa loggen. Skriv aldrig hemligheter i den.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs.html">AWS Lambda: Sending Lambda function logs to CloudWatch Logs</a>.</p>
+<p>Om logggrupp och loggström: <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatchLogsConcepts.html">Amazon CloudWatch Logs concepts</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0081-event-och-testhandelse.html">Förra: Event och testhändelse</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0083-exekveringsmiljo.html">Nästa: Exekveringsmiljö</a>
+</nav>
+
+</main>
+</body>
+</html>

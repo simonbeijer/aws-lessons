@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Timeout</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 86 · v42, 16 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 86</p>
+<h1>Timeout</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att timeout är den längsta tid ett anrop får köra, 3 sekunder om du inte ändrar den, och att Lambda avbryter anropet med <code>Task timed out</code> när tiden går ut.
+</div>
+
+<section class="explain">
+<h2>Vad är timeout?</h2>
+
+<p>Timeout är den längsta tid ett anrop får köra. Den är en inställning i funktionens <a href="0078-lambda-funktion.html">konfiguration</a>. I konsolen ändrar du den under Configuration → General configuration → Edit. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html#configuration-timeout-console">AWS: Configuring timeout</a>)</span></p>
+
+<p>Standard är 3 sekunder. Du kan välja från 1 sekund upp till 900 sekunder, alltså 15 minuter. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html">AWS: Configure timeout</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad händer när tiden går ut?</h2>
+
+<p>Lambda avbryter anropet. <a href="0080-handler.html">Handlern</a> hinner inte returnera något, och anropet blir ett fel. Ingen server kraschar. Felet syns i <a href="0082-cloudwatch-logs.html">loggen</a>, före <a href="0085-duration-och-billed-duration.html">REPORT-raden</a>. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#runtimes-lifecycle-invoke-with-errors">AWS: Failures during the invoke phase</a>)</span></p>
+
+<pre><code>2024-03-04T17:22:38.033Z b70435cc-…  Task timed out after 3.00 seconds
+REPORT RequestId: b70435cc-…  Duration: 3004.92 ms  Billed Duration: 3117 ms  Memory Size: 128 MB  Max Memory Used: 33 MB  Init Duration: 111.23 ms</code></pre>
+
+<p>Talet 3.00 är din timeout i sekunder. Duration är nästan exakt lika lång. Du betalar för tiden fram till avbrottet, här med Init Duration inräknad eftersom det var en <a href="0084-kallstart.html">kallstart</a>. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#runtimes-lifecycle-invoke-with-errors">AWS: Failures during the invoke phase</a>)</span></p>
+
+<div class="box note">
+  <span class="box-title">Två loggformat</span>
+  <p>AWS byter just nu format på loggens egna rader. I det nya formatet står <code>Status: timeout</code> sist på REPORT-raden, och raden <code>Task timed out</code> saknas i AWS exempel. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#runtimes-lifecycle-invoke-with-errors">AWS: Failures during the invoke phase</a>)</span></p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vilket värde ska du välja?</h2>
+
+<p>Välj ett värde som räcker även för de långsamma anropen. Ligger timeout nära den tid funktionen brukar ta, avbryts anrop i onödan, till exempel när en annan tjänst svarar långsamt. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html#configuration-timeout-use-cases">AWS: Appropriate timeout value</a>)</span></p>
+
+<p>En funktion som anropar en <a href="0039-rds.html">databas</a> får därför ofta mer än 3 sekunder, till exempel 10. Men välj inte mer än du behöver: hänger sig ett anrop betalar du tills tiden går ut.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du har inte ändrat timeout. Hur länge får ett anrop köra?</p>
+  <div class="options">
+    <button class="opt" data-why="15 minuter är det högsta du kan välja, inte standardvärdet.">I högst 15 minuter</button>
+    <button class="opt" data-correct data-why="Standardvärdet för timeout är 3 sekunder.">I högst tre sekunder</button>
+    <button class="opt" data-why="Lambda avbryter anropet när timeout går ut, även om handlern inte är klar.">Så länge det behövs</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Timeout är 1 sekund, men handlern behöver 2 sekunder. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Lambda väntar inte längre än timeout, utan avbryter anropet.">Lambda väntar tills handlern har svarat</button>
+    <button class="opt" data-why="Timeout ändras bara när du själv ändrar den i konfigurationen.">Lambda höjer timeout till 2 sekunder</button>
+    <button class="opt" data-correct data-why="Efter 1 sekund avbryter Lambda anropet, och anropet blir ett fel.">Lambda avbryter anropet efter 1 sekund</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 85: ett anrop avbröts av timeout. Vad visar Billed Duration?</p>
+  <div class="options">
+    <button class="opt" data-why="Ett avbrutet anrop har ändå kört, och den tiden betalar du för.">Ingenting, anropet blev fel</button>
+    <button class="opt" data-why="Handlerns tid räknas med, ända fram till avbrottet.">Endast tiden före handlern</button>
+    <button class="opt" data-correct data-why="Billed Duration är tiden fram till avbrottet, plus Init Duration vid en kallstart.">Tiden fram till avbrottet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Timeout är den längsta tid ett anrop får köra: 3 sekunder som standard, högst 900 sekunder (15 minuter). Den ändras under Configuration → General configuration.</li>
+    <li>När tiden går ut avbryter Lambda anropet. Loggen visar <code>Task timed out after … seconds</code>, eller <code>Status: timeout</code> på REPORT-raden i det nya formatet.</li>
+    <li>Du betalar för tiden fram till avbrottet. Välj ett värde som räcker för långsamma anrop, men inte mer.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html">AWS Lambda: Configure Lambda function timeout</a>.</p>
+<p>Om vad som händer vid timeout: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#runtimes-lifecycle-invoke-with-errors">AWS Lambda: Failures during the invoke phase</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0085-duration-och-billed-duration.html">Förra: Duration och Billed Duration</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0087-execution-role.html">Nästa: Execution role</a>
+</nav>
+
+</main>
+</body>
+</html>

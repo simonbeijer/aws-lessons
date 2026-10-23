@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenAPI</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 65 · v41, 18 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 65</p>
+<h1>OpenAPI</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en OpenAPI-fil beskriver API:ets sökvägar, metoder, kroppar och svar, och att du själv måste hålla den i takt med koden.
+</div>
+
+<section class="explain">
+<h2>Vad är OpenAPI?</h2>
+
+<p>OpenAPI är en standard för att beskriva ett <a href="0053-rest-api.html">API</a> i en fil. Filen säger vilka sökvägar som finns, vilka <a href="0049-http-metod.html">metoder</a> de svarar på, vilka <a href="0048-http-anrop-och-svar.html">kroppar</a> de tar och vilka svar de ger. <span class="src">(<a href="https://swagger.io/docs/specification/v3_0/about/">Swagger: What is OpenAPI?</a>, kursmaterialet v41)</span></p>
+
+<p>Filen skrivs i <a href="0064-yaml.html">YAML</a> eller <a href="0052-json.html">JSON</a>. Både människor och program kan läsa den, utan att se koden. <span class="src">(<a href="https://spec.openapis.org/oas/v3.0.3.html#format">OpenAPI 3.0.3: Format</a>, <a href="https://spec.openapis.org/oas/v3.0.3.html#introduction">Introduction</a>)</span></p>
+
+<p>Filen är avtalet mellan API:et och de som anropar det. Utan den kan bara den som skrev koden använda API:et. <span class="src">(kursens lektion sida 11, kursmaterialet v41)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur ser filen ut?</h2>
+
+<p>Filen är nycklar i lager: sökvägen, under den metoden, och under metoden kroppen och svaren. Ett utdrag ur <code>openapi.yaml</code>, anropet som skapar en kund:</p>
+
+<pre><code>paths:
+  /customers:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        "201":
+          description: Kunden skapades
+        "400":
+          description: Namnet saknas</code></pre>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Nyckel</th><th>Beskriver</th></tr>
+  <tr><td><code>paths</code></td><td>Alla <a href="0053-rest-api.html">sökvägar</a>, här <code>/customers</code>. <span class="src">(<a href="https://spec.openapis.org/oas/v3.0.3.html#paths-object">Paths</a>)</span></td></tr>
+  <tr><td><code>post</code></td><td><a href="0049-http-metod.html">Metoden</a> under sökvägen. <span class="src">(<a href="https://spec.openapis.org/oas/v3.0.3.html#operation-object">Operation</a>)</span></td></tr>
+  <tr><td><code>requestBody</code></td><td>Kroppen anropet tar, här JSON. <code>schema</code> är dess form: ett JSON-objekt där <code>name</code> är text. <span class="src">(<a href="https://spec.openapis.org/oas/v3.0.3.html#request-body-object">Request Body</a>)</span></td></tr>
+  <tr><td><code>responses</code></td><td>Svaren, ett per <a href="0050-statuskod.html">statuskod</a>, med en beskrivning (<code>description</code>). Statuskoden står inom citattecken. <span class="src">(<a href="https://spec.openapis.org/oas/v3.0.3.html#responses-object">Responses</a>)</span></td></tr>
+</table>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vem håller filen rätt?</h2>
+
+<p>Det gör du. Filen och koden i <code>server.js</code> ändrar inte varandra. <span class="src">(kursmaterialet v41)</span></p>
+
+<p>Lägger du till en <a href="0057-express.html">route</a> i koden men inte i filen, saknar filen ett anrop som API:et har. Att filen och koden glider isär kallas att de driftar. <span class="src">(kursmaterialet v41)</span></p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Ändrar du en route i koden: ändra filen direkt efteråt.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad beskriver en OpenAPI-fil?</p>
+  <div class="options">
+    <button class="opt" data-why="Databasen beskrivs inte; filen beskriver vad API:et tar emot och svarar.">Databasens tabeller och alla kolumner</button>
+    <button class="opt" data-why="Koden står i server.js; filen beskriver bara vilka anrop som finns och vad de svarar.">Programkoden bakom varje enskild route</button>
+    <button class="opt" data-correct data-why="Filen listar sökvägar, metoderna under dem, kroppen anropen tar och svaren per statuskod.">Sökvägar, metoder, kroppar och svar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du lägger till en route för <code>DELETE /customers/:id</code> i <code>server.js</code>. Vad händer med <code>openapi.yaml</code>?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Filen och koden ändrar inte varandra, så du skriver in DELETE i filen själv.">Inget, du måste själv skriva in routen</button>
+    <button class="opt" data-why="Filen ändras inte när servern startar om; den är en egen fil som bara du skriver i.">Den uppdateras av sig själv vid start</button>
+    <button class="opt" data-why="Express skriver aldrig i filen; filen och koden är två olika saker som du håller ihop.">Express lägger in den nya routen där</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 57: filen beskriver <code>GET /kunder</code>, men <code>server.js</code> har ingen sådan route. Vad svarar servern?</p>
+  <div class="options">
+    <button class="opt" data-why="Servern läser inte filen för att svara; utan route finns inget som svarar 200.">200, för att filen har anropet</button>
+    <button class="opt" data-why="Servern startar som vanligt; ett anrop utan route ger 404, inte 500.">500, för att servern inte startar</button>
+    <button class="opt" data-correct data-why="Matchar ingen route svarar Express själv 404, t.ex. Cannot GET /kunder.">404, för att ingen route matchar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En OpenAPI-fil beskriver API:et: sökvägar, metoder, kroppar och svar per statuskod. Den skrivs i YAML eller JSON.</li>
+    <li>Filen är avtalet mellan API:et och de som anropar det, och går att läsa utan koden.</li>
+    <li>Filen och koden ändrar inte varandra. Ändrar du en route: ändra filen, annars driftar de isär.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://swagger.io/docs/specification/v3_0/about/">Swagger: What is OpenAPI?</a></p>
+<p>Standarden: <a href="https://spec.openapis.org/oas/v3.0.3.html">OpenAPI Specification 3.0.3</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0064-yaml.html">Förra: YAML</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0066-swagger-ui.html">Nästa: Swagger UI</a>
+</nav>
+
+</main>
+</body>
+</html>

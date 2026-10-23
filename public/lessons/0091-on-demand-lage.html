@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>On-demand-läge</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 91 · v42, 21 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 91</p>
+<h1>On-demand-läge</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att on-demand-läge betyder att en DynamoDB-tabell betalas per läsning och skrivning, och att du inte betalar för läsningar och skrivningar när tabellen inte används.
+</div>
+
+<section class="explain">
+<h2>Vad är on-demand-läge?</h2>
+
+<p>On-demand-läge är ett sätt att betala för en <a href="0088-dynamodb.html">DynamoDB-tabell</a>: per läsning och per skrivning. Du säger inte i förväg hur mycket trafik tabellen ska klara. Ökar trafiken klarar DynamoDB mer av sig själv. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/on-demand-capacity-mode.html">AWS: On-demand capacity mode</a>)</span></p>
+
+<p>Läget står i fältet Capacity mode. När du skapar en tabell och behåller valet Default settings blir det on-demand. AWS rekommenderar det för de flesta tabeller. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html">AWS: Throughput capacity</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad är alternativet?</h2>
+
+<p>Alternativet heter provisioned. Där anger du hur många läsningar och skrivningar per sekund tabellen ska klara, och betalar per timme för det, även när ingen använder tabellen. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html">AWS: Throughput capacity</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Provisioned</h3>
+    <p>Du bokar en mängd per sekund. Du betalar per timme. Som en <a href="0029-ec2-instans.html">EC2-instans</a> som står på.</p>
+  </div>
+  <div>
+    <h3>On-demand</h3>
+    <p>Du bokar inget. Du betalar för varje läsning och skrivning. Som <a href="0077-serverlost.html">serverlöst</a>, där du betalar per anrop.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad kostar tabellen i vila?</h2>
+
+<p>I vila betalar du bara för datan som ligger i tabellen, per GB och månad. Läsningar och skrivningar kostar inget i vila, eftersom inga görs. Kursmaterialet säger att tabellen kostar ingenting i vila. Enligt AWS gäller det läsningar och skrivningar, inte lagringen. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/on-demand-capacity-mode.html">AWS: On-demand capacity mode</a>, <a href="https://aws.amazon.com/dynamodb/pricing/on-demand/">AWS: DynamoDB on-demand pricing</a>)</span></p>
+
+<p>Med Free plan ingår 25 GB lagring varje månad. Läsningar och skrivningar i on-demand-läge ingår inte, så de dras från <a href="0001-aws-kontotyper.html">krediterna</a>. <span class="src">(<a href="https://aws.amazon.com/free/database/">AWS: Free Tier, Databases</a>, <a href="https://aws.amazon.com/dynamodb/pricing/on-demand/">AWS: DynamoDB on-demand pricing</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. En tabell i on-demand-läge får inga anrop på en vecka. Vad räknas ändå?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Utan anrop görs inga läsningar eller skrivningar, men datan i tabellen räknas per GB och månad.">Datan som ligger lagrad i tabellen</button>
+    <button class="opt" data-why="Timavgift finns i provisioned-läge; on-demand har ingen.">En avgift per timme för tabellen</button>
+    <button class="opt" data-why="I on-demand-läge bokar du inga läsningar i förväg.">Läsningarna som du har bokat in</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad anger du i förväg i provisioned-läge, men inte i on-demand-läge?</p>
+  <div class="options">
+    <button class="opt" data-why="Lagringen anger du inte i förväg i något av lägena; den räknas efter hur mycket data som finns.">Hur många gigabyte tabellen rymmer</button>
+    <button class="opt" data-why="Partitionsnyckeln anger du i båda lägena när tabellen skapas.">Namnet och typen på partitionsnyckeln</button>
+    <button class="opt" data-correct data-why="I provisioned-läge bokar du läsningar och skrivningar per sekund och betalar per timme för dem.">Läsningar och skrivningar per sekund</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 77: en Lambda-funktion får inga anrop på ett dygn. Vad kostar koden?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Du betalar per anrop och för tiden koden körs, så utan anrop kostar koden inget.">Inget, den betalas per anrop</button>
+    <button class="opt" data-why="En EC2-instans kostar så länge den körs, men Lambda betalas per anrop.">Lika mycket som en EC2-instans</button>
+    <button class="opt" data-why="Lambda har ingen timavgift; du betalar per anrop och körtid.">Avgift för alla dygnets timmar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>On-demand-läge betyder att en DynamoDB-tabell betalas per läsning och skrivning. Det är förvalt under Capacity mode.</li>
+    <li>I provisioned-läge bokar du läsningar och skrivningar per sekund och betalar per timme, även när tabellen inte används.</li>
+    <li>I vila betalar du inget för läsningar och skrivningar, bara för lagrad data. Med Free plan ingår 25 GB lagring i månaden.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/on-demand-capacity-mode.html">Amazon DynamoDB: On-demand capacity mode</a>.</p>
+<p>Om de två lägena: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html">Amazon DynamoDB: Throughput capacity</a>. Om Free plan: <a href="https://aws.amazon.com/free/database/">AWS Free Tier: Databases</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0090-partitionsnyckel.html">Förra: Partitionsnyckel</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0092-dynamodb-operationer.html">Nästa: DynamoDB-operationer</a>
+</nav>
+
+</main>
+</body>
+</html>

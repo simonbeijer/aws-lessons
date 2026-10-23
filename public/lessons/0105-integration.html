@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Integration</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 105 · v42, 35 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 105</p>
+<h1>Integration</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att integrationen är det som står bakom en route, här funktionen <code>v42-api</code>, och att den kan bytas utan att adressen ändras.
+</div>
+
+<section class="explain">
+<h2>Vad är en integration?</h2>
+
+<p>En integration är det som en <a href="0104-route-i-api-gateway.html">route</a> skickar anropet till. I ditt API är det funktionen <code>v42-api</code>. När en route matchar anropar API Gateway integrationen, och svaret går tillbaka till klienten. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations.html">AWS: Integrations for HTTP APIs</a>)</span></p>
+
+<p>Du väljer integrationen när du skapar API:et, under <strong>Add integration</strong>: Lambda, region eu-north-1, funktionen <code>v42-api</code>. Alla fem routes har samma integration. I konsolen ser du den under <strong>Integrations</strong>. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-dynamo-db.html">AWS: CRUD API tutorial</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad kan stå bakom?</h2>
+
+<p>Bakom en route kan det också stå en server. I <a href="0070-mixed-content.html">lektion 70</a> skickade API Gateway anropet till ditt API på EC2. Då är integrationen serverns HTTP-adress, inte en funktion. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-http.html">AWS: HTTP proxy integrations</a>)</span></p>
+
+<p>Det kan också vara en <a href="0075-application-load-balancer.html">Application Load Balancer</a> inne i ditt <a href="0020-vpc.html">VPC</a>, med servrar bakom. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-private.html">AWS: Private integrations</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad händer med adressen?</h2>
+
+<p>Adressen ändras inte när du byter integration. Klienten anropar API:ets adress, inte funktionen. Funktionens namn finns inte i adressen. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-stages.html">AWS: API:ets adress</a>)</span></p>
+
+<p>Adressen och dina routes är ingången. Integrationen är det som står bakom. Byter du det som står bakom, anropar sidan på Amplify samma adress.</p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-lambda">Funktionen v42-api</button>
+    <button class="chip" data-target="p-ec2">Server på EC2</button>
+    <button class="chip" data-target="p-alb">Load balancer</button>
+  </div>
+  <div class="picker-panel" id="p-lambda">
+    <p><span class="tag good">Samma adress</span> <code>GET /customers</code> går till Lambda, som kör <code>v42-api</code>.</p>
+  </div>
+  <div class="picker-panel" id="p-ec2">
+    <p><span class="tag good">Samma adress</span> <code>GET /customers</code> går till serverns HTTP-adress.</p>
+  </div>
+  <div class="picker-panel" id="p-alb">
+    <p><span class="tag good">Samma adress</span> <code>GET /customers</code> går till load balancern, som väljer en server.</p>
+  </div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad är integrationen i ditt API?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Alla fem routes skickar anropet till funktionen v42-api, som är integrationen.">Funktionen v42-api som Lambda kör</button>
+    <button class="opt" data-why="Adressen hör till API:et; integrationen är det som står bakom routen.">Adressen som klienten alltid anropar</button>
+    <button class="opt" data-why="Det är routen; integrationen är det som routen skickar anropet till.">Metoden GET och sökvägen /customers</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du byter integrationen från <code>v42-api</code> till en server på EC2. Vad händer med adressen?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Adressen hör till API:et, så den är densamma när integrationen byts.">Den är densamma som förut</button>
+    <button class="opt" data-why="Klienten anropar API:ets adress, och den följer inte med det som står bakom.">Den byts mot EC2:s adress</button>
+    <button class="opt" data-why="API Gateway har bara HTTPS-adresser, oavsett vad som står bakom.">Den börjar på http:// nu</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 75: vad gör en Application Load Balancer?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är DynamoDB som sparar items; en ALB skickar anropen vidare till servrar.">Sparar varje anrop som item i tabellen</button>
+    <button class="opt" data-correct data-why="En ALB tar emot alla anrop och skickar varje anrop till en server bakom.">Skickar varje anrop till en server bakom</button>
+    <button class="opt" data-why="En ALB kör ingen kod själv; den skickar anropet till en server som svarar.">Kör koden för varje anrop som funktion</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En integration är det som en route skickar anropet till. I ditt API är det funktionen <code>v42-api</code>, för alla fem routes.</li>
+    <li>Bakom en route kan det också stå en server, eller en Application Load Balancer med servrar bakom.</li>
+    <li>Adressen hör till API:et, inte till integrationen. Byter du integration anropar klienten samma adress som förut.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations.html">Amazon API Gateway: Create integrations for HTTP APIs</a>.</p>
+<p>Om hur integrationen kopplas till routes i konsolen: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-dynamo-db.html">Amazon API Gateway: Tutorial: Create a CRUD HTTP API with Lambda and DynamoDB</a> (steg 5 och 6).</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0104-route-i-api-gateway.html">Förra: Route i API Gateway</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0106-stage-och-invoke-url.html">Nästa: Stage och Invoke URL</a>
+</nav>
+
+</main>
+</body>
+</html>

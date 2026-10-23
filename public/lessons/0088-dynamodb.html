@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DynamoDB</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 88 · v42, 18 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 88</p>
+<h1>DynamoDB</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att DynamoDB är en managed databas utan server att sköta, och att koden inte håller någon anslutning öppen: varje läsning och skrivning är ett eget anrop.
+</div>
+
+<section class="explain">
+<h2>Vad är DynamoDB?</h2>
+
+<p>DynamoDB är en databastjänst i AWS där du inte har någon server att sköta. Du väljer ingen server och patchar inget. Du väljer heller ingen motor eller version, som du gör med PostgreSQL i <a href="0039-rds.html">RDS</a>. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html#ddb-characteristics-serverless">AWS: What is DynamoDB?</a>)</span></p>
+
+<p>Den är managed, som RDS: AWS sköter driften, till exempel backup och övervakning. Datan sparas i tabeller, som du hittar i DynamoDB-konsolen under Tables. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html#ddb-characteristics-fully-managed">AWS: Fully managed</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/getting-started-step-1.html">AWS: Create a table</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur når koden databasen?</h2>
+
+<p>Koden gör ett eget anrop för varje läsning och skrivning. DynamoDB är en webbtjänst: koden skickar ett HTTPS-anrop och får ett svar. Ingen anslutning hålls öppen. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SQLtoNoSQL.Accessing.html">AWS: Accessing a relational database and DynamoDB</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>PostgreSQL i RDS</h3>
+    <p>Programmet öppnar en anslutning till port 5432 och skickar frågorna genom den, som med <code>pool</code> i <a href="0059-sql-parameter.html">lektion 59</a>.</p>
+  </div>
+  <div>
+    <h3>DynamoDB</h3>
+    <p>Ingen anslutning. Varje läsning och skrivning är ett eget anrop, som till ett API.</p>
+  </div>
+</div>
+
+<p>En <a href="0078-lambda-funktion.html">Lambda-funktion</a> har därför ingen databasanslutning att hålla öppen mellan anropen, som den i <a href="0083-exekveringsmiljo.html">lektion 83</a>.</p>
+</section>
+
+<section class="explain">
+<h2>Vem får läsa och skriva?</h2>
+
+<p>Den som har behörighet i IAM får det. DynamoDB har inga användarnamn eller lösenord. Varje anrop visar vem som skickar det, och IAM avgör om just det anropet är tillåtet. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html#ddb-intro-security">AWS: Security</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SQLtoNoSQL.Accessing.html">AWS: Accessing DynamoDB</a>)</span></p>
+
+<p>För en Lambda-funktion är det <a href="0087-execution-role.html">execution role</a>. Rollen som konsolen skapar får bara skriva loggar, så den får inte läsa tabellen förrän du lägger till det. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/permissions-executionrole-update.html#update-execution-role">AWS: Updating the execution role</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Funktionen ska spara en kund i DynamoDB. Vad måste koden hålla öppet mellan anropen?</p>
+  <div class="options">
+    <button class="opt" data-why="Port 5432 hör till PostgreSQL; mot DynamoDB hålls ingen anslutning öppen.">En öppen anslutning till port 5432</button>
+    <button class="opt" data-why="Konsolen används av dig, inte av koden, och koden behöver inget öppet.">En inloggning i konsolen hela tiden</button>
+    <button class="opt" data-correct data-why="DynamoDB är en webbtjänst där varje läsning och skrivning är ett eget anrop.">Inget, varje skrivning blir ett anrop</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad avgör om din Lambda-funktion får läsa en DynamoDB-tabell?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="IAM avgör varje anrop, och för funktionen gäller dess execution role.">Funktionens execution role i IAM</button>
+    <button class="opt" data-why="DynamoDB har inga lösenord; IAM avgör om anropet är tillåtet.">Ett lösenord i funktionens kod</button>
+    <button class="opt" data-why="DynamoDB har inga egna användare; IAM avgör om anropet är tillåtet.">En användare i själva tabellen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 39: vad betyder det att en databas är managed?</p>
+  <div class="options">
+    <button class="opt" data-why="Managed betyder tvärtom att AWS sköter driften åt dig.">Att du själv patchar en server</button>
+    <button class="opt" data-why="Managed handlar om vem som sköter driften, inte om var databasen nås.">Att den saknar en publik adress</button>
+    <button class="opt" data-correct data-why="Managed betyder att AWS sköter driften, och du använder databasen.">Att AWS sköter driften åt dig</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>DynamoDB är en managed databastjänst i AWS utan server, motor eller version att sköta. Datan sparas i tabeller.</li>
+    <li>Koden håller ingen anslutning öppen. Varje läsning och skrivning är ett eget HTTPS-anrop med ett svar.</li>
+    <li>DynamoDB har inga lösenord. IAM avgör varje anrop, och för en Lambda-funktion är det execution role.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html">Amazon DynamoDB: What is Amazon DynamoDB?</a>.</p>
+<p>Om anslutningen: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SQLtoNoSQL.Accessing.html">Amazon DynamoDB: Differences in accessing a relational (SQL) database and DynamoDB</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0087-execution-role.html">Förra: Execution role</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0089-item-och-attribut.html">Nästa: Item och attribut</a>
+</nav>
+
+</main>
+</body>
+</html>

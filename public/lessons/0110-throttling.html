@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Throttling</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 110 · v42, 40 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 110</p>
+<h1>Throttling</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att rate och burst sätter en gräns för hur många anrop per sekund API:et tar emot, och att anrop över gränsen får 429 utan att funktionen körs.
+</div>
+
+<section class="explain">
+<h2>Vad är throttling?</h2>
+
+<p>Throttling är en gräns för hur många anrop API Gateway släpper igenom per sekund. Du sätter den på en <a href="0106-stage-och-invoke-url.html">stage</a>, under <strong>Deploy → Stages → $default</strong> och sedan <strong>Throttling</strong>. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-throttling.html">AWS: Throttle requests to your HTTP APIs</a>, kursmaterialet v42)</span></p>
+
+<p>Gränsen gäller alla klienter tillsammans. Ett <a href="0103-http-api.html">HTTP API</a> kan inte sätta en gräns per klient. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html">AWS: REST APIs och HTTP APIs</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad är rate och burst?</h2>
+
+<p>Rate och burst är gränsens två tal. Varje anrop tar en pollett ur en hink. Är hinken tom, stoppas anropet. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html">AWS: Throttle requests, token bucket</a>)</span></p>
+
+<ul>
+  <li><strong>Burst</strong> är hur många polletter hinken rymmer: så många anrop får komma på en gång.</li>
+  <li><strong>Rate</strong> är hur många polletter som fylls på per sekund: takten i längden.</li>
+</ul>
+
+<div class="box note">
+  <span class="box-title">Ej exakt</span>
+  <p>AWS kallar gränsen ett mål. Ibland släpps fler anrop igenom.</p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad händer över gränsen?</h2>
+
+<p>API Gateway svarar <code>429 Too Many Requests</code>, med kroppen <code>{"message":"Too Many Requests"}</code>. Koden börjar på 4, så det räknas som <a href="0050-statuskod.html">klientens fel</a>. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-throttling.html">AWS: Throttle requests to your HTTP APIs</a>)</span></p>
+
+<p>Funktionen körs inte. Anropet syns därför inte i funktionens logg i <a href="0082-cloudwatch-logs.html">CloudWatch Logs</a>. Så skyddar gränsen funktionen, och <a href="0088-dynamodb.html">DynamoDB</a> bakom den, från en klient som skickar för många anrop. I <a href="0067-autentisering.html">lektion 67</a> hämtades 184 000 bokningar, utan någon sådan gräns.</p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Sätt gränsen så att din sida och dina tester ryms under den.</p>
+</div>
+</section>
+
+<div class="picker">
+  <p>Rate 5 och burst 2. Välj hur anropen kommer:</p>
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-tva">2 anrop på en gång</button>
+    <button class="chip" data-target="p-sex">6 anrop på en gång</button>
+    <button class="chip" data-target="p-takt">1 anrop i sekunden</button>
+  </div>
+  <div class="picker-panel" id="p-tva">
+    <p>Hinken har två polletter. Båda anropen får var sin.</p>
+    <p><span class="tag good">Fungerar</span> Funktionen körs två gånger.</p>
+  </div>
+  <div class="picker-panel" id="p-sex">
+    <p>Två anrop får polletter. Hinken är sedan tom, och resten får <code>429</code>.</p>
+    <p><span class="tag bad">Stoppad</span> Fyra anrop når aldrig funktionen.</p>
+  </div>
+  <div class="picker-panel" id="p-takt">
+    <p>Hinken fylls på snabbare än anropen tar polletter.</p>
+    <p><span class="tag good">Fungerar</span> Alla anrop går igenom.</p>
+  </div>
+</div>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Stagen har rate 5 och burst 2. Sex anrop kommer på exakt samma gång. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Rate är takten i längden; på en gång får bara burst, två anrop, plats.">Alla sex går igenom, för rate är fem</button>
+    <button class="opt" data-correct data-why="Hinken rymmer två polletter, så två går igenom och resten får 429.">Två går igenom, och fyra får svar 429</button>
+    <button class="opt" data-why="Gränsen stoppar bara anropen som inte får en pollett, inte alla.">Inget går igenom, då gränsen är nådd nu</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Ett anrop får 429 från API Gateway. Vad gör funktionen med anropet?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är API Gateway som svarar 429, inte funktionens kod.">Den körs och returnerar själv 429</button>
+    <button class="opt" data-correct data-why="API Gateway stoppar anropet innan det når funktionen, så den körs inte.">Ingenting, för den körs aldrig alls</button>
+    <button class="opt" data-why="Anropet når aldrig funktionen, så det finns inget svar att kasta.">Den körs, men svaret kastas sedan</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 50: <code>429</code> börjar på 4. Vad säger det om felet?</p>
+  <div class="options">
+    <button class="opt" data-why="Fel hos servern har koder som börjar på 5.">Att det var servern som kraschade sist</button>
+    <button class="opt" data-why="Koder som börjar på 2 betyder att det gick bra.">Att anropet gick bra, men svaret dröjde</button>
+    <button class="opt" data-correct data-why="4xx är klientens fel; här skickade klienten för många anrop.">Att klienten gjorde fel, här för ofta</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Throttling är en gräns för antal anrop per sekund, satt på en stage. I ett HTTP API gäller den alla klienter tillsammans.</li>
+    <li>Burst är hur många anrop som får komma på en gång. Rate är hur många per sekund som släpps igenom i längden.</li>
+    <li>Anrop över gränsen får <code>429 Too Many Requests</code> från API Gateway. Funktionen körs inte, så gränsen skyddar den och det bakom den.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-throttling.html">Amazon API Gateway: Throttle requests to your HTTP APIs</a>.</p>
+<p>Om rate och burst i hinken: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html">Amazon API Gateway: Throttle requests to your REST APIs</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0109-cors-i-api-gateway.html">Förra: CORS i API Gateway</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0111-miljovariabel-i-vite.html">Nästa: Miljövariabel i Vite</a>
+</nav>
+
+</main>
+</body>
+</html>

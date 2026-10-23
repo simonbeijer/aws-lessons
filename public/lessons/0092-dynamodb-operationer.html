@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DynamoDB-operationer</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 92 · v42, 22 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 92</p>
+<h1>DynamoDB-operationer</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad <code>GetItem</code>, <code>PutItem</code>, <code>UpdateItem</code>, <code>DeleteItem</code> och <code>Scan</code> gör med en DynamoDB-tabell, och att <code>Scan</code> läser hela tabellen.
+</div>
+
+<section class="explain">
+<h2>Vad är en operation?</h2>
+
+<p>En operation är ett <a href="0088-dynamodb.html">anrop till DynamoDB</a> som gör en sak med en tabell. Fyra av de fem kräver ett värde på <a href="0090-partitionsnyckel.html">partitionsnyckeln</a> <code>id</code> och rör bara det itemet. De gör det ett API gör med <a href="0049-http-metod.html">GET, POST, PUT och DELETE</a>. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html">AWS: Working with items</a>)</span></p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Operation</th><th>Vad den gör</th><th>Räknas som</th></tr></thead>
+  <tbody>
+    <tr><td><code>GetItem</code></td><td>Hämtar itemet med ett visst <code>id</code>.</td><td>läsning</td></tr>
+    <tr><td><code>PutItem</code></td><td>Sparar ett helt item. Samma <code>id</code> ersätter det gamla.</td><td>skrivning</td></tr>
+    <tr><td><code>UpdateItem</code></td><td>Ändrar <a href="0089-item-och-attribut.html">attribut</a> i ett item. Finns <code>id</code> inte, skapas itemet.</td><td>skrivning</td></tr>
+    <tr><td><code>DeleteItem</code></td><td>Tar bort itemet med ett visst <code>id</code>.</td><td>skrivning</td></tr>
+    <tr><td><code>Scan</code></td><td>Läser alla items.</td><td>läsning</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad gör Scan?</h2>
+
+<p>Scan läser varje item i tabellen. Den tar inget <code>id</code>, så DynamoDB går igenom alla items. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html">AWS: Scanning tables</a>)</span></p>
+
+<div class="picker">
+  <p>Tabellen har tre items. Välj en operation.</p>
+  <div class="picker-buttons">
+    <button class="chip" data-target="op-get">GetItem demo-2</button>
+    <button class="chip" data-target="op-scan">Scan</button>
+  </div>
+  <div class="picker-panel" id="op-get">
+    <p>Bara <strong><code>demo-2</code></strong> läses, inga andra.</p>
+  </div>
+  <div class="picker-panel" id="op-scan">
+    <p>Alla tre läses: <strong><code>demo-1</code>, <code>demo-2</code> och <code>demo-3</code></strong>.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad kostar en Scan?</h2>
+
+<p>En Scan kostar mer ju större tabellen är. I <a href="0091-on-demand-lage.html">on-demand-läge</a> betalar du per läsning, räknat efter hur många items som läses och hur stora de är. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html#Scan.CapacityUnits">AWS: Capacity units consumed by scan</a>)</span></p>
+
+<p>GetItem läser ett item, Scan läser alla. Har tabellen en miljon items läser Scan en miljon. Därför blir Scan dyrast i en stor tabell.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Funktionen ska lista alla kunder i tabellen. Vilken operation gör det?</p>
+  <div class="options">
+    <button class="opt" data-why="GetItem hämtar bara itemet med ett visst id, inte alla.">GetItem, som hämtar ett item</button>
+    <button class="opt" data-correct data-why="Scan tar inget id och läser varje item i tabellen.">Scan, som läser hela tabellen</button>
+    <button class="opt" data-why="UpdateItem ändrar ett item; den läser inte alla items åt dig.">UpdateItem, som ändrar ett item</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Varför kostar en Scan mer i en stor tabell än i en liten?</p>
+  <div class="options">
+    <button class="opt" data-why="I on-demand-läge finns ingen timavgift; du betalar per läsning.">Den kostar per timme för tabellen</button>
+    <button class="opt" data-correct data-why="Scan läser alla items, och varje läst item räknas in i kostnaden.">Den läser varje item i tabellen</button>
+    <button class="opt" data-why="Scan är en läsning; den skriver inte om några items.">Den skriver över itemen den läser</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 90: vad måste varje item ha för att sparas?</p>
+  <div class="options">
+    <button class="opt" data-why="Bara partitionsnyckeln är obligatorisk; name är ett valfritt attribut.">Attributet name med kundens fulla namn</button>
+    <button class="opt" data-why="Två items kan ha olika attribut; bara partitionsnyckeln måste finnas.">Samma attribut som de tidigare itemen</button>
+    <button class="opt" data-correct data-why="Partitionsnyckeln är obligatorisk, och utan den sparar DynamoDB inte itemet.">Partitionsnyckeln id med ett eget värde</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En operation är ett anrop till DynamoDB som gör en sak med en tabell. <code>GetItem</code>, <code>PutItem</code>, <code>UpdateItem</code> och <code>DeleteItem</code> hämtar, sparar, ändrar och tar bort ett item med ett visst <code>id</code>.</li>
+    <li><code>UpdateItem</code> skapar ett nytt item om <code>id</code> inte finns.</li>
+    <li><code>Scan</code> tar inget <code>id</code> och läser hela tabellen. I on-demand-läge betalar du för allt som läses, så Scan blir dyrare ju större tabellen är.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html">Amazon DynamoDB: Working with items and attributes</a>.</p>
+<p>Om Scan och vad den läser: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html">Amazon DynamoDB: Scanning tables</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0091-on-demand-lage.html">Förra: On-demand-läge</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0093-minsta-mojliga-behorighet.html">Nästa: Minsta möjliga behörighet</a>
+</nav>
+
+</main>
+</body>
+</html>

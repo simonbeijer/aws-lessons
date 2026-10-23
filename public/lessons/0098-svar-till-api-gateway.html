@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Svar till API Gateway</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 98 · v42, 28 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 98</p>
+<h1>Svar till API Gateway</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att svaret är ett objekt med <code>statusCode</code>, <code>headers</code> och <code>body</code> som sträng, och att ett fel som inte fångas ger klienten ett 5xx-fel med bara ett kort meddelande.
+</div>
+
+<section class="explain">
+<h2>Vad returnerar handlern?</h2>
+
+<p>Handlern returnerar ett objekt med tre delar: <code>statusCode</code>, <code>headers</code> och <code>body</code>. API Gateway gör om det till <a href="0048-http-anrop-och-svar.html">HTTP-svaret</a> som klienten får. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.v2">AWS: Lambda function response for format 2.0</a>)</span></p>
+
+<pre><code>return {
+  statusCode: 404,
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ error: "customer 999 not found" })
+};</code></pre>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Del</th><th>Blir i svaret</th></tr>
+  <tr><td><code>statusCode</code></td><td><a href="0050-statuskod.html">Statuskoden</a>, här 404.</td></tr>
+  <tr><td><code>headers</code></td><td><a href="0051-header.html">Headers</a>, här Content-Type.</td></tr>
+  <tr><td><code>body</code></td><td>Kroppen, alltid en sträng.</td></tr>
+</table>
+</div>
+
+<p>I <a href="0057-express.html">Express</a> skrev <code>res.status(404).json(...)</code> svaret. Här returnerar handlern det.</p>
+</section>
+
+<section class="explain">
+<h2>Varför är body en sträng?</h2>
+
+<p>Kroppen i ett HTTP-svar är text. <code>JSON.stringify</code> gör om ett objekt till en sträng med <a href="0052-json.html">JSON</a>, det omvända mot <code>JSON.parse</code> i <a href="0097-handelse-fran-api-gateway.html">lektion 97</a>. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">MDN: JSON.stringify()</a>)</span></p>
+
+<p>I konsolens testresultat syns citattecknen escapade:</p>
+
+<pre><code>"body": "{\"error\":\"customer 999 not found\"}"</code></pre>
+
+<p>Alla svar har samma form, och <code>body</code> är alltid en sträng.</p>
+</section>
+
+<section class="explain">
+<h2>Vad händer vid fel?</h2>
+
+<p>Klienten får ett <a href="0050-statuskod.html">5xx-fel</a> och bara <code>{"message":"Internal Server Error"}</code>. Det gäller ett kastat fel som inget fångar. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-troubleshooting-lambda.html#http-api-troubleshooting-lambda-internal-server-error">AWS: HTTP API Internal Server Error</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway-errors.html">AWS: Handling Lambda errors</a>)</span></p>
+
+<p>Att kasta ett fel, <code>throw</code>, stoppar koden direkt. Ett <code>try</code>/<code>catch</code> runt koden kan fånga felet och returnera ett eget svar, till exempel 404. Fångas felet inte, blir det inget svar från handlern. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw">MDN: throw</a>)</span></p>
+
+<p>Detaljerna hamnar bara i <a href="0082-cloudwatch-logs.html">CloudWatch Logs</a>.</p>
+
+<div class="box note">
+  <span class="box-title">500 eller 502?</span>
+  <p>Kursmaterialet säger 500. AWS felsida för Lambda säger 502 när funktionen kastar ett fel eller svarar i fel format. API Gateways felsökningssida anger ingen kod. Vilken som gäller är obekräftat. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway-errors.html">AWS: Handling Lambda errors with API Gateway</a>, <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-troubleshooting-lambda.html#http-api-troubleshooting-lambda-internal-server-error">AWS: HTTP API Internal Server Error</a>)</span></p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad måste <code>body</code> vara i svaret till API Gateway?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="body är alltid en sträng, ofta gjord med JSON.stringify.">En sträng med JSON, alltså text</button>
+    <button class="opt" data-why="Statuskoden står i statusCode; body är kroppen, som en sträng.">Ett tal som blir till statuskoden</button>
+    <button class="opt" data-why="body ska vara en sträng; ett objekt görs om med JSON.stringify först.">Ett objekt med fält för kunden</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Koden kastar ett fel som inget <code>try</code>/<code>catch</code> fångar. Vad får klienten?</p>
+  <div class="options">
+    <button class="opt" data-why="Detaljerna hamnar bara i CloudWatch Logs, aldrig hos klienten.">Hela felet med raderna från koden</button>
+    <button class="opt" data-why="Handlern gav inget svar, så det blir ett 5xx-fel, inte 200.">Statuskoden 200 och en tom kropp</button>
+    <button class="opt" data-correct data-why="Klienten får ett 5xx-fel och bara Internal Server Error.">En 5xx-kod och ett kort meddelande</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 97: hur gör koden om <code>event.body</code> till ett objekt?</p>
+  <div class="options">
+    <button class="opt" data-why="JSON har ingen metod object; strängen görs om med JSON.parse."><code>JSON.object(event.body)</code></button>
+    <button class="opt" data-why="String har ingen metod parse; strängen görs om med JSON.parse."><code>String.parse(event.body)</code></button>
+    <button class="opt" data-correct data-why="JSON.parse gör om JSON-strängen i body till ett objekt."><code>JSON.parse(event.body)</code></button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Handlern returnerar ett objekt med <code>statusCode</code>, <code>headers</code> och <code>body</code>, och API Gateway gör om det till HTTP-svaret.</li>
+    <li><code>body</code> är alltid en sträng. <code>JSON.stringify</code> gör om ett objekt till JSON-text.</li>
+    <li>Ett fel som inte fångas ger klienten ett 5xx-fel och bara Internal Server Error. Detaljerna finns i CloudWatch Logs.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.response">Amazon API Gateway: Lambda function response format</a>.</p>
+<p>Om fel: <a href="https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway-errors.html">AWS Lambda: Handling Lambda errors with an API Gateway API</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0097-handelse-fran-api-gateway.html">Förra: Händelse från API Gateway</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0099-uuid.html">Nästa: UUID</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Serverlöst</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 77 · v42, 7 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 77</p>
+<h1>Serverlöst</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att serverlöst betyder att du inte har någon server att sköta, och att du betalar per anrop i stället för medan en server står på.
+</div>
+
+<section class="explain">
+<h2>Vad betyder serverlöst?</h2>
+
+<p>Serverlöst betyder att du inte har någon server att sköta. Servrar finns ändå, eftersom koden måste köras någonstans. Men AWS äger och sköter dem. AWS startar dem, patchar dem och lägger till fler när trafiken ökar. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html">AWS: What is Lambda?</a>, <a href="https://aws.amazon.com/serverless/">AWS: Serverless</a>)</span></p>
+
+<p>Du lämnar bara din kod. Lambda, som nästa lektion handlar om, är AWS tjänst för serverlös kod. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html">AWS: What is Lambda?</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad skiljer det från EC2?</h2>
+
+<p>Skillnaden är vem som sköter servern. En <a href="0029-ec2-instans.html">EC2-instans</a>, som servrarna bakom en <a href="0075-application-load-balancer.html">lastbalanserare</a>, sköter du själv.</p>
+
+<div class="two-col">
+  <div>
+    <h3>EC2-instans</h3>
+    <p>Du väljer <a href="0030-ami.html">AMI</a> och <a href="0031-instanstyp.html">instanstyp</a>. Du <a href="0039-rds.html">patchar</a> operativsystemet. Du stoppar den när du är klar.</p>
+  </div>
+  <div>
+    <h3>Serverlöst</h3>
+    <p>Du lämnar din kod. AWS sköter resten. Det finns inget att stoppa.</p>
+  </div>
+</div>
+
+<p>Det finns heller ingen server att logga in på, som med <a href="0036-ec2-instance-connect.html">EC2 Instance Connect</a>.</p>
+</section>
+
+<section class="explain">
+<h2>Vad betalar du för?</h2>
+
+<p>Du betalar per anrop och för tiden koden körs. Kommer inga anrop kostar koden inget. <span class="src">(<a href="https://aws.amazon.com/lambda/pricing/">AWS: Lambda pricing</a>)</span></p>
+
+<p>En EC2-instans kostar per sekund så länge den körs, även när ingen använder den. En instans som står på hela natten kostar hela natten. Därför <a href="0038-stoppa-terminera.html">stoppar eller terminerar</a> du den. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html#ec2-pricing">AWS: Pricing for Amazon EC2</a>)</span></p>
+
+<p>Med Free plan ingår varje månad en miljon anrop till Lambda, plus en del körtid. Går du över dras det från krediterna. <span class="src">(<a href="https://aws.amazon.com/free/serverless/">AWS: Free Tier, Serverless</a>, <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier.html">AWS: Free Tier</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad betyder serverlöst?</p>
+  <div class="options">
+    <button class="opt" data-why="Servrarna finns, men det är AWS som äger och sköter dem.">Det finns inga servrar alls längre</button>
+    <button class="opt" data-correct data-why="Servrarna finns, men AWS startar, patchar och lägger till fler åt dig.">AWS sköter servrarna, inte du själv</button>
+    <button class="opt" data-why="Koden körs i AWS, inte på din dator; skillnaden är att AWS sköter servern.">Koden körs på din vanliga hemdator</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Ingen anropar din serverlösa kod på en hel vecka. Vad kostar koden?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Du betalar per anrop och körtid, så utan anrop kostar koden inget.">Inget, eftersom du betalar per anrop</button>
+    <button class="opt" data-why="Det gäller en EC2-instans som körs; serverlös kod kostar bara när den anropas.">Lika mycket som en körande instans</button>
+    <button class="opt" data-why="Det finns ingen timavgift; du betalar per anrop och för tiden koden körs.">En fast timavgift, oavsett antal anrop</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 38: du stoppar en EC2-instans. Vad betalar du för då?</p>
+  <div class="options">
+    <button class="opt" data-why="En stoppad instans kostar inget; det är disken som kostar.">Instansen per sekund, exakt som förut</button>
+    <button class="opt" data-correct data-why="Disken, EBS-volymen, finns kvar och kostar per GB och månad.">Bara för EBS-volymen som finns kvar</button>
+    <button class="opt" data-why="Disken finns kvar när instansen är stoppad, och den kostar.">Ingenting, för allt står avstängt nu</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Serverlöst betyder att AWS äger och sköter servrarna. Du lämnar bara din kod.</li>
+    <li>En EC2-instans väljer, patchar och stoppar du själv. Serverlöst finns inget sådant att göra.</li>
+    <li>Du betalar per anrop och för tiden koden körs. Utan anrop kostar koden inget, till skillnad från en instans som körs.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html">AWS Lambda: What is AWS Lambda?</a>.</p>
+<p>Om priset: <a href="https://aws.amazon.com/lambda/pricing/">AWS Lambda pricing</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0076-arn.html">Förra: ARN</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0078-lambda-funktion.html">Nästa: Lambda-funktion</a>
+</nav>
+
+</main>
+</body>
+</html>

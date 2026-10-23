@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swagger UI</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 66 · v41, 19 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 66</p>
+<h1>Swagger UI</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att Swagger UI ritar en webbsida ur OpenAPI-filen där varje anrop går att prova, och att alla som når sidan ser hela API:et.
+</div>
+
+<section class="explain">
+<h2>Vad är Swagger UI?</h2>
+
+<p>Swagger UI är ett verktyg som läser en <a href="0065-openapi.html">OpenAPI-fil</a> och ritar en webbsida ur den. Varje anrop, till exempel <code>GET /customers</code>, blir en rad du fäller ut, med kroppen det tar och svaren det ger. <span class="src">(<a href="https://swagger.io/tools/swagger-ui/">Swagger UI</a>, kursmaterialet v41)</span></p>
+
+<p>Ändrar du filen och startar om servern, ändras sidan. <span class="src">(kursmaterialet v41)</span></p>
+
+<p>I <a href="0057-express.html">Express</a> serverar paketet <code>swagger-ui-express</code>, färdig kod som installeras med <a href="0016-bygge.html">npm</a>, sidan på en sökväg du väljer, här <code>/docs</code>. <span class="src">(<a href="https://github.com/scottie1984/swagger-ui-express">swagger-ui-express</a>, kursmaterialet v41)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur provar man ett anrop?</h2>
+
+<p>Fäll ut anropet, klicka Try it out, fyll i och klicka Execute. Webbläsaren skickar då anropet till API:et. Under knappen visas <a href="0050-statuskod.html">statuskoden</a>, svaret och samma anrop som <a href="0054-curl.html">curl-kommando</a>. <span class="src">(kursmaterialet v41)</span></p>
+
+<p>Öppna sidan på samma adress och port som API:et, till exempel <code>http://&lt;publik IP&gt;:3000/docs</code>. Annars kan webbläsaren stoppa anropet, och Swagger UI visar Failed to fetch. <span class="src">(<a href="https://swagger.io/docs/open-source-tools/swagger-ui/usage/cors/">Swagger UI: CORS</a>, kursmaterialet v41)</span></p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Execute skickar ett riktigt anrop. <code>DELETE</code> tar bort kunden i databasen på riktigt.</p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vem ser sidan?</h2>
+
+<p>Alla som når porten. Släpper <a href="0035-kalla-i-regel.html">regeln</a> för port 3000 in <code>0.0.0.0/0</code>, kan vem som helst öppna <code>/docs</code>. <span class="src">(kursmaterialet v41)</span></p>
+
+<p>Sidan visar varje anrop som står i filen, även de du inte tänkt visa. Den skyddar ingenting. <span class="src">(kursmaterialet v41)</span></p>
+
+<p>En bokningsapp hade Swagger UI öppet på <code>/docs</code>. Där syntes ett anrop som gav ut bokningar utan inloggning. En utomstående hämtade 184 000 stycken. <span class="src">(kursens lektion sida 24–25)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Var hämtar Swagger UI det som står på sidan?</p>
+  <div class="options">
+    <button class="opt" data-why="Swagger UI läser inte koden; sidan ritas bara ur OpenAPI-filen.">Ur Express-koden i server.js</button>
+    <button class="opt" data-correct data-why="Sidan ritas ur OpenAPI-filen, så ändrar du filen ändras sidan.">Ur OpenAPI-filen för API:et</button>
+    <button class="opt" data-why="Swagger UI läser inte databasen; allt på sidan kommer ur OpenAPI-filen.">Ur tabellerna i RDS-databasen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du fyller i id 7 för <code>DELETE /customers/:id</code> och klickar Execute. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Execute provar inte låtsas; webbläsaren skickar ett riktigt anrop till API:et.">Bara ett exempelsvar visas</button>
+    <button class="opt" data-correct data-why="Anropet går till det riktiga API:et, så kund 7 tas bort på riktigt.">Kunden raderas ur databasen</button>
+    <button class="opt" data-why="Swagger UI ändrar aldrig filen; anropet går till API:et och tar bort kunden.">Raden försvinner ur filen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 35: regeln för port 3000 har källan <code>0.0.0.0/0</code>. Vem kan öppna <code>/docs</code>?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="0.0.0.0/0 är alla adresser, så alla som når porten ser sidan och alla anrop.">Alla adresser på internet</button>
+    <button class="opt" data-why="0.0.0.0/0 är alla adresser, inte bara din; My IP hade varit bara din dator.">Bara din egen IP-adress</button>
+    <button class="opt" data-why="Regeln gäller alla adresser utifrån, inte bara servern själv.">Bara servern via localhost</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Swagger UI ritar en webbsida ur OpenAPI-filen. I Express serverar <code>swagger-ui-express</code> den, här på <code>/docs</code>.</li>
+    <li>Try it out och Execute skickar ett riktigt anrop och visar statuskod, svar och curl-kommando. Öppna sidan på samma adress och port som API:et.</li>
+    <li>Alla som når porten ser sidan och varje anrop i filen. Sidan skyddar ingenting.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://swagger.io/tools/swagger-ui/">Swagger UI</a></p>
+<p>Se en sådan sida (valfritt): <a href="https://petstore.swagger.io">petstore.swagger.io</a>, ett demo-API med husdjur.</p>
+<p>Paketet för Express: <a href="https://github.com/scottie1984/swagger-ui-express">swagger-ui-express</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0065-openapi.html">Förra: OpenAPI</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0067-autentisering.html">Nästa: Autentisering</a>
+</nav>
+
+</main>
+</body>
+</html>

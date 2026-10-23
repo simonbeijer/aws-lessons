@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Miljövariabel i Lambda</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 94 · v42, 24 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 94</p>
+<h1>Miljövariabel i Lambda</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att <code>TABLE_NAME</code> sätts i funktionens konfiguration och läses med <code>process.env</code>, och att värdet läses när en ny exekveringsmiljö startar.
+</div>
+
+<section class="explain">
+<h2>Var sätter du den?</h2>
+
+<p>Du sätter den i funktionens <a href="0078-lambda-funktion.html">konfiguration</a> i konsolen, där du också ställer in <a href="0086-timeout.html">timeout</a>. Det är samma sorts <a href="0044-miljovariabel.html">miljövariabel som i lektion 44</a>, ett namn med ett värde, men du skriver inget <code>export</code> i terminalen. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html">AWS: Working with Lambda environment variables</a>)</span></p>
+
+<p>Under Configuration → Environment variables → Edit → Add environment variable fyller du i nyckel och värde. Nyckeln är namnet, <code class="copyable">TABLE_NAME</code>. Värdet är tabellens namn, <code class="copyable">v42-customers</code>. Sedan Save. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#create-environment-variables">AWS: Creating environment variables</a>)</span></p>
+
+<p>Tabellnamnet hör hemma i konfigurationen, inte i koden. Då kan samma kod köra mot en annan tabell: du byter värdet, inte koden.</p>
+</section>
+
+<section class="explain">
+<h2>Hur läser koden den?</h2>
+
+<p>Koden läser den med <code>process.env</code>, som i lektion 44. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#retrieve-environment-variables">AWS: Retrieving environment variables</a>)</span></p>
+
+<pre><code>const TABLE = process.env.TABLE_NAME; // en gång per miljö</code></pre>
+
+<p>Raden står utanför <a href="0080-handler.html">handlern</a>. Den körs alltså en gång, när en ny <a href="0083-exekveringsmiljo.html">exekveringsmiljö</a> startar, vid en <a href="0084-kallstart.html">kallstart</a>. Varje anrop till miljön använder sedan samma värde. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#static-initialization">AWS: Optimizing static initialization</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>När gäller ett nytt värde?</h2>
+
+<p>Ett nytt värde gäller när Save är klar. Du behöver inte klicka <a href="0078-lambda-funktion.html">Deploy</a>: Deploy sparar kod, Save sparar konfigurationen. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/functions-states.html#functions-states-updating">AWS: Function states during updates</a>)</span></p>
+
+<p>Lambda bygger varje ny miljö utifrån funktionens konfiguration, så miljön får variabeln. Den försvinner inte som i en stängd terminalflik. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html">AWS: Execution environment lifecycle</a>)</span></p>
+
+<p>Saknas variabeln blir värdet <code>undefined</code>, JavaScripts värde för något som inte finns. Koden hittar då ingen tabell.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Var sätter du <code>TABLE_NAME</code> för funktionen?</p>
+  <div class="options">
+    <button class="opt" data-why="export gäller bara terminalfliken; Lambda läser variabeln från funktionens konfiguration.">Med kommandot export i terminalfliken</button>
+    <button class="opt" data-correct data-why="Den sätts under Configuration → Environment variables och sparas med Save.">I funktionens konfiguration i konsolen</button>
+    <button class="opt" data-why="Står tabellnamnet i koden måste koden ändras för att byta tabell.">Direkt i koden, ovanför process.env</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. <code>const TABLE = process.env.TABLE_NAME;</code> står utanför handlern. Hur ofta läses värdet?</p>
+  <div class="options">
+    <button class="opt" data-why="Vid varje anrop körs bara handlern; koden utanför körs när miljön startar.">En gång i varje anrop, före handlern</button>
+    <button class="opt" data-why="Deploy sparar ny kod; raden körs först när en ny miljö startar.">En gång, när du har tryckt Deploy</button>
+    <button class="opt" data-correct data-why="Koden utanför handlern körs en gång per miljö, när miljön startar.">En gång per miljö, när den startar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 44: vem får en kopia av en variabel du sätter med <code>export</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Variabeln finns bara i den flik där du satte den, inte i andra flikar.">Alla terminalflikar på samma server</button>
+    <button class="opt" data-correct data-why="Varje program du startar från terminalen får en kopia av dess miljövariabler.">Programmen du startar från terminalen</button>
+    <button class="opt" data-why="Variabeln skrivs aldrig in i koden; det var just det den skulle undvika.">Projektkoden som ligger i Git-repot</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En miljövariabel i Lambda sätts i funktionens konfiguration, under Configuration → Environment variables, inte med <code>export</code> i terminalen. Save räcker, ingen Deploy behövs.</li>
+    <li>Koden läser den med <code>process.env.TABLE_NAME</code>. Tabellnamnet står i konfigurationen, så samma kod kan köra mot en annan tabell.</li>
+    <li>Raden utanför handlern körs en gång per miljö. En ny miljö får värdet från konfigurationen. Saknas variabeln blir värdet <code>undefined</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html">AWS Lambda: Working with Lambda environment variables</a>.</p>
+<p>Om när värdet gäller: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html">AWS Lambda: Execution environment lifecycle</a> och <a href="https://docs.aws.amazon.com/lambda/latest/dg/functions-states.html">AWS Lambda: Function states</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0093-minsta-mojliga-behorighet.html">Förra: Minsta möjliga behörighet</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0095-aws-sdk.html">Nästa: AWS SDK</a>
+</nav>
+
+</main>
+</body>
+</html>

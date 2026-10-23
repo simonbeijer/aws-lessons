@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Händelse från API Gateway</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 97 · v42, 27 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 97</p>
+<h1>Händelse från API Gateway</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Var metoden, sökvägen, id:t och kroppen står i eventet från API Gateway, och att <code>body</code> är en sträng där citattecknen inuti måste escapas.
+</div>
+
+<section class="explain">
+<h2>Vad skickar API Gateway?</h2>
+
+<p>API Gateway skickar hela HTTP-anropet, som ett event i JSON. Tjänsten från <a href="0070-mixed-content.html">lektion 70</a> tar emot anrop över HTTPS och kan skicka dem vidare till en <a href="0078-lambda-funktion.html">Lambda-funktion</a>. Då gör den om <a href="0048-http-anrop-och-svar.html">anropet</a> till ett <a href="0081-event-och-testhandelse.html">event</a>, som <a href="0080-handler.html">handlern</a> får. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#apigateway-example-event">AWS: Lambda med API Gateway</a>, <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.proxy-format-structure">AWS: Payload format structure</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Var står delarna?</h2>
+
+<p>Delarna står på fasta platser i eventet. Koden behöver fyra av dem, här för anropet <code>PUT /customers/abc-123</code>: <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.proxy-format-structure">AWS: Payload format structure</a>)</span></p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Del</th><th>I koden</th><th>Värde</th></tr>
+  <tr><td><a href="0049-http-metod.html">Metoden</a></td><td><code>event.requestContext.http.method</code></td><td><code>"PUT"</code></td></tr>
+  <tr><td><a href="0053-rest-api.html">Sökvägen</a></td><td><code>event.rawPath</code></td><td><code>"/customers/abc-123"</code></td></tr>
+  <tr><td>Id:t</td><td><code>event.pathParameters.id</code></td><td><code>"abc-123"</code></td></tr>
+  <tr><td>Kroppen</td><td><code>event.body</code></td><td><code>"{\"name\":\"Carol\"}"</code></td></tr>
+</table>
+</div>
+
+<p>Id:t finns där för att routen i API Gateway skrivs <code>PUT /customers/{id}</code>. Klammerparenteserna gör id till en sökvägsparameter, som <code>:id</code> i <a href="0057-express.html">Express</a>. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-routes.html#http-api-routes-path-variables">AWS: Path variables</a>)</span> Det riktiga eventet har fler fält. En testhändelse behöver bara dessa:</p>
+
+<pre><code>{
+  "rawPath": "/customers/abc-123",
+  "requestContext": { "http": { "method": "PUT" } },
+  "pathParameters": { "id": "abc-123" },
+  "body": "{\"name\":\"Carol\"}"
+}</code></pre>
+</section>
+
+<section class="explain">
+<h2>Varför escapas citattecknen?</h2>
+
+<p>Det beror på att <code>body</code> är en sträng, text inom dubbla citattecken, och kroppen inuti är JSON med egna citattecken. Ett vanligt <code>"</code> inuti avslutar strängen för tidigt, och då är testhändelsen inte <a href="0052-json.html">JSON</a>. Därför skrivs varje citattecken inuti som <code>\"</code>, med ett omvänt snedstreck före. Det kallas att escapa tecknet. <span class="src">(<a href="https://www.rfc-editor.org/rfc/rfc8259.html#section-7">RFC 8259: Strings</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="esc-ja">Escapad</button>
+    <button class="chip" data-target="esc-nej">Inte escapad</button>
+  </div>
+  <div class="picker-panel" id="esc-ja">
+<pre><code>"body": "{\"name\":\"Carol\"}"</code></pre>
+    <p>Rätt. Strängen slutar vid sista citattecknet.</p>
+  </div>
+  <div class="picker-panel" id="esc-nej">
+<pre><code>"body": "{"name":"Carol"}"</code></pre>
+    <p>Fel. Strängen slutar redan före <code>name</code>.</p>
+  </div>
+</div>
+
+<p>Koden gör om strängen till ett objekt med <code>JSON.parse(event.body)</code>. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse">MDN: JSON.parse()</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Anropet är <code>PUT /customers/abc-123</code>. Var står metoden PUT i eventet?</p>
+  <div class="options">
+    <button class="opt" data-why="rawPath innehåller bara sökvägen; metoden står i requestContext.http.method.">I rawPath, före sökvägen /customers</button>
+    <button class="opt" data-correct data-why="Metoden står i event.requestContext.http.method.">I requestContext, under delen http</button>
+    <button class="opt" data-why="pathParameters har bara delar av sökvägen, som id:t; metoden står i requestContext.http.method.">I pathParameters, nära id:t abc-123</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Kroppen ska vara <code>{"name":"Carol"}</code>. Vilken rad i testhändelsen är rätt?</p>
+  <div class="options">
+    <button class="opt" data-why="Citattecknet efter Carol är inte escapat, så strängen slutar för tidigt."><code>"body": "{\"name\":\"Carol"}"</code></button>
+    <button class="opt" data-correct data-why="Varje citattecken inuti strängen har ett omvänt snedstreck före."><code>"body": "{\"name\":\"Carol\"}"</code></button>
+    <button class="opt" data-why="De yttre citattecknen ska inte escapas, för de startar och avslutar strängen."><code>"body": \"{\"name\":\"Carol\"}\"</code></button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 81: vem bestämmer vad eventet innehåller?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Anroparen bestämmer eventets innehåll, och API Gateway skickar sitt eget format.">Anroparen, här API Gateway</button>
+    <button class="opt" data-why="Handlern tar emot eventet; det är anroparen som bestämmer vad som står i det.">Handlern, när den startar</button>
+    <button class="opt" data-why="Lambda lämnar bara eventet vidare; innehållet bestäms av anroparen.">Lambda, likadant för alla</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>API Gateway gör om HTTP-anropet till ett event i JSON och ger det till handlern.</li>
+    <li>Metoden står i <code>event.requestContext.http.method</code>, sökvägen i <code>event.rawPath</code>, id:t i <code>event.pathParameters.id</code> och kroppen i <code>event.body</code>.</li>
+    <li><code>body</code> är en sträng. Citattecknen inuti skrivs <code>\"</code>, och koden gör om strängen till ett objekt med <code>JSON.parse</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html">Amazon API Gateway: Lambda proxy integrations for HTTP APIs</a>.</p>
+<p>Om escapade citattecken: <a href="https://www.rfc-editor.org/rfc/rfc8259.html#section-7">RFC 8259: Strings</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0096-documentclient.html">Förra: DocumentClient</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0098-svar-till-api-gateway.html">Nästa: Svar till API Gateway</a>
+</nav>
+
+</main>
+</body>
+</html>

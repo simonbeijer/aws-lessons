@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lambda-funktion</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 78 · v42, 8 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 78</p>
+<h1>Lambda-funktion</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en Lambda-funktion är kod plus konfiguration som körs när en händelse kommer, utan server, port eller process som väntar, och att ny kod gäller först efter Deploy.
+</div>
+
+<section class="explain">
+<h2>Vad är en Lambda-funktion?</h2>
+
+<p>En Lambda-funktion är din kod plus konfiguration, alltså inställningar som till exempel funktionens namn. Den ligger i Lambda, AWS tjänst för <a href="0077-serverlost.html">serverlös</a> kod. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/concepts-basics.html">AWS: How Lambda works</a>)</span></p>
+
+<p>Lambda kör koden när en händelse kommer, alltså när något <a href="0048-http-anrop-och-svar.html">anropar</a> funktionen. När koden är klar slutar den köra. I konsolen heter den här sortens funktion Event function. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/concepts-basics.html">AWS: How Lambda works</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html">AWS: What is AWS Lambda?</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad skiljer den från Express?</h2>
+
+<p>Ingenting väntar mellan anropen. Din <a href="0057-express.html">Express</a>-server var en <a href="0060-process-i-bakgrunden.html">process</a> som <a href="0033-port.html">lyssnade på port 3000</a> hela tiden, även när ingen anropade.</p>
+
+<div class="two-col">
+  <div>
+    <h3>Express-server</h3>
+    <p>Du startar en process med <code>node server.js</code>. Den lyssnar på en port och väntar. Stoppas processen svarar ingen.</p>
+  </div>
+  <div>
+    <h3>Lambda-funktion</h3>
+    <p>Ingen port och ingen process som väntar. Utan anrop finns bara koden och konfigurationen.</p>
+  </div>
+</div>
+
+</section>
+
+<section class="explain">
+<h2>När gäller ny kod?</h2>
+
+<p>Ny kod gäller först när du har klickat Deploy. Du skriver koden i en editor på funktionens sida i konsolen. Deploy är knappen som sparar den i funktionen. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/getting-started.html">AWS: Create your first Lambda function</a>)</span></p>
+
+<p>Kör du funktionen utan Deploy körs den gamla koden. Det liknar när du ändrade Express-koden och fick köra <a href="0060-process-i-bakgrunden.html"><code>pkill node</code></a> och starta servern igen.</p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Ändra koden, klicka Deploy, vänta tills konsolen säger att det är klart, och kör sedan.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Ingen anropar din Lambda-funktion på en timme. Vad gör den under tiden?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Utan anrop körs ingenting; funktionen finns bara som kod och konfiguration.">Inget, den är bara kod och inställningar då</button>
+    <button class="opt" data-why="Det gör en Express-server; en Lambda-funktion har ingen port som den lyssnar på.">Den lyssnar på port 3000 tills någon anropar</button>
+    <button class="opt" data-why="Ingen process väntar; Lambda kör koden först när en händelse kommer.">Den körs hela tiden i bakgrunden som process</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du ändrar koden i editorn och kör funktionen direkt. Du får det gamla svaret. Varför?</p>
+  <div class="options">
+    <button class="opt" data-why="Det finns ingen process att stoppa; ny kod gäller när du klickat Deploy.">Du har inte stoppat processen med pkill node</button>
+    <button class="opt" data-why="Du anropade ju direkt efter; utan Deploy körs ändå den gamla koden.">Den nya koden gäller först vid nästa anrop</button>
+    <button class="opt" data-correct data-why="Utan Deploy kör funktionen fortfarande den gamla koden.">Du har inte klickat på Deploy efter ändringen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 60: vad gör <code>nohup</code> i <code>nohup node server.js &amp;</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Det gör &amp;; nohup gör att servern struntar i signalen hangup.">Kör servern i bakgrunden, terminalen blir fri</button>
+    <button class="opt" data-why="Tvärtom: nohup gör att servern kör kvar när fliken stängs.">Stoppar servern så fort du stänger fliken</button>
+    <button class="opt" data-correct data-why="nohup gör att processen struntar i signalen hangup, så den kör kvar.">Låter servern köra vidare när fliken stängs</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En Lambda-funktion är kod plus konfiguration. Lambda kör koden när en händelse kommer, alltså när något anropar den.</li>
+    <li>Till skillnad från en Express-server finns ingen server, ingen port och ingen process som väntar mellan anropen.</li>
+    <li>Ny kod gäller först efter Deploy. Utan Deploy körs den gamla koden.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/concepts-basics.html">AWS Lambda: How Lambda works</a>.</p>
+<p>Om Deploy: <a href="https://docs.aws.amazon.com/lambda/latest/dg/getting-started.html">AWS Lambda: Create your first Lambda function</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0077-serverlost.html">Förra: Serverlöst</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0079-runtime.html">Nästa: Runtime</a>
+</nav>
+
+</main>
+</body>
+</html>

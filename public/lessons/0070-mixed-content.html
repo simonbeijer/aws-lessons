@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mixed content</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 70 · v41, 23 av 23 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 70</p>
+<h1>Mixed content</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Varför din sida på Amplify, som har HTTPS, inte får anropa ditt API över HTTP, och att API Gateway löser det i v42.
+</div>
+
+<section class="explain">
+<h2>Vad är HTTPS?</h2>
+
+<p>HTTPS är HTTP med kryptering. Ingen på vägen kan läsa eller ändra anropet och svaret. Med HTTP går allt som klartext. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Mixed_content">MDN: Mixed content</a>)</span></p>
+
+<p>Din sida på <a href="0017-amplify-hosting.html">Amplify</a> har en adress som börjar med <code>https://</code>. Ditt API på EC2 nås bara med <code>http://</code>. <span class="src">(kursens lektion sida 18)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad stoppar webbläsaren?</h2>
+
+<p>Webbläsaren stoppar anrop över HTTP från JavaScript på en sida som laddats över HTTPS. Annars kunde någon på vägen läsa eller ändra det sidan skickar och får. Att en HTTPS-sida hämtar något över HTTP kallas mixed content. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Mixed_content">MDN: Mixed content</a>)</span></p>
+
+<p>Anropet lämnar aldrig webbläsaren. I <a href="0056-network-fliken.html">Network-fliken</a> står det <code>blocked:mixed-content</code>, och koden får <a href="0066-swagger-ui.html">Failed to fetch</a>. <span class="src">(kursmaterialet v41)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3><a href="0069-cors.html">CORS</a></h3>
+    <p>Servern svarar, men koden får inte läsa. En header löser det.</p>
+  </div>
+  <div>
+    <h3>Mixed content</h3>
+    <p>Anropet når aldrig servern. Ingen header löser det.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Hur löser API Gateway det?</h2>
+
+<p>API Gateway ger ditt API en HTTPS-adress. Det är en AWS-tjänst som tar emot anropen och skickar dem vidare till ditt API. Den har bara HTTPS-adresser. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/data-protection-encryption.html#data-protection-in-transit">AWS: Data encryption in API Gateway</a>, <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-http.html">AWS: HTTP proxy integrations</a>)</span></p>
+
+<p>Sidan anropar API Gateway över HTTPS, och API Gateway skickar anropet till servern på EC2. I sidans kod byts bara API:ets adress. <span class="src">(kursmaterialet v41)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Sidan på <code>https://main.xxxx.amplifyapp.com</code> anropar <code>http://16.170.12.34:3000/customers</code>. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är CORS; vid mixed content når anropet aldrig servern.">Servern svarar, men koden får inte läsa svaret</button>
+    <button class="opt" data-correct data-why="En HTTPS-sida får inte anropa över HTTP, så webbläsaren stoppar anropet.">Det stoppas i webbläsaren och når aldrig servern</button>
+    <button class="opt" data-why="Webbläsaren stoppar anropet, eftersom sidan har HTTPS och API:et bara HTTP.">Anropet går fram, och listan visas som vanligt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad löser mixed content mellan sidan på Amplify och API:et?</p>
+  <div class="options">
+    <button class="opt" data-why="Anropet når aldrig servern, så ingen header från servern hjälper.">En CORS-header från servern i varje svar</button>
+    <button class="opt" data-correct data-why="API Gateway har en HTTPS-adress och skickar anropen vidare till ditt API.">API Gateway med HTTPS framför ditt API</button>
+    <button class="opt" data-why="Problemet är API:ets HTTP-adress, inte sidans; sidan ska ha kvar HTTPS.">Att sidan på Amplify laddas över HTTP</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 69: Vilka delar av en adress avgör ursprunget?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Skiljer en av de tre delarna är det ett annat ursprung.">Schemat, värden och porten</button>
+    <button class="opt" data-why="Sökvägen räknas inte; ursprunget är schema, värd och port.">Värden, porten och sökvägen</button>
+    <button class="opt" data-why="Sökvägen räknas inte, men porten gör det; ursprunget är schema, värd och port.">Schemat, värden och sökvägen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>HTTPS är HTTP med kryptering. Sidan på Amplify har HTTPS, API:et på EC2 bara HTTP.</li>
+    <li>Mixed content: en HTTPS-sida får inte anropa något över HTTP. Webbläsaren stoppar anropet innan det skickas, och ingen header från servern hjälper.</li>
+    <li>API Gateway har bara HTTPS-adresser och skickar anropen vidare till ditt API. Det löser problemet.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Mixed_content">MDN: Mixed content</a>.</p>
+<p>Om API Gateway och HTTPS: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/data-protection-encryption.html#data-protection-in-transit">AWS: Data encryption in Amazon API Gateway</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0069-cors.html">Förra: CORS</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0071-aws-cloudshell.html">Nästa: AWS CloudShell</a>
+</nav>
+
+</main>
+</body>
+</html>

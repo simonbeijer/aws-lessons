@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Item och attribut</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 89 · v42, 19 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 89</p>
+<h1>Item och attribut</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en rad i en DynamoDB-tabell heter item, att den består av attribut, alltså par av namn och värde, och att två items i samma tabell kan ha olika attribut.
+</div>
+
+<section class="explain">
+<h2>Vad är ett item?</h2>
+
+<p>Ett item är en rad i en <a href="0088-dynamodb.html">DynamoDB</a>-tabell, till exempel en kund i tabellen <code class="copyable">v42-customers</code>. Det liknar en rad i en <a href="0039-rds.html">relationsdatabas</a>. En tabell kan ha hur många items som helst. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html#HowItWorks.CoreComponents.TablesItemsAttributes">AWS: Tables, items, and attributes</a>)</span></p>
+
+<p>I DynamoDB-konsolen öppnar du tabellen och väljer Explore table items för att se itemen. Create item lägger till ett nytt. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/getting-started-step-2.html">AWS: Write data to a table</a>)</span></p>
+
+<p>Här skrivs ett item som ett <a href="0052-json.html">JSON-objekt</a>, som AWS gör i sina exempel: <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html#HowItWorks.CoreComponents.TablesItemsAttributes">AWS: Tables, items, and attributes</a>)</span></p>
+
+<pre><code>{ "id": "demo-1", "name": "Alice" }</code></pre>
+</section>
+
+<section class="explain">
+<h2>Vad är ett attribut?</h2>
+
+<p>Ett attribut är ett par av namn och värde i ett item, som <code>"name": "Alice"</code>. Itemet ovan har två attribut: <code>id</code> och <code>name</code>. Ett attribut liknar en kolumn i en relationsdatabas. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html#HowItWorks.CoreComponents.TablesItemsAttributes">AWS: Tables, items, and attributes</a>)</span></p>
+
+<p>Varje värde har en typ, till exempel String för text eller Number för tal. I konsolen väljer du Add new attribute, sedan typen, och fyller i namn och värde. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes">AWS: Data types</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/getting-started-step-2.html">AWS: Write data to a table</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Kan items ha olika attribut?</h2>
+
+<p>Ja. Varje item har sina egna attribut. Utom <code>id</code> bestäms inga attribut när tabellen skapas. I en relationsdatabas bestämmer schemat kolumnerna i förväg, och varje rad har samma kolumner. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes">AWS: Data types</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Alice, två attribut</h3>
+<pre><code>{ "id": "demo-1",
+  "name": "Alice" }</code></pre>
+  </div>
+  <div>
+    <h3>Carol, tre attribut</h3>
+<pre><code>{ "id": "demo-2",
+  "name": "Carol",
+  "created_at": "2026-10-22" }</code></pre>
+  </div>
+</div>
+
+<p>Båda ligger i samma tabell. Alice saknar <code>created_at</code>, och det är inget fel. Ett attribut måste ändå finnas i alla items: <code>id</code>. Nästa lektion förklarar varför. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html#HowItWorks.CoreComponents.TablesItemsAttributes">AWS: Tables, items, and attributes</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Hur många attribut har itemet <code>{ "id": "demo-1", "name": "Alice" }</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Hela objektet är ett item; varje par av namn och värde i det är ett attribut.">Ett, allt i det är ett attribut</button>
+    <button class="opt" data-correct data-why="Varje par av namn och värde är ett attribut, och här finns två par.">Två, id och name med sina värden</button>
+    <button class="opt" data-why="Ett attribut är namnet och värdet tillsammans, så två par blir två attribut.">Fyra, både två namn och två värden</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Alice har <code>id</code> och <code>name</code>. Du lägger till Carol med <code>id</code>, <code>name</code> och <code>created_at</code>. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Items i samma tabell får ha olika attribut, så Carol sparas.">Carol nekas, för Alice saknar det</button>
+    <button class="opt" data-correct data-why="Varje item har sina egna attribut, så Carol sparas med tre och Alice har kvar två.">Carol sparas med sina tre attribut</button>
+    <button class="opt" data-why="Ett item ändras inte av att ett annat item får fler attribut.">Alice får ett tomt created_at också</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 52: vad är ett JSON-objekt?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Ett JSON-objekt är par av namn och värde inom { }, precis som ett item.">Par av namn och värde inom { }</button>
+    <button class="opt" data-why="Värden inom [ ] är en lista, inte ett objekt.">En lista av bara värden i [ ]</button>
+    <button class="opt" data-why="Ett JSON-objekt är data inom { }, inte ett filnamn.">Ett namn på en fil i en mapp</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett item är en rad i en DynamoDB-tabell, till exempel en kund. Du ser itemen under Explore table items i konsolen.</li>
+    <li>Ett attribut är ett par av namn och värde i itemet, som <code>"name": "Alice"</code>. Värdet har en typ, till exempel String.</li>
+    <li>Två items i samma tabell kan ha olika attribut. Bara <code>id</code> måste finnas i alla. Nästa lektion förklarar varför.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html">Amazon DynamoDB: Core components</a>.</p>
+<p>Om typerna: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html">Amazon DynamoDB: Supported data types and naming rules</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0088-dynamodb.html">Förra: DynamoDB</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0090-partitionsnyckel.html">Nästa: Partitionsnyckel</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stage och Invoke URL</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 106 · v42, 36 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 106</p>
+<h1>Stage och Invoke URL</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en stage är en driftsatt version av API:et med egen adress, och att <code>$default</code> med auto-deploy gör ändringar aktiva direkt.
+</div>
+
+<section class="explain">
+<h2>Vad är en stage?</h2>
+
+<p>En stage är en driftsatt version av ditt <a href="0103-http-api.html">HTTP API</a>, med en egen adress. Varje stage har ett namn, till exempel <code>dev</code> eller <code>prod</code>. Ditt API får stagen <code>$default</code> när du skapar det. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-stages.html">AWS: Stages for HTTP APIs</a>)</span></p>
+
+<p>Att driftsätta (deploy) är att ta en ögonblicksbild av API:ets <a href="0104-route-i-api-gateway.html">routes</a> och <a href="0105-integration.html">integrationer</a> och lägga ut den på en stage. Först då kan klienter anropa ändringarna. Det liknar <a href="0078-lambda-funktion.html">Deploy i Lambda</a>, men gäller API:et, inte funktionens kod. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-stages.html">AWS: Stages for HTTP APIs</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad är Invoke URL?</h2>
+
+<p>Invoke URL är stagens adress, till exempel:</p>
+
+<pre><code>https://ab12cd34ef.execute-api.eu-north-1.amazonaws.com</code></pre>
+
+<p>Du ser den överst på API:ets sida i konsolen. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-dynamo-db.html#http-api-dynamo-db-invoke-api">AWS: Test your API</a>)</span> <code>ab12cd34ef</code> är id:t som AWS gav ditt API, och <code>eu-north-1</code> är regionen. Stagen <code>$default</code> har inget namn i adressen. Routen skrivs direkt efter, som <code>/customers</code>. En stage med annat namn står före routen, som <code>/prod/customers</code>. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-publish.html">AWS: Publish HTTP APIs</a>)</span></p>
+
+<p>Skriver du <code>/$default</code> i adressen svarar API Gateway <a href="0014-static-website-hosting.html">Forbidden</a>. <span class="src">(kursmaterialet v42)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad gör auto-deploy?</h2>
+
+<p>Med auto-deploy driftsätts varje ändring i API:et direkt. En ny route gäller utan att du klickar Deploy. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-stages.html">AWS: Stages for HTTP APIs</a>)</span> Stagen <code>$default</code> får auto-deploy när du skapar API:et, i steget <strong>Define stages</strong>.</p>
+
+<p>Utan auto-deploy anropar klienten den gamla versionen tills du driftsätter. Saknas Invoke URL: gå till <strong>Deploy → Stages → $default</strong>, slå på <strong>Auto-deploy</strong> och klicka <strong>Deploy</strong>.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Din stage heter <code>$default</code>. Vad står direkt efter <code>.amazonaws.com</code> när du anropar <code>GET /customers</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Stagen $default har inget namn i adressen; skriver du /$default får du Forbidden.">Stagen /$default och sedan /customers</button>
+    <button class="opt" data-correct data-why="Stagen $default nås direkt på adressen, så routen skrivs direkt efter.">Bara routen /customers, ingenting före</button>
+    <button class="opt" data-why="Funktionens namn finns inte i adressen; där står bara API:ets id och region.">Namnet /v42-api och sedan /customers</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Auto-deploy är på. Du lägger till en route. När kan klienter anropa den?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Auto-deploy driftsätter varje ändring i API:et direkt.">Direkt, utan att du klickar</button>
+    <button class="opt" data-why="Med auto-deploy driftsätts ändringen åt dig, utan att du gör något.">Först när du driftsatt API:et</button>
+    <button class="opt" data-why="Routen hör till API:et; funktionens kod behöver inte ändras.">När funktionen fått ny kod</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 78: du ändrar koden i <code>v42-api</code>. När gäller den nya koden?</p>
+  <div class="options">
+    <button class="opt" data-why="Auto-deploy driftsätter API:ets routes och integrationer, inte funktionens kod.">Direkt, för stagen har auto-deploy</button>
+    <button class="opt" data-correct data-why="Ny kod gäller först efter Deploy i Lambda; auto-deploy gäller bara API:et.">Efter Deploy på funktionens sida</button>
+    <button class="opt" data-why="Stagen visar API:et; funktionens kod gäller först efter Deploy i Lambda.">När stagen driftsätter API:et igen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En stage är en driftsatt version av API:et, med egen adress. Att driftsätta är att lägga ut API:ets routes och integrationer på stagen.</li>
+    <li>Invoke URL är stagens adress. Stagen <code>$default</code> har inget namn i adressen, så routen skrivs direkt efter <code>.amazonaws.com</code>.</li>
+    <li>Med auto-deploy gäller varje ändring i API:et direkt. Funktionens kod gäller fortfarande först efter Deploy i Lambda.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-stages.html">Amazon API Gateway: Stages for HTTP APIs</a>.</p>
+<p>Om var du hittar Invoke URL: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-dynamo-db.html#http-api-dynamo-db-invoke-api">Amazon API Gateway: Tutorial: Create a CRUD HTTP API with Lambda and DynamoDB</a> (steg 7).</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0105-integration.html">Förra: Integration</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0107-resource-based-policy.html">Nästa: Resource-based policy</a>
+</nav>
+
+</main>
+</body>
+</html>

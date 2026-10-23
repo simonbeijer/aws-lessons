@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skalvariabel</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 73 · v42, 3 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 73</p>
+<h1>Skalvariabel</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att <code>API=https://...</code> sparar ett värde som <code>$API</code> läser i nästa kommando, och att variabeln utan <code>export</code> bara finns i skalet.
+</div>
+
+<section class="explain">
+<h2>Vad är en skalvariabel?</h2>
+
+<p>En skalvariabel är ett namn med ett värde som bash håller i minnet. Bash är skalet: <a href="0037-user-data.html">programmet</a> som läser det du skriver i terminalen, även i <a href="0071-aws-cloudshell.html">CloudShell</a>. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Shell-Parameters.html">GNU Bash: Shell Parameters</a>, <a href="https://docs.aws.amazon.com/cloudshell/latest/userguide/getting-started.html#launch-region-shell">AWS: Bash i CloudShell</a>)</span></p>
+
+<p>Du skapar den med namnet, ett likhetstecken och värdet. Inga mellanslag runt likhetstecknet, annars läser bash raden som ett kommando.</p>
+
+<pre><code>API=https://ab12cd34ef.execute-api.eu-north-1.amazonaws.com</code></pre>
+
+<p>Adressen är påhittad. Den ser ut som HTTPS-adressen <a href="0070-mixed-content.html">API Gateway</a> ger ditt API, och du byter den mot din egen.</p>
+</section>
+
+<section class="explain">
+<h2>Hur läser du värdet?</h2>
+
+<p>Skriv <code>$</code> före namnet. Bash byter ut <code>$API</code> mot värdet innan kommandot körs. Det är samma idé som <a href="0061-variabel-i-postman.html"><code>{{baseUrl}}</code> i Postman</a>, fast i terminalen. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html">GNU Bash: Parameter Expansion</a>)</span></p>
+
+<div class="two-col">
+  <div>
+    <h3>Det du skriver</h3>
+    <p><code class="copyable">curl -i $API/customers</code></p>
+  </div>
+  <div>
+    <h3>Det som körs</h3>
+    <p><code>curl -i https://ab12cd34ef.execute-api.eu-north-1.amazonaws.com/customers</code></p>
+  </div>
+</div>
+
+<p>Adressen står på ett ställe, så du slipper skriva den i varje <a href="0054-curl.html">curl-kommando</a>.</p>
+</section>
+
+<section class="explain">
+<h2>Vad ändrar export?</h2>
+
+<p>Med <code>export</code> blir variabeln en <a href="0044-miljovariabel.html">miljövariabel</a>, och ett program du startar, till exempel ett Node.js-program, får en kopia. Utan <code>export</code> finns den bara i skalet, och programmet får den inte. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html">GNU Bash: export</a>, <a href="https://www.gnu.org/software/bash/manual/html_node/Environment.html">GNU Bash: Environment</a>)</span></p>
+
+<p>För <code>curl -i $API/customers</code> räcker det utan <code>export</code>. Bash har redan bytt ut <code>$API</code> när curl startar, så curl behöver aldrig variabeln.</p>
+
+<p>Precis som en miljövariabel försvinner den när du stänger terminalfliken.</p>
+</section>
+
+<h3>Prova själv (valfritt)</h3>
+
+<p><code>echo</code> skriver ut värdet.</p>
+
+<pre><code>API=https://example.com
+echo $API/customers</code></pre>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad gör bash med <code>$API</code> i <code>curl -i $API/customers</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Bash byter ut $API innan curl startar, så curl ser bara adressen och aldrig namnet.">Låter curl själv slå upp namnet $API</button>
+    <button class="opt" data-correct data-why="$ följt av ett namn byts mot variabelns värde innan kommandot körs.">Byter ut den mot värdet före körningen</button>
+    <button class="opt" data-why="Bash läser värdet ur skalet; export behövs bara för att ett program ska få variabeln.">Kräver export innan värdet går att nå</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du kör <code>API=https://...</code> utan <code>export</code> och startar sedan ett Node.js-program. Får programmet <code>API</code>?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Utan export finns variabeln bara i skalet, så programmet får ingen kopia.">Nej, variabeln finns bara i skalet</button>
+    <button class="opt" data-why="Ett program får bara exporterade variabler, och den här exporterades inte.">Ja, alla variabler följer med dit</button>
+    <button class="opt" data-why="Fliken spelar ingen roll här; utan export stannar variabeln i skalet.">Ja, så länge terminalfliken är öppen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 44: hur läser ett Node.js-program miljövariabeln <code>DB_PASSWORD</code>?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="process.env.DB_PASSWORD läser värdet ur listan över miljövariabler programmet fick.">Via process.env i Node.js-koden</button>
+    <button class="opt" data-why="$DB_PASSWORD fungerar i bash, men Node.js läser variabeln med process.env.">Via $DB_PASSWORD i Node.js-koden</button>
+    <button class="opt" data-why="export sätter variabeln i bash, men i koden läser Node.js den med process.env.">Via export-raden i Node.js-koden</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>API=https://...</code> skapar en skalvariabel: ett namn med ett värde i bash. Inga mellanslag runt likhetstecknet.</li>
+    <li><code>$API</code> byts mot värdet innan kommandot körs, så adressen står på ett ställe.</li>
+    <li>Utan <code>export</code> finns variabeln bara i skalet. Med <code>export</code> blir den en miljövariabel som programmet du startar får.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://www.gnu.org/software/bash/manual/html_node/Shell-Parameters.html">GNU Bash Reference Manual: Shell Parameters</a>.</p>
+<p>Om <code>$</code>: <a href="https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html">GNU Bash: Shell Parameter Expansion</a>. Om <code>export</code>: <a href="https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html">GNU Bash: Bourne Shell Builtins</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0072-aws-cli.html">Förra: AWS CLI</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0074-kommandosubstitution.html">Nästa: Kommandosubstitution</a>
+</nav>
+
+</main>
+</body>
+</html>

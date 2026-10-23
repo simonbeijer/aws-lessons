@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duration och Billed Duration</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 85 · v42, 15 av 41 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 85</p>
+<h1>Duration och Billed Duration</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad fälten på REPORT-raden säger om tid och minne, och att Billed Duration är den tid du betalar för, med Init Duration inräknad vid en kallstart.
+</div>
+
+<section class="explain">
+<h2>Vad är Duration?</h2>
+
+<p>Duration är tiden handlern tog att köra anropet, i millisekunder. Fältet står på <a href="0084-kallstart.html">REPORT-raden</a>, direkt efter <code>RequestId</code>. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html#node-logging-output">AWS: REPORT line data fields</a>)</span></p>
+
+<p><code>RequestId</code> är anropets id. Det är samma id som handlern får i <a href="0080-handler.html"><code>context</code></a>. Samma id står på anropets övriga rader i loggen, så du hittar alla rader som hör till ett anrop. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html#node-logging-output">AWS: Log format</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-context.html">AWS: Context object</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad är Billed Duration?</h2>
+
+<p>Billed Duration är tiden AWS tar betalt för. Den är Duration avrundad uppåt till hel millisekund. Vid en kallstart läggs <code>Init Duration</code> till före avrundningen. Därför skiljer sig de två fälten. <span class="src">(<a href="https://aws.amazon.com/blogs/compute/aws-lambda-standardizes-billing-for-init-phase/">AWS: Billing for INIT phase</a>)</span></p>
+
+<p>Det är körtiden från <a href="0077-serverlost.html">lektion 77</a>. På Free plan räknas den mot körtiden som ingår varje månad. <span class="src">(<a href="https://aws.amazon.com/free/serverless/">AWS: Free Tier, Serverless</a>)</span></p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="bd-varm">Varmt anrop</button>
+    <button class="chip" data-target="bd-kall">Kallstart</button>
+  </div>
+  <div class="picker-panel" id="bd-varm">
+<pre><code>REPORT RequestId: 57f231fb-…  Duration: 79.67 ms  Billed Duration: 80 ms  Memory Size: 128 MB  Max Memory Used: 73 MB</code></pre>
+    <p>79,67 avrundas uppåt till 80.</p>
+  </div>
+  <div class="picker-panel" id="bd-kall">
+<pre><code>REPORT RequestId: c793869b-…  Duration: 128.83 ms  Billed Duration: 296 ms  Memory Size: 128 MB  Max Memory Used: 74 MB  Init Duration: 166.62 ms</code></pre>
+    <p>128,83 + 166,62 = 295,45, avrundat 296.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad visar minnesfälten?</h2>
+
+<p><code>Memory Size</code> är <a href="0031-instanstyp.html">minnet</a> funktionen har fått, i megabyte (MB). 128 MB är standard och det minsta. Mer minne ger också mer processorkraft, men samma tid kostar mer. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html">AWS: Configure memory</a>, <a href="https://aws.amazon.com/lambda/pricing/">AWS: Lambda pricing</a>)</span></p>
+
+<p><code>Max Memory Used</code> är det mesta funktionen använde. Ligger det nära Memory Size behöver funktionen kanske mer minne. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html#node-logging-output">AWS: REPORT line data fields</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html#configuration-memory-use-cases">AWS: Appropriate memory setting</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Ett anrop var en kallstart. Vad räknas in i Billed Duration?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Vid en kallstart läggs Init Duration till Duration, och summan avrundas uppåt.">Handlerns tid och Init Duration</button>
+    <button class="opt" data-why="Init Duration räknas också in när anropet är en kallstart.">Bara tiden medan handlern kördes</button>
+    <button class="opt" data-why="Handlerns tid räknas alltid; vid en kallstart kommer Init Duration till.">Bara tiden innan själva handlern</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Max Memory Used ligger nära Memory Size. Vad säger det?</p>
+  <div class="options">
+    <button class="opt" data-why="Funktionen använder nästan allt minne den har, så den har inte för mycket.">Funktionen har för stort minne</button>
+    <button class="opt" data-correct data-why="Funktionen använder nästan allt minne den fått och kan behöva mer.">Funktionen kan behöva mer minne</button>
+    <button class="opt" data-why="Kallstart syns som Init Duration, inte i minnesfälten.">Anropet var en kallstart nyss</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 84: när har REPORT-raden fältet Init Duration?</p>
+  <div class="options">
+    <button class="opt" data-why="En fryst miljö som återanvänds ger ett varmt anrop, och då saknas Init Duration.">När en fryst miljö användes</button>
+    <button class="opt" data-correct data-why="Init Duration finns vid en kallstart, när Lambda först skapade en ny miljö.">När en ny miljö startades</button>
+    <button class="opt" data-why="Ett fel i handlern ger inte Init Duration; fältet visar en kallstart.">När handlern gav ett fel</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>Duration</code> är tiden handlern tog. <code>RequestId</code> är anropets id, samma som i <code>context</code>.</li>
+    <li><code>Billed Duration</code> är tiden du betalar för: Duration, plus Init Duration vid en kallstart, avrundad uppåt till hel millisekund.</li>
+    <li><code>Memory Size</code> är minnet funktionen fått, <code>Max Memory Used</code> det mesta den använde. Mer minne ger mer processorkraft men kostar mer per millisekund.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html#node-logging-output">AWS Lambda: REPORT line data fields</a>.</p>
+<p>Om Init Duration i Billed Duration: <a href="https://aws.amazon.com/blogs/compute/aws-lambda-standardizes-billing-for-init-phase/">AWS Compute Blog: AWS Lambda standardizes billing for INIT phase</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0084-kallstart.html">Förra: Kallstart</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0086-timeout.html">Nästa: Timeout</a>
+</nav>
+
+</main>
+</body>
+</html>
