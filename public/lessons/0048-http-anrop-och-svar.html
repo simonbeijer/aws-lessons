@@ -32,7 +32,7 @@
 </section>
 
 <section class="explain">
-<h2>Fyra delar i samma ordning</h2>
+<h2>Vilka delar har ett anrop och ett svar?</h2>
 
 <p>Anrop och svar har fyra delar: startrad, headers, tom rad och kropp. Kursens exempel skapar en kund: <span class="src">(kursens lektion sida 14, <a href="https://www.rfc-editor.org/rfc/rfc9112.html#section-2.1">RFC 9112: Message format</a>)</span></p>
 
@@ -65,9 +65,9 @@ Content-Type: application/json
 </section>
 
 <section class="explain">
-<h2>Samma form åt båda hållen</h2>
+<h2>Hur skiljer sig ett anrop från ett svar?</h2>
 
-<p>Kursens poäng: anrop och svar är byggda likadant. Bara startraden skiljer: anropet säger vad klienten vill, svaret hur det gick. <span class="src">(kursens lektion sida 14)</span></p>
+<p>Anrop och svar är byggda likadant. Bara startraden skiljer: anropet säger vad klienten vill, svaret hur det gick. <span class="src">(kursens lektion sida 14)</span></p>
 
 <p>Läs därför ett svar uppifrån: startrad, headers och kroppen efter den tomma raden. Ett anrop som bara hämtar något har ingen kropp. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages#request_body">MDN: Request body</a>)</span></p>
 

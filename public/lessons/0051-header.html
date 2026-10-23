@@ -20,7 +20,7 @@
 
 <div class="goal">
   <strong>Vad du ska veta efter lektionen</strong>
-  Att en header är en rad med nyckel och värde om anropet eller svaret, och att kursens server inte läser kroppen om anropet saknar <code>Content-Type: application/json</code>.
+  Att en header är en rad med nyckel och värde om anropet eller svaret, och att servern inte läser kroppen om anropet saknar <code>Content-Type: application/json</code>.
 </div>
 
 <section class="explain">
@@ -32,9 +32,9 @@
 </section>
 
 <section class="explain">
-<h2>Fyra headers i kursens exempel</h2>
+<h2>Vilka headers har ett anrop och ett svar?</h2>
 
-<p>Kursens exempel skapar en kund och har fyra olika headers: <span class="src">(kursens lektion sida 14)</span></p>
+<p>Exemplet skapar en kund och har fyra olika headers: <span class="src">(kursens lektion sida 14)</span></p>
 
 <pre><code>POST /customers HTTP/1.1
 Host: 16.170.12.34:3000
@@ -65,7 +65,7 @@ Location: /customers/3
 </section>
 
 <section class="explain">
-<h2>Utan Content-Type läses inte kroppen</h2>
+<h2>Vad händer om Content-Type saknas?</h2>
 
 <p>Kursens server läser kroppen bara när anropet har <code>Content-Type: application/json</code>. Saknas headern ser servern ingen kropp, fast den finns där. Klicka och jämför: <span class="src">(kursmaterialet v41, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type">MDN: Content-Type</a>)</span></p>
 
@@ -89,7 +89,7 @@ Content-Type: application/json
   </div>
 </div>
 
-<p>Servern tror att namnet saknas. Det är en <a href="0050-statuskod.html">4xx</a>: felet ligger i anropet, och klienten rättar det genom att lägga till headern. Kursen kallar det ett vanligt fel i klientkod. <span class="src">(kursmaterialet v41)</span></p>
+<p>Servern tror att namnet saknas. Det är en <a href="0050-statuskod.html">4xx</a>: felet ligger i anropet, och klienten rättar det genom att lägga till headern. Det är ett vanligt fel i klientkod. <span class="src">(kursmaterialet v41)</span></p>
 </section>
 
 <h2>Quiz</h2>
@@ -105,7 +105,7 @@ Content-Type: application/json
 </div>
 
 <div class="quiz-q">
-  <p class="q">2. Du skickar <code>POST /customers</code> med ett namn i kroppen men utan <code>Content-Type</code>. Vad svarar kursens server?</p>
+  <p class="q">2. Du skickar <code>POST /customers</code> med ett namn i kroppen men utan <code>Content-Type</code>. Vad svarar servern?</p>
   <div class="options">
     <button class="opt" data-correct data-why="Utan headern läser servern inte kroppen, så den tror att namnet saknas och svarar 400.">400, servern läste inte kroppen</button>
     <button class="opt" data-why="Servern gissar inte; utan headern läser den inte kroppen alls.">201, servern gissar ett format</button>
@@ -130,7 +130,7 @@ Content-Type: application/json
   <ul>
     <li>En header är en rad med nyckel och värde, t.ex. <code>Content-Type: application/json</code>. Den står mellan startraden och den tomma raden.</li>
     <li><code>Host</code> säger vart anropet ska, <code>Content-Type</code> vilket format kroppen har, <code>Accept</code> vad klienten vill ha tillbaka och <code>Location</code> var en ny resurs finns.</li>
-    <li>Saknas <code>Content-Type: application/json</code> läser kursens server inte kroppen och svarar 400. Klienten rättar det med headern.</li>
+    <li>Saknas <code>Content-Type: application/json</code> läser servern inte kroppen och svarar 400. Klienten rättar det med headern.</li>
   </ul>
 </div>
 

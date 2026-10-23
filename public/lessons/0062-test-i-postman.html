@@ -40,17 +40,17 @@
 
 <p>Allt som börjar med <code>pm</code> kommer från Postman. <code>pm.test</code> skapar testet <code>"Status 200"</code>, och namnet visas i Test Results. <code>pm.response</code> är svaret, och <code>to.have.status(200)</code> kontrollerar dess statuskod. Är koden en annan blir testet rött. <span class="src">(<a href="https://learning.postman.com/docs/tests-and-scripts/write-scripts/test-scripts/#validate-responses">Postman: Validate responses</a>)</span></p>
 
-<p>Kursens poäng: ett test per anrop. Blir ett test rött är det API:et som ska rättas, inte testet. <span class="src">(kursmaterialet v41)</span></p>
+<p>Varje anrop får minst ett test. Blir ett test rött är det API:et som ska rättas, inte testet. <span class="src">(kursmaterialet v41)</span></p>
 </section>
 
 <section class="explain">
-<h2>Run kör hela collectionen</h2>
+<h2>Hur körs alla tester?</h2>
 
 <p>Run skickar alla anrop i <a href="0055-postman.html">collectionen</a> i ordning och kör testerna efter varje svar. Klicka på collectionen och välj Run, så öppnas fönstret Collection Runner. Längst upp står antalet tester som gick igenom (passed) och inte (failed). <span class="src">(<a href="https://learning.postman.com/docs/tests-and-scripts/running-collections/intro-to-collection-runs/">Postman: Collection Runner</a>, kursmaterialet v41)</span></p>
 
 <p>Ordningen spelar roll: anropet som skapar en kund måste gå före det som hämtar den. Du ändrar ordningen genom att dra. <span class="src">(<a href="https://learning.postman.com/docs/tests-and-scripts/running-collections/intro-to-collection-runs/#configure-a-collection-run">Postman: Configure a collection run</a>, kursmaterialet v41)</span></p>
 
-<p>Kursens poäng: kör samma anrop i samma ordning efter varje ändring i servern. Då ser du om något som fungerade har gått sönder. <span class="src">(kursmaterialet v41)</span></p>
+<p>Kör samma anrop i samma ordning efter varje ändring i servern. Då ser du om något som fungerade har gått sönder. <span class="src">(kursmaterialet v41)</span></p>
 </section>
 
 <h2>Quiz</h2>
@@ -59,8 +59,8 @@
   <p class="q">1. När kör Postman ett test som ligger under Post-response?</p>
   <div class="options">
     <button class="opt" data-why="Post-response betyder efter svaret; testet behöver svaret för att ha något att kontrollera.">Innan anropet går iväg till servern</button>
-    <button class="opt" data-correct data-why="Testet ligger under Post-response, så Postman kör det när svaret har kommit, varje gång.">Varje gång svaret har kommit fram</button>
     <button class="opt" data-why="Testet körs varje gång anropet skickas, inte bara när du öppnar Run.">Bara när hela collectionen ska köras</button>
+    <button class="opt" data-correct data-why="Testet ligger under Post-response, så Postman kör det när svaret har kommit, varje gång.">Varje gång svaret har kommit fram</button>
   </div>
   <p class="feedback" aria-live="polite"></p>
 </div>
@@ -68,8 +68,8 @@
 <div class="quiz-q">
   <p class="q">2. Vad gör Run på en collection?</p>
   <div class="options">
-    <button class="opt" data-correct data-why="Collection Runner skickar alla anrop i ordning, kör testerna efter varje svar och visar passed och failed.">Skickar alla anrop i ordning och kör testerna</button>
     <button class="opt" data-why="Run skickar anropen i den ordning de ligger; ordningen spelar roll och du ändrar den genom att dra.">Skickar alla anropen på en gång utan ordning</button>
+    <button class="opt" data-correct data-why="Collection Runner skickar alla anrop i ordning, kör testerna efter varje svar och visar passed och failed.">Skickar alla anrop i ordning och kör testerna</button>
     <button class="opt" data-why="Run skickar anropen på riktigt och kör testerna efter varje svar, den listar inte bara testerna.">Listar bara de tester som finns i collectionen</button>
   </div>
   <p class="feedback" aria-live="polite"></p>

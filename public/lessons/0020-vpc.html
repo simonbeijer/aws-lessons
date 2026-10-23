@@ -20,7 +20,7 @@
 
 <div class="goal">
   <strong>Vad du ska veta efter lektionen</strong>
-  Att en VPC är ditt eget avgränsade nätverk i en region, och att default VPC redan finns men inte används i kursen.
+  Att en VPC är ditt eget avgränsade nätverk i en region, och att default VPC redan finns men inte används.
 </div>
 
 <section class="explain">
@@ -44,7 +44,7 @@
 
 <p>Default VPC är en VPC som AWS redan har skapat åt dig i varje region. Den har adressintervallet <code>172.31.0.0/16</code>. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html">AWS: Default VPCs</a>, <a href="https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc-components.html">AWS: Default VPC components</a>)</span></p>
 
-<p>Den är gjord för att komma igång snabbt: det du startar där kan nås från internet direkt. Kursen bygger i stället en egen VPC, där du själv bestämmer adresserna och vad som når internet. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html">AWS: Default VPCs</a>, <a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-your-vpc.html">AWS: Configure a VPC</a>)</span></p>
+<p>Den är gjord för att komma igång snabbt: det du startar där kan nås från internet direkt. I stället byggs en egen VPC, där du själv bestämmer adresserna och vad som når internet. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html">AWS: Default VPCs</a>, <a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-your-vpc.html">AWS: Configure a VPC</a>)</span></p>
 
 <div class="two-col">
   <div>
@@ -101,7 +101,7 @@
   <ul>
     <li>En VPC är ditt eget nätverk i AWS, avskilt från andra nätverk. Den hör till en region.</li>
     <li>När du skapar en VPC väljer du dess adressintervall, till exempel <code>10.0.0.0/16</code>.</li>
-    <li>Default VPC (<code>172.31.0.0/16</code>) finns redan i varje region. Kursen låter den vara och bygger en egen.</li>
+    <li>Default VPC (<code>172.31.0.0/16</code>) finns redan i varje region. Den får vara kvar, och en egen VPC byggs i stället.</li>
   </ul>
 </div>
 

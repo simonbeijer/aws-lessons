@@ -52,7 +52,7 @@
 
 <p>Ingenting. Gateway endpoints har ingen avgift. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html">AWS: Gateway endpoints</a>)</span></p>
 
-<p>Det finns en annan sort, interface endpoint, som kostar. Kursen använder den inte. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html">AWS: Gateway endpoints for Amazon S3</a>)</span></p>
+<p>Det finns en annan sort, interface endpoint, som kostar. VPC:n använder ingen sådan. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html">AWS: Gateway endpoints for Amazon S3</a>)</span></p>
 </section>
 
 <h2>Quiz</h2>
@@ -68,7 +68,7 @@
 </div>
 
 <div class="quiz-q">
-  <p class="q">2. Vad kostar kursens gateway endpoint för S3?</p>
+  <p class="q">2. Vad kostar en gateway endpoint för S3?</p>
   <div class="options">
     <button class="opt" data-why="Gateway endpoints har ingen avgift alls, varken per timme eller per gigabyte.">Ett pris per timme medan den finns</button>
     <button class="opt" data-why="Gateway endpoints har ingen avgift alls, varken per gigabyte eller per timme.">Ett pris per gigabyte du skickar ut</button>
@@ -91,7 +91,7 @@
 
 <div class="summary">
   <ul>
-    <li>En VPC endpoint är en väg från VPC:n direkt till en AWS-tjänst, utan Internet Gateway. Kursens gateway endpoint går till S3 i samma region.</li>
+    <li>En VPC endpoint är en väg från VPC:n direkt till en AWS-tjänst, utan Internet Gateway. VPC:ns gateway endpoint går till S3 i samma region.</li>
     <li>Raden <code>pl-... → vpce-...</code> i den privata route tablen skickar S3-trafik till endpointen. Utan den når de privata subnäten inte S3.</li>
     <li>En gateway endpoint kostar ingenting.</li>
   </ul>

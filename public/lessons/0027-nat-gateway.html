@@ -48,11 +48,11 @@
 </section>
 
 <section class="explain">
-<h2>Varför skapar kursen ingen?</h2>
+<h2>Varför skapas ingen NAT Gateway?</h2>
 
 <p>Den kostar pengar så länge den finns. Du betalar för varje timme den är tillgänglig, även utan trafik, och dessutom för varje gigabyte den skickar. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/nat-gateway-pricing.html">AWS: Pricing for NAT gateways</a>)</span></p>
 
-<p>AWS prisexempel är 0,045 USD per timme, alltså ungefär 33 USD i månaden. Kursen väljer därför <code>NAT gateways: None</code>. <span class="src">(<a href="https://aws.amazon.com/vpc/pricing/">AWS: Amazon VPC pricing</a>)</span></p>
+<p>AWS prisexempel är 0,045 USD per timme, alltså ungefär 33 USD i månaden. Därför väljs <code>NAT gateways: None</code>. <span class="src">(<a href="https://aws.amazon.com/vpc/pricing/">AWS: Amazon VPC pricing</a>)</span></p>
 
 <div class="box bad">
   <span class="box-title">Varning</span>
@@ -103,7 +103,7 @@
   <ul>
     <li>En NAT Gateway låter servrar i ett privat subnät nå internet, men ingen på internet kan starta en kontakt med dem.</li>
     <li>Den står i ett publikt subnät. Den privata route tablen får raden <code>0.0.0.0/0 → nat-...</code>.</li>
-    <li>Den kostar per timme så länge den finns, plus per gigabyte. Därför skapar kursen ingen.</li>
+    <li>Den kostar per timme så länge den finns, plus per gigabyte. Därför skapas ingen.</li>
   </ul>
 </div>
 

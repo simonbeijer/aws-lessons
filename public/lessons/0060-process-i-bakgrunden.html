@@ -24,9 +24,9 @@
 </div>
 
 <section class="explain">
-<h2>Vad händer med servern när fliken stängs?</h2>
+<h2>Vad händer när fliken stängs?</h2>
 
-<p>Den stannar. <code>node server.js</code> startar en process, alltså ett program som körs, i <a href="0036-ec2-instance-connect.html">terminalen</a>. En signal är ett kort besked till en process. Stänger du fliken försvinner terminalen, och då får bash normalt signalen hangup ("lägg på"). Bash skickar den vidare till processerna den startat, och de avslutas. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Signals.html">Bash: Signals</a>, kursmaterialet v41)</span></p>
+<p>Servern stannar. <code>node server.js</code> startar en process, alltså ett program som körs, i <a href="0036-ec2-instance-connect.html">terminalen</a>. En signal är ett kort besked till en process. Stänger du fliken försvinner terminalen, och då får <a href="0037-user-data.html">bash</a> normalt signalen hangup ("lägg på"). Bash skickar den vidare till processerna den startat, och de avslutas. <span class="src">(<a href="https://www.gnu.org/software/bash/manual/html_node/Signals.html">Bash: Signals</a>, kursmaterialet v41)</span></p>
 </section>
 
 <section class="explain">
@@ -55,7 +55,6 @@
 
 <p>Ctrl+C stoppar visningen, inte servern. Har du ändrat koden: <code class="copyable">pkill node</code> stoppar servern, sedan startar du den igen. <span class="src">(<a href="https://man7.org/linux/man-pages/man1/pkill.1.html">pkill(1)</a>, kursmaterialet v41)</span></p>
 
-<p>Kursens poäng: starta servern så att den överlever att du stänger fliken. <span class="src">(kursmaterialet v41)</span></p>
 </section>
 
 <h2>Quiz</h2>
@@ -85,7 +84,7 @@
   <div class="options">
     <button class="opt" data-correct data-why="Miljövariabler finns bara i fliken där du satte dem, så servern får inget DB_HOST.">Miljövariablerna finns inte i den nya fliken</button>
     <button class="opt" data-why="nohup ändrar inte miljövariablerna; de saknades redan i den nya fliken.">nohup tar bort alla miljövariablerna vid start</button>
-    <button class="opt" data-why="Databasen ser inte vilken flik anropet kommer från; variablerna saknas.">Databasen tar bara emot från första fliken</button>
+    <button class="opt" data-why="Databasen ser inte vilken flik anropet kommer från; variablerna saknas.">Databasen tar bara emot från din första flik</button>
   </div>
   <p class="feedback" aria-live="polite"></p>
 </div>

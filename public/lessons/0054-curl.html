@@ -28,7 +28,7 @@
 
 <p>curl är ett kommando som skickar ett HTTP-anrop från <a href="0036-ec2-instance-connect.html">terminalen</a> och skriver ut svaret. Det finns redan i appen Terminal på din Mac. <span class="src">(<a href="https://curl.se/docs/manpage.html">curl: man page</a>, kursmaterialet v41)</span></p>
 
-<p>Utan något mer skickar curl GET och skriver bara ut kroppen. En flagga är ett tillägg efter ett bindestreck som ändrar vad kommandot gör. Flaggan <code>-i</code> skriver också ut startraden och headers. Kursens poäng: curl visar exakt vad servern svarade. Prova mot en öppen testserver, eller klicka och jämför: <span class="src">(<a href="https://curl.se/docs/manpage.html#-i">curl: -i</a>, kursens lektion sida 19 och 36)</span></p>
+<p>Utan något mer skickar curl GET och skriver bara ut kroppen. En flagga är ett tillägg efter ett bindestreck som ändrar vad kommandot gör. Flaggan <code>-i</code> skriver också ut startraden och headers. curl visar exakt vad servern svarade. Prova mot en öppen testserver, eller klicka och jämför: <span class="src">(<a href="https://curl.se/docs/manpage.html#-i">curl: -i</a>, kursens lektion sida 19 och 36)</span></p>
 
 <pre><code>curl -i https://jsonplaceholder.typicode.com/posts/1</code></pre>
 
@@ -64,7 +64,7 @@ content-length: 292
 </section>
 
 <section class="explain">
-<h2>-X, -H och -d bygger anropet</h2>
+<h2>Vad gör flaggorna -X, -H och -d?</h2>
 
 <p><code>-X</code> sätter <a href="0049-http-metod.html">metoden</a>, <code>-H</code> lägger till en <a href="0051-header.html">header</a> och <code>-d</code> skickar kroppen. Så här skapar du ett inlägg med POST: <span class="src">(<a href="https://curl.se/docs/manpage.html">curl: man page</a>, kursens lektion sida 19)</span></p>
 
@@ -96,7 +96,7 @@ content-length: 292
 </div>
 
 <div class="quiz-q">
-  <p class="q">2. Du skickar bara <code>-X POST</code> och <code>-d '{"name":"Dave"}'</code> till kursens server. Varför blir svaret 400?</p>
+  <p class="q">2. Du skickar bara <code>-X POST</code> och <code>-d '{"name":"Dave"}'</code> till servern. Varför blir svaret 400?</p>
   <div class="options">
     <button class="opt" data-why="POST får ha en kropp; felet är att -H saknas, så kroppen får fel Content-Type.">POST får aldrig skickas med kropp</button>
     <button class="opt" data-correct data-why="Utan -H sätter -d formulärformatet som Content-Type, så servern läser inte kroppen som JSON.">Kroppen får fel Content-Type utan -H</button>

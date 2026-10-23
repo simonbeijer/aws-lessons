@@ -32,7 +32,7 @@
 </section>
 
 <section class="explain">
-<h2>Samma ord, olika datorer</h2>
+<h2>Vilken dator är localhost?</h2>
 
 <p>Vilken dator <code>localhost</code> är beror på var du skriver det. <span class="src">(kursmaterialet v41)</span></p>
 
@@ -57,7 +57,7 @@
 
 <p>Där testar du bara programmet. Ett anrop till <code>localhost</code> på servern lämnar aldrig servern och passerar därför ingen <a href="0034-security-group.html">security group</a>. Svarar det, fungerar programmet. <span class="src">(<a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html">AWS: Security groups</a>, <a href="https://www.rfc-editor.org/rfc/rfc1122.html#page-31">RFC 1122: loopback</a>)</span></p>
 
-<p>Kursens poäng: får du timeout från din dator, testa <code class="copyable">curl http://localhost:3000</code> på servern först. Svarar det där, ligger felet i vägen dit, inte i koden. Oftast saknas regeln för port 3000, eller så har <a href="0035-kalla-i-regel.html">My IP</a> en gammal adress. <span class="src">(kursmaterialet v41, kursens lektion sida 17, <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/TroubleshootingInstancesConnecting.html#TroubleshootingInstancesConnectionTimeout">AWS: Connection timed out</a>)</span></p>
+<p>Får du timeout från din dator, testa <code class="copyable">curl http://localhost:3000</code> på servern först. Svarar det där, ligger felet i vägen dit, inte i koden. Oftast saknas regeln för port 3000, eller så har <a href="0035-kalla-i-regel.html">My IP</a> en gammal adress. <span class="src">(kursmaterialet v41, kursens lektion sida 17, <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/TroubleshootingInstancesConnecting.html#TroubleshootingInstancesConnectionTimeout">AWS: Connection timed out</a>)</span></p>
 </section>
 
 <h2>Quiz</h2>

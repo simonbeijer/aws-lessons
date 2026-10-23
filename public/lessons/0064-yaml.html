@@ -42,11 +42,11 @@ name: Carol</code></pre>
   </div>
 </div>
 
-<p>I kursen är filen <code>openapi.yaml</code> skriven i YAML. Den beskriver API:et, och servern läser den när den startar. <span class="src">(kursmaterialet v41)</span></p>
+<p>Filen <code>openapi.yaml</code> är skriven i YAML. Den beskriver API:et, mer om det i nästa lektion, och servern läser den när den startar. <span class="src">(kursmaterialet v41)</span></p>
 </section>
 
 <section class="explain">
-<h2>Indraget bär betydelse</h2>
+<h2>Varför spelar indraget roll?</h2>
 
 <p>Indraget, mellanslagen först på raden, visar vad som hör ihop. En rad längre in hör till raden ovanför. Rader som hör till samma sak står exakt lika långt in. Tabbar (tabbtangentens tecken) får inte användas. <span class="src">(kursmaterialet v41, <a href="https://yaml.org/spec/1.2.2/#indentation-spaces">YAML: Indentation spaces</a>)</span> Klicka och jämför:</p>
 
@@ -78,7 +78,7 @@ name: Carol</code></pre>
 </section>
 
 <section class="explain">
-<h2>Ett fel indrag stoppar servern</h2>
+<h2>Fel i indraget</h2>
 
 <p>Ett ojämnt indrag gör filen ogiltig, och då startar servern inte. Felet syns i <a href="0060-process-i-bakgrunden.html">server.log</a> som <code>YAMLParseError</code> med rad och kolumn (hur många tecken in felet sitter). <span class="src">(kursmaterialet v41, <a href="https://eemeli.org/yaml/#errors">yaml: Errors</a>)</span></p>
 
@@ -112,8 +112,8 @@ name: Carol</code></pre>
 <div class="quiz-q">
   <p class="q">3. Repetition från lektion 60: servern startas med <code>nohup node server.js &gt; server.log 2&gt;&amp;1 &amp;</code> men startar inte. Var syns felmeddelandet?</p>
   <div class="options">
-    <button class="opt" data-why="&gt; server.log skickar utskriften till filen, så terminalen visar inget.">I terminalen, direkt under det som du skrev</button>
     <button class="opt" data-correct data-why="2&gt;&amp;1 skickar felmeddelanden samma väg som vanlig utskrift, alltså till server.log.">I filen server.log, i mappen där du startade</button>
+    <button class="opt" data-why="&gt; server.log skickar utskriften till filen, så terminalen visar inget.">I terminalen, direkt under det som du skrev</button>
     <button class="opt" data-why="Felet skrivs av servern själv, och 2&gt;&amp;1 skickar det till server.log, inte till YAML-filen.">I filen openapi.yaml, vid raden som är fel</button>
   </div>
   <p class="feedback" aria-live="polite"></p>
@@ -139,7 +139,7 @@ name: Carol</code></pre>
 <nav class="bottomnav">
   <a href="0063-negativt-test.html">Förra: Negativt test</a>
   <a href="../index.html">Alla lektioner</a>
-  <span class="disabled">Nästa: OpenAPI</span>
+  <a href="0065-openapi.html">Nästa: OpenAPI</a>
 </nav>
 
 </main>

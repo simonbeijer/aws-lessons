@@ -20,7 +20,7 @@
 
 <div class="goal">
   <strong>Vad du ska veta efter lektionen</strong>
-  Vad en zon är, hur den skiljer sig från en region, och varför kursens nätverk byggs i två zoner.
+  Vad en zon är, hur den skiljer sig från en region, och varför nätverket byggs i två zoner.
 </div>
 
 <section class="explain">
@@ -55,9 +55,9 @@
 
 <p>Två zoner gör att det du bygger fortsätter fungera om en zon går ner. AWS råder dig att lägga det du bygger i flera zoner. <span class="src">(<a href="https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html#concepts-availability-zones">AWS: Availability Zones</a>)</span></p>
 
-<p>Kursens nätverk får därför subnät i både <code>eu-north-1a</code> och <code>eu-north-1b</code>.</p>
+<p>Nätverket får därför subnät i både <code>eu-north-1a</code> och <code>eu-north-1b</code>.</p>
 
-<p>Det finns ett skäl till. RDS är en databas som AWS driver åt dig, och den kommer senare i kursen. RDS kräver subnät i minst två zoner, även om databasen bara står i en. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.Subnets">AWS: Working with DB subnet groups</a>)</span></p>
+<p>Det finns ett skäl till. RDS är en databas som AWS driver åt dig, och den kommer i en senare lektion. RDS kräver subnät i minst två zoner, även om databasen bara står i en. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.Subnets">AWS: Working with DB subnet groups</a>)</span></p>
 </section>
 
 <h2>Quiz</h2>
@@ -73,7 +73,7 @@
 </div>
 
 <div class="quiz-q">
-  <p class="q">2. Varför byggs kursens nätverk i två zoner?</p>
+  <p class="q">2. Varför byggs nätverket i två zoner?</p>
   <div class="options">
     <button class="opt" data-why="Zonerna delar inte på kostnaden. Skälet är att en zon kan gå ner.">Så att zonerna kan dela lika på kostnaden</button>
     <button class="opt" data-why="Båda zonerna ligger i samma region, eu-north-1.">Så att nätverket kan finnas i två regioner</button>
@@ -83,7 +83,7 @@
 </div>
 
 <div class="quiz-q">
-  <p class="q">3. Repetition från lektion 8: kursen bygger i <code>eu-north-1</code>. Vad är det?</p>
+  <p class="q">3. Repetition från lektion 8: nätverket byggs i <code>eu-north-1</code>. Vad är det?</p>
   <div class="options">
     <button class="opt" data-correct data-why="eu-north-1 är koden för regionen Europe (Stockholm), som har minst tre zoner.">En region med flera zoner</button>
     <button class="opt" data-why="En zon har en bokstav sist, till exempel eu-north-1a.">En av zonerna i Stockholm</button>
@@ -98,7 +98,7 @@
   <ul>
     <li>En Availability Zone är ett eller flera datacenter i en region, med egen ström och eget nätverk.</li>
     <li>En region har minst tre zoner. Zonens kod är regionens kod plus en bokstav, till exempel <code>eu-north-1a</code>. En VPC täcker hela regionen, ett subnät ligger i en zon.</li>
-    <li>Kursen bygger i två zoner så att allt klarar att en zon går ner, och för att RDS kräver subnät i minst två zoner.</li>
+    <li>Nätverket byggs i två zoner så att allt klarar att en zon går ner, och för att RDS kräver subnät i minst två zoner.</li>
   </ul>
 </div>
 

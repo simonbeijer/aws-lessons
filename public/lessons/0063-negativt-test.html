@@ -32,9 +32,9 @@
 </section>
 
 <section class="explain">
-<h2>Tre fel som kursen testar</h2>
+<h2>Vilka fel testas?</h2>
 
-<p>Kursen har tre negativa tester, och varje fel har sin <a href="0050-statuskod.html">statuskod</a>: <span class="src">(kursmaterialet v41, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/400">MDN: 400 Bad Request</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404">MDN: 404 Not Found</a>)</span></p>
+<p>Det finns tre negativa tester, och varje fel har sin <a href="0050-statuskod.html">statuskod</a>: <span class="src">(kursmaterialet v41, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/400">MDN: 400 Bad Request</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404">MDN: 404 Not Found</a>)</span></p>
 
 <div class="table-wrap">
 <table>
@@ -55,7 +55,7 @@
 <section class="explain">
 <h2>Varför felen också testas</h2>
 
-<p>Ett API som bara testas på den lyckliga vägen går sönder i det som inte testades. Därför är de negativa testerna enligt kursen de viktigaste. <span class="src">(kursmaterialet v41)</span></p>
+<p>Ett API som bara testas på den lyckliga vägen går sönder i det som inte testades. Därför är de negativa testerna de viktigaste. <span class="src">(kursmaterialet v41)</span></p>
 
 <p>Ett exempel: <code>DELETE</code> svarar 204 men tar inte bort kunden ur databasen. Alla tester på den lyckliga vägen blir gröna. Bara hämtningen efteråt avslöjar felet, med 200 i stället för 404. <span class="src">(kursmaterialet v41)</span></p>
 
@@ -68,8 +68,8 @@
   <p class="q">1. Vad kontrollerar ett negativt test?</p>
   <div class="options">
     <button class="opt" data-why="Det gör testerna på den lyckliga vägen; ett negativt test skickar ett anrop som ska misslyckas.">Att ett rätt anrop får statuskod 200</button>
-    <button class="opt" data-why="Servern ska svara även på fel anrop, med en felkod som 400 eller 404, och det är den koden testet kontrollerar.">Att servern inte svarar på fel anrop</button>
     <button class="opt" data-correct data-why="Ett negativt test skickar ett anrop som ska misslyckas och blir grönt när felkoden är den väntade.">Att ett fel anrop får väntad felkod</button>
+    <button class="opt" data-why="Servern ska svara även på fel anrop, med en felkod som 400 eller 404, och det är den koden testet kontrollerar.">Att servern inte svarar på fel anrop</button>
   </div>
   <p class="feedback" aria-live="polite"></p>
 </div>
@@ -77,15 +77,15 @@
 <div class="quiz-q">
   <p class="q">2. Kund 42 har tagits bort med <code>DELETE</code>. Vilken kod ska testet för <code>GET /customers/42</code> vänta sig?</p>
   <div class="options">
+    <button class="opt" data-correct data-why="Resursen finns inte längre, och det betyder 404 Not Found.">404, eftersom kunden inte längre finns</button>
     <button class="opt" data-why="200 skulle betyda att kunden finns kvar, alltså att DELETE inte tog bort den.">200, eftersom själva anropet är rätt</button>
     <button class="opt" data-why="204 är svaret på själva DELETE; en hämtning av en kund som inte finns ger 404.">204, eftersom kunden har tagits bort</button>
-    <button class="opt" data-correct data-why="Resursen finns inte längre, och det betyder 404 Not Found.">404, eftersom kunden inte längre finns</button>
   </div>
   <p class="feedback" aria-live="polite"></p>
 </div>
 
 <div class="quiz-q">
-  <p class="q">3. Repetition från lektion 52: <code>{"name":""}</code> är giltig JSON. Vad svarar kursens server på <code>POST /customers</code> med den kroppen?</p>
+  <p class="q">3. Repetition från lektion 52: <code>{"name":""}</code> är giltig JSON. Vad svarar servern på <code>POST /customers</code> med den kroppen?</p>
   <div class="options">
     <button class="opt" data-correct data-why="Servern kontrollerar också värdet, och ett tomt namn ger 400 och name is required.">400, eftersom namnet inte är ifyllt</button>
     <button class="opt" data-why="Giltig JSON räcker inte; servern kontrollerar också att namnet inte är tomt.">201, eftersom kroppen är giltig JSON</button>
@@ -99,7 +99,7 @@
 <div class="summary">
   <ul>
     <li>Ett negativt test skickar ett anrop som ska misslyckas och kontrollerar att felkoden är rätt, t.ex. 400 eller 404.</li>
-    <li>Kursens tre: borttagen kund ger 404, tomt namn ger 400, <code>/customers/abc</code> ger 400. Testet är samma rad som förut, med en annan siffra.</li>
+    <li>De tre: borttagen kund ger 404, tomt namn ger 400, <code>/customers/abc</code> ger 400. Testet är samma rad som förut, med en annan siffra.</li>
     <li>Ett API som bara testas på den lyckliga vägen går sönder i det som inte testades. Felkoden är dessutom ett besked till klienten.</li>
   </ul>
 </div>

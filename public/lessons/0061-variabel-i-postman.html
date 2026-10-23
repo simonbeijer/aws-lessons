@@ -28,11 +28,11 @@
 
 <p>En variabel är ett namn som står för ett värde. Du skriver namnet inom dubbla klammerparenteser, <code>{{baseUrl}}</code>, och Postman byter ut det mot värdet när anropet skickas. <span class="src">(<a href="https://learning.postman.com/docs/use/send-requests/variables/variables/#variable-concepts">Postman: Variables</a>, kursmaterialet v41)</span></p>
 
-<p>Kursen använder en collection-variabel. Den sparas i <a href="0055-postman.html">collectionen</a> och gäller för alla anrop i den. Du lägger till den under fliken Variables när du har klickat på collectionen. <span class="src">(<a href="https://learning.postman.com/docs/use/send-requests/variables/define-variables/#define-collection-variables">Postman: Define variables</a>)</span></p>
+<p>Här används en collection-variabel. Den sparas i <a href="0055-postman.html">collectionen</a> och gäller för alla anrop i den. Du lägger till den under fliken Variables när du har klickat på collectionen. <span class="src">(<a href="https://learning.postman.com/docs/use/send-requests/variables/define-variables/#define-collection-variables">Postman: Define variables</a>)</span></p>
 </section>
 
 <section class="explain">
-<h2>Adressen på ett ställe</h2>
+<h2>Hur används baseUrl i anropen?</h2>
 
 <p>Adressen står bara i baseUrl, med värdet <code>http://&lt;din publika IP&gt;:3000</code>, utan snedstreck sist. Det är serverns <a href="0028-publik-privat-ip.html">publika adress</a> och <a href="0033-port.html">porten</a> servern använder. Varje anrop börjar sedan med variabeln: <span class="src">(kursmaterialet v41)</span></p>
 
@@ -46,10 +46,10 @@
 
 <p>Då ändrar du värdet på baseUrl, en gång. Anropen rör du inte. Servern får en ny publik IP när du <a href="0038-stoppa-terminera.html">stoppar och startar</a> den. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-ec2-instance-stop-start-works.html">AWS: How stop and start works</a>, kursmaterialet v41)</span> Reboot instance, en omstart utan stopp, behåller adressen. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-reboot.html">AWS: Reboot your instance</a>)</span></p>
 
-<p>Kursens poäng: adressen står på ett ställe, så samma collection fungerar mot servern idag och mot en annan adress senare i kursen. <span class="src">(kursmaterialet v41)</span></p>
+<p>Adressen står på ett ställe, så samma collection fungerar mot servern idag och mot en annan adress senare. <span class="src">(kursmaterialet v41)</span></p>
 
 <div class="box note">
-  <span class="box-title">Kursen och Postman skiljer sig</span>
+  <span class="box-title">Instruktionen och Postman skiljer sig</span>
   <p>Kursmaterialet säger: fyll i Initial value och Current value, sedan Save. Postman har nu ett enda värde, som sparas automatiskt. Ser du två kolumner: fyll i båda. <span class="src">(<a href="https://learning.postman.com/docs/use/send-requests/variables/define-variables/#previous-way-of-defining-variables">Postman: Define variables</a>)</span></p>
 </div>
 </section>

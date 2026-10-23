@@ -52,12 +52,12 @@
 
 <p>Gruppen kräver subnät i minst två <a href="0022-availability-zone.html">zoner</a> så att RDS kan lägga en kopia av databasen i den andra zonen. Kopian tar över om första zonen går ner. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.CreateDBSubnetGroup">AWS: Create a DB subnet group</a>)</span></p>
 
-<p>Kravet gäller även när databasen bara står i en zon, som i kursen. Då går kopian att slå på senare. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.CreateDBSubnetGroup">AWS: Create a DB subnet group</a>)</span></p>
+<p>Kravet gäller även när databasen bara står i en zon, som den gör här. Då går kopian att slå på senare. <span class="src">(<a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html#USER_VPC.CreateDBSubnetGroup">AWS: Create a DB subnet group</a>)</span></p>
 
 <p>Ett subnät ligger i exakt en zon, så gruppen behöver minst två subnät i olika zoner.</p>
 
 <div class="box good">
-  <span class="box-title">Kursens poäng</span>
+  <span class="box-title">Så ska gruppen se ut</span>
   <p>DB subnet group i två privata subnät, i två zoner. <span class="src">(kursens lektion sida 14 och 17)</span></p>
 </div>
 </section>
@@ -75,7 +75,7 @@
 </div>
 
 <div class="quiz-q">
-  <p class="q">2. Kursens databas står i en zon. Varför kräver gruppen ändå två zoner?</p>
+  <p class="q">2. Databasen står i en zon. Varför kräver gruppen ändå två zoner?</p>
   <div class="options">
     <button class="opt" data-why="Databasen står i ett subnät åt gången, i en zon.">Den står i båda zonerna samtidigt</button>
     <button class="opt" data-why="Kravet handlar om zoner, inte om hur många adresser som finns.">Varje zon har för få IP-adresser</button>
@@ -89,7 +89,7 @@
   <div class="options">
     <button class="opt" data-why="Ett subnät ligger i exakt en zon, aldrig i flera.">I alla zoner i hela regionen</button>
     <button class="opt" data-correct data-why="Ett subnät ligger i exakt en zon, så två zoner kräver minst två subnät.">I exakt en zon, aldrig flera</button>
-    <button class="opt" data-why="Ett subnät kan inte sträcka sig över flera zoner.">I två zoner, som kursens nät</button>
+    <button class="opt" data-why="Ett subnät kan inte sträcka sig över flera zoner.">I två zoner, som hela VPC:n</button>
   </div>
   <p class="feedback" aria-live="polite"></p>
 </div>
@@ -98,7 +98,7 @@
 
 <div class="summary">
   <ul>
-    <li>En DB subnet group är en lista med subnät som RDS får ställa databasen i. Kursens grupp har de två privata subnäten.</li>
+    <li>En DB subnet group är en lista med subnät som RDS får ställa databasen i. Gruppen har de två privata subnäten.</li>
     <li>Du väljer gruppen. RDS väljer subnätet och en ledig IP-adress, och databasen står i subnätets zon.</li>
     <li>Gruppen måste ha subnät i minst två zoner, så att RDS kan lägga en kopia av databasen i den andra zonen. Kravet gäller även när databasen bara står i en zon.</li>
   </ul>

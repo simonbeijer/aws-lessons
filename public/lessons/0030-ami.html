@@ -46,7 +46,7 @@
 
 <p>Den har också EC2 Instance Connect färdigt installerat. Det är tjänsten som låter dig skriva kommandon till servern direkt i webbläsaren. Med en annan AMI kan den saknas. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-set-up.html">AWS: Install EC2 Instance Connect</a>)</span></p>
 
-<p>Kursen väljer arkitekturen 64-bit (x86). Arkitekturen är den sorts processor AMI:n är byggd för, och den måste passa instanstypen. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html">AWS: Amazon Machine Images</a>)</span></p>
+<p>Som arkitektur väljs 64-bit (x86). Arkitekturen är den sorts processor AMI:n är byggd för, och den måste passa instanstypen. <span class="src">(<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html">AWS: Amazon Machine Images</a>)</span></p>
 </section>
 
 <h2>Quiz</h2>
@@ -62,7 +62,7 @@
 </div>
 
 <div class="quiz-q">
-  <p class="q">2. Varför passar Amazon Linux 2023 i kursen?</p>
+  <p class="q">2. Varför väljs Amazon Linux 2023?</p>
   <div class="options">
     <button class="opt" data-why="Det finns många AMI:er, t.ex. med Windows. Skälet är kostnad och Instance Connect.">Den är ensam om att fungera på EC2-servrarna</button>
     <button class="opt" data-why="Valet av AMI påverkar inte om servern nås. Skälet är kostnad och Instance Connect.">Den gör att servern blir nåbar från internet</button>
@@ -87,7 +87,7 @@
   <ul>
     <li>En AMI är avbilden servern startar från. Den innehåller programvaran, främst operativsystemet.</li>
     <li>Du väljer AMI under Application and OS Images när du startar en instans. Samma AMI kan starta flera likadana servrar.</li>
-    <li>Kursen använder Amazon Linux 2023, 64-bit (x86): AWS egen Linux, utan extra kostnad och med EC2 Instance Connect installerat.</li>
+    <li>Servern använder Amazon Linux 2023, 64-bit (x86): AWS egen Linux, utan extra kostnad och med EC2 Instance Connect installerat.</li>
   </ul>
 </div>
 

@@ -20,7 +20,7 @@
 
 <div class="goal">
   <strong>Vad du ska veta efter lektionen</strong>
-  Att JSON är formatet som kroppen skrivs i, både i anropet och i svaret, och att JSON är strikt: ett enda fel tecken gör att kursens server svarar 400.
+  Att JSON är formatet som kroppen skrivs i, både i anropet och i svaret, och att JSON är strikt: ett enda fel tecken gör att servern svarar 400.
 </div>
 
 <section class="explain">
@@ -60,7 +60,7 @@
 </section>
 
 <section class="explain">
-<h2>Ett fel tecken ger 400</h2>
+<h2>Vad händer om JSON:en har ett fel?</h2>
 
 <p>Ett fel tecken gör att kroppen inte är JSON. Då svarar kursens server 400. Enkla citattecken, ett komma efter sista paret eller en avbruten kropp räcker. Klicka och jämför: <span class="src">(kursmaterialet v41, <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON">MDN: Working with JSON</a>)</span></p>
 
@@ -85,7 +85,7 @@
 <h2>Quiz</h2>
 
 <div class="quiz-q">
-  <p class="q">1. Klienten skickar <code>{ 'name': 'Carol' }</code> med rätt <code>Content-Type</code>. Vad svarar kursens server?</p>
+  <p class="q">1. Klienten skickar <code>{ 'name': 'Carol' }</code> med rätt <code>Content-Type</code>. Vad svarar servern?</p>
   <div class="options">
     <button class="opt" data-correct data-why="JSON kräver dubbla citattecken, så servern kan inte läsa kroppen och svarar 400.">400: enkla citattecken är inte JSON</button>
     <button class="opt" data-why="Med enkla citattecken är kroppen inte JSON, så ingen kund skapas.">201: Carol skapas precis som vanligt</button>
@@ -97,7 +97,7 @@
 <div class="quiz-q">
   <p class="q">2. Hur står datumet <code>created_at</code> i serverns svar?</p>
   <div class="options">
-    <button class="opt" data-why="Ett tal skrivs utan citattecken; kursens datum står inom dubbla citattecken.">Som ett heltal utan några citattecken</button>
+    <button class="opt" data-why="Ett tal skrivs utan citattecken; exemplets datum står inom dubbla citattecken.">Som ett heltal utan några citattecken</button>
     <button class="opt" data-why="JSON har ingen typ för datum, så ett datum måste skrivas som text.">Som en särskild datumtyp för JSON</button>
     <button class="opt" data-correct data-why="JSON har ingen datumtyp, så datumet skickas som text inom dubbla citattecken.">Som en text inom dubbla citattecken</button>
   </div>
@@ -120,7 +120,7 @@
   <ul>
     <li>JSON är textformatet som kroppen skrivs i, både i anropet och i svaret. <code>Content-Type: application/json</code> säger att kroppen är JSON.</li>
     <li>Ett JSON-objekt är par av namn och värde inom <code>{ }</code>. Namn och text står inom dubbla citattecken. Datum skickas som text.</li>
-    <li>JSON är strikt. Ett fel tecken, t.ex. enkla citattecken, ger 400 från kursens server. Även giltig JSON kontrolleras: ett tomt namn ger också 400.</li>
+    <li>JSON är strikt. Ett fel tecken, t.ex. enkla citattecken, ger 400 från servern. Även giltig JSON kontrolleras: ett tomt namn ger också 400.</li>
   </ul>
 </div>
 
