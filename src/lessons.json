@@ -346,6 +346,13 @@
       "title": "v41 – Bygg och testa ett API",
       "lessons": [
         {
+          "nr": null,
+          "file": "v41-start.html",
+          "title": "Veckan i överblick: bygg och testa ett API",
+          "goal": "Vad veckans API blir och var varje begrepp passar in.",
+          "tag": ""
+        },
+        {
           "nr": 48,
           "file": "0048-http-anrop-och-svar.html",
           "title": "HTTP-anrop och svar",
@@ -512,6 +519,13 @@
       "code": "v42",
       "title": "V42 – Serverlösa lösningar",
       "lessons": [
+        {
+          "nr": null,
+          "file": "V42-start.html",
+          "title": "Veckan i överblick: serverlösa lösningar",
+          "goal": "Vad veckans lösning blir och var varje begrepp passar in.",
+          "tag": ""
+        },
         {
           "nr": 71,
           "file": "0071-aws-cloudshell.html",
@@ -805,6 +819,13 @@
       "code": "v43",
       "title": "V43 – Asynkrona flöden och integration",
       "lessons": [
+        {
+          "nr": null,
+          "file": "V43-start.html",
+          "title": "Veckan i överblick: asynkrona flöden och integration",
+          "goal": "Vad veckans lösning blir och var varje begrepp passar in.",
+          "tag": ""
+        },
         {
           "nr": 112,
           "file": "0112-synkront-och-asynkront.html",

@@ -90,7 +90,7 @@ function Week({ week, done, set }) {
               onChange={(e) => set([l], e.target.checked)}
             />
             <span className="no">
-              Lektion {l.nr}
+              {l.nr === null ? "Start" : `Lektion ${l.nr}`}
               {l.tag && ` · ${l.tag}`}
             </span>
             <a href={`/lessons/${l.file}`}>{l.title}</a>
