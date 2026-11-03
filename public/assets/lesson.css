@@ -243,8 +243,7 @@ button {
 .quiz-q .feedback.right strong { color: var(--good); }
 .quiz-q .feedback.wrong strong { color: var(--bad); }
 
-/* Kopiera-knapp (läggs till av lesson.js på pre och .copyable) */
-.copy-wrap { position: relative; }
+/* Kodrutor (inga kopiera-knappar) */
 pre {
   background: var(--code-bg);
   border-radius: 8px;
@@ -253,18 +252,6 @@ pre {
   font-size: 15px;
 }
 pre code { background: none; padding: 0; }
-.copy-btn {
-  font-size: 13px;
-  padding: 3px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--muted);
-  margin-left: 6px;
-  vertical-align: middle;
-}
-.copy-wrap > .copy-btn { position: absolute; top: 8px; right: 8px; margin: 0; }
-.copy-btn:hover { color: var(--accent); border-color: var(--accent); }
 
 /* Sammanfattning och slut */
 .summary {

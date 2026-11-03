@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start v43: asynkrona flöden och integration</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Start · V43</span>
+</nav>
+
+<p class="lesson-no">Start · V43</p>
+<h1>Veckan i överblick: asynkrona flöden och integration</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad veckans lösning blir och var varje begrepp passar in.
+</div>
+
+<section class="explain">
+<h2>Vad bygger vi?</h2>
+
+<p><code>v42-api</code> sparar kunden, lägger ett meddelande i SQS-kön (Simple Queue Service) <code>v43-customer-events</code> och svarar 201 utan att vänta på jobbet. Lambda-funktionen <code>v43-welcome</code> hämtar meddelandet och skriver <code>welcome_sent_at</code> i <code>v42-customers</code>. Ett fel ger nya försök, och till slut hamnar meddelandet i en dödbrevskö (DLQ, dead-letter queue). Sist publicerar API:et en händelse till EventBridge, en tjänst som tar emot händelser och skickar dem vidare enligt regler: här till kön, ett mejl och en logg.</p>
+
+<svg viewBox="0 0 640 200" role="img" aria-label="v42-api skickar ett meddelande till kön v43-customer-events. Lambda v43-welcome hämtar det och skriver i DynamoDB v42-customers. Efter flera misslyckanden flyttas meddelandet till dödbrevskön. v42-api kan i stället publicera en händelse till EventBridge, som skickar den till kön." style="width:100%;height:auto;margin:16px 0;font-size:14px">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+  <g fill="#fff" stroke="#2563eb" stroke-width="2">
+    <rect x="10" y="30" width="120" height="50" rx="8"/>
+    <rect x="170" y="30" width="150" height="50" rx="8"/>
+    <rect x="370" y="30" width="110" height="50" rx="8"/>
+    <rect x="520" y="30" width="115" height="50" rx="8"/>
+    <rect x="370" y="130" width="150" height="50" rx="8"/>
+    <rect x="10" y="130" width="120" height="50" rx="8" stroke-dasharray="6 4"/>
+  </g>
+  <g fill="#111827" text-anchor="middle">
+    <text x="70" y="52" font-weight="700">Lambda</text><text x="70" y="70">v42-api</text>
+    <text x="245" y="52" font-weight="700">SQS-kö</text><text x="245" y="70">v43-customer-events</text>
+    <text x="425" y="52" font-weight="700">Lambda</text><text x="425" y="70">v43-welcome</text>
+    <text x="577" y="52" font-weight="700">DynamoDB</text><text x="577" y="70">v42-customers</text>
+    <text x="445" y="152" font-weight="700">Dödbrevskö</text><text x="445" y="170">…events-dlq</text>
+    <text x="70" y="152" font-weight="700">EventBridge</text><text x="70" y="170">mejl, logg</text>
+  </g>
+  <g stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#ah)">
+    <path d="M130,55 H168"/><path d="M320,55 H368"/><path d="M480,55 H518"/>
+    <path d="M280,80 V155 H368"/>
+    <path d="M70,80 V128" stroke-dasharray="6 4"/>
+    <path d="M130,155 H210 V82" stroke-dasharray="6 4"/>
+  </g>
+  <g fill="#6b7280" text-anchor="middle" font-size="13">
+    <text x="324" y="147">flera fel</text>
+  </g>
+</svg>
+</section>
+
+<section class="explain">
+<h2>Vad liknar det?</h2>
+
+<p>V42. Samma kund, tabell och route. Funktionen är samma sorts handler.</p>
+
+<p>Det håller inte här: i v42 var anropet och jobbet ett anrop, och ett fel gav klienten 500. Nu får klienten 201 före jobbet, och felet når inte klienten. Inget HTTP-anrop startar <code>v43-welcome</code>: Lambda hämtar från kön.</p>
+</section>
+
+<section class="explain">
+<h2>Veckans begrepp</h2>
+
+<ul>
+  <li>Idén: <a href="0112-synkront-och-asynkront.html">synkront och asynkront</a> (0112), <a href="0114-producent-och-konsument.html">producent och konsument</a> (0114)</li>
+  <li>Kön: <a href="0113-sqs-ko.html">SQS-kö</a> (0113), standardkö (0115), meddelande (0116), retention period (0121), URL och ARN (0125)</li>
+  <li>Hämtning: hämtat är inte borta (0117), visibility timeout (0118), receive count (0119), long polling (0120)</li>
+  <li>Dödbrevskön: dödbrevskö (0122), maxReceiveCount (0123), redrive (0124)</li>
+  <li>Producenten: SendMessage (0126), innehåll (0127), spara först (0128)</li>
+  <li>Konsumenten: SQS-trigger (0129), roll (0130), event (0131), batch size (0132)</li>
+  <li>Fel: återförsök (0133), tillfälligt och permanent (0134), minst en gång (0135), idempotens (0136)</li>
+  <li>Händelser: händelse (0137), EventBridge (0138), regel (0139), mål (0140), PutEvents (0141), kuvert (0142), SNS-ämne (0143), prenumeration (0144), access policy (0145)</li>
+  <li>Bonus: Scheduler (0146), cron och rate (0147)</li>
+</ul>
+</section>
+
+<section class="explain">
+<h2>Efter veckan</h2>
+
+<p>Du kan följa ett meddelande genom bilden, säga vad som händer vid fel, och varför koden måste tåla samma meddelande två gånger.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad får klienten när jobbet i v43-welcome misslyckas?</p>
+  <div class="options">
+    <button class="opt" data-why="Det gällde v42, där anropet och jobbet var ett, men nu svarar API:et före jobbet.">Ett 500-svar från v42-api, som förut</button>
+    <button class="opt" data-correct data-why="Klienten fick 201 före jobbet, så felet hanteras av kön med nya försök.">Fortfarande 201, felet stannar i kön</button>
+    <button class="opt" data-why="API:et har redan svarat, så klienten väntar inte på jobbet.">Inget svar, anropet väntar på jobbet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad startar v43-welcome?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Lambda hämtar meddelandet från kön och anropar funktionen.">Lambda, som hämtar åt funktionen</button>
+    <button class="opt" data-why="Inget HTTP-anrop startar funktionen, Lambda hämtar från kön.">API Gateway, med ett HTTP-anrop</button>
+    <button class="opt" data-why="v42-api lämnar bara meddelandet i kön och anropar inte konsumenten.">v42-api, som anropar den direkt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>API:et svarar 201 efter att meddelandet lagts i kön. Lambda hämtar det och gör jobbet.</li>
+    <li>Ett fel ger nya försök och till slut dödbrevskön. EventBridge skickar en händelse till flera mål.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS Lambda: Using Lambda with Amazon SQS</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0111-miljovariabel-i-vite.html">Förra: Miljövariabel i Vite</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0112-synkront-och-asynkront.html">Nästa: Synkront och asynkront</a>
+</nav>
+
+</main>
+</body>
+</html>

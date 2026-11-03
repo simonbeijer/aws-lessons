@@ -52,7 +52,7 @@
 
 <p>API Gateway svarar <code>429 Too Many Requests</code>, med kroppen <code>{"message":"Too Many Requests"}</code>. Koden börjar på 4, så det räknas som <a href="0050-statuskod.html">klientens fel</a>. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-throttling.html">AWS: Throttle requests to your HTTP APIs</a>)</span></p>
 
-<p>Funktionen körs inte. Anropet syns därför inte i funktionens logg i <a href="0082-cloudwatch-logs.html">CloudWatch Logs</a>. Så skyddar gränsen funktionen, och <a href="0088-dynamodb.html">DynamoDB</a> bakom den, från en klient som skickar för många anrop. I <a href="0067-autentisering.html">lektion 67</a> hämtades 184 000 bokningar, utan någon sådan gräns.</p>
+<p>Funktionen körs inte. Anropet syns därför inte i funktionens logg i <a href="0082-cloudwatch-logs.html">CloudWatch Logs</a>. Så skyddar gränsen funktionen, och <a href="0088-dynamodb.html">DynamoDB</a> bakom den, från en klient som skickar för många anrop.</p>
 
 <div class="box good">
   <span class="box-title">Gör så här</span>
@@ -97,8 +97,8 @@
   <p class="q">2. Ett anrop får 429 från API Gateway. Vad gör funktionen med anropet?</p>
   <div class="options">
     <button class="opt" data-why="Det är API Gateway som svarar 429, inte funktionens kod.">Den körs och returnerar själv 429</button>
-    <button class="opt" data-correct data-why="API Gateway stoppar anropet innan det når funktionen, så den körs inte.">Ingenting, för den körs aldrig alls</button>
     <button class="opt" data-why="Anropet når aldrig funktionen, så det finns inget svar att kasta.">Den körs, men svaret kastas sedan</button>
+    <button class="opt" data-correct data-why="API Gateway stoppar anropet innan det når funktionen, så den körs inte.">Ingenting, för den körs aldrig alls</button>
   </div>
   <p class="feedback" aria-live="polite"></p>
 </div>

@@ -800,6 +800,33 @@
           "tag": "labb 4"
         }
       ]
+    },
+    {
+      "code": "v43",
+      "title": "V43 – Asynkrona flöden och integration",
+      "lessons": [
+        {
+          "nr": 112,
+          "file": "0112-synkront-och-asynkront.html",
+          "title": "Synkront och asynkront",
+          "goal": "Att synkront betyder att anroparen väntar på jobbet, och asynkront att jobbet görs senare. API:et i V43 svarar 201 innan välkomnandet är gjort.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 113,
+          "file": "0113-sqs-ko.html",
+          "title": "SQS-kö",
+          "goal": "Att en SQS-kö sparar meddelanden tills någon tagit bort dem, och att hämta inte är att ta bort. Därför tappar en kraschad mottagare inget.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 114,
+          "file": "0114-producent-och-konsument.html",
+          "title": "Producent och konsument",
+          "goal": "Att producenten lägger meddelanden på kön och konsumenten hämtar dem. I V43 delar de bara kön och anropar aldrig varandra.",
+          "tag": "labb 1–3"
+        }
+      ]
     }
   ]
 }

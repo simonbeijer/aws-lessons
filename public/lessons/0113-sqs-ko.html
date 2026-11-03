@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQS-kö</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 113 · V43, 2 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 113</p>
+<h1>SQS-kö</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en SQS-kö sparar meddelanden tills någon tagit bort dem, och att hämta inte är att ta bort. Därför tappar en kraschad mottagare inget.
+</div>
+
+<section class="explain">
+<h2>Vad sparar kön?</h2>
+
+<p>En SQS-kö sparar meddelanden tills någon har hämtat dem och tagit bort dem. Ett meddelande är en text som en del av systemet skickar till kön. Kön sparar det på flera servrar. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html">AWS: What is Amazon SQS?</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad händer vid hämtning?</h2>
+
+<p>Meddelandet blir osynligt för andra en kort stund. Hämtat är inte borta: en mottagare, alltså den som hämtar, tar bort meddelandet först när den själv säger till kön att det är klart. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html">AWS: Visibility timeout</a>)</span></p>
+
+<p>Kraschar mottagaren innan dess, blir meddelandet synligt igen och kan hämtas på nytt. Därför tappar en kraschad mottagare inget. Priset är att ett meddelande kan komma mer än en gång.</p>
+</section>
+
+<section class="explain">
+<h2>Hur länge ligger det kvar?</h2>
+
+<p>Det ligger kvar tills någon tagit bort det, men som standard högst fyra dagar. Därefter tar kön bort det själv. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html">AWS: What is Amazon SQS?</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad händer med ett meddelande när en mottagare hämtat det?</p>
+  <div class="options">
+    <button class="opt" data-why="Hämtat är inte borta, meddelandet tas bort först när mottagaren säger till.">Det tas bort ur kön omedelbart</button>
+    <button class="opt" data-why="Meddelandet stannar i samma kö och flyttas inte vid hämtning.">Det flyttas till en annan kö</button>
+    <button class="opt" data-correct data-why="Det blir osynligt för andra och finns kvar tills mottagaren tar bort det.">Det blir osynligt en kort stund</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. En mottagare kraschar innan den sagt att meddelandet är klart. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="En krasch tar inte bort meddelandet, det finns kvar i kön.">Det tas bort och jobbet blir ogjort</button>
+    <button class="opt" data-correct data-why="Meddelandet var aldrig borta, så det kan hämtas på nytt och inget går förlorat.">Det blir synligt igen efter en stund</button>
+    <button class="opt" data-why="Osynligheten är tidsbegränsad, efter en stund är meddelandet synligt igen.">Det är osynligt tills kön rensas ut</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 112: API:et har lagt ett meddelande i kön och svarat 201. Hur görs välkomnandet?</p>
+  <div class="options">
+    <button class="opt" data-why="Kön sparar bara meddelandet, jobbet görs av den som hämtar det.">Kön utför jobbet automatiskt</button>
+    <button class="opt" data-why="Då hade API:et väntat på jobbet innan 201, men det väntar bara på kön.">Synkront, API:et väntar klart</button>
+    <button class="opt" data-correct data-why="Jobbet görs efter svaret, utan att API:et väntar på det.">Asynkront, jobbet görs senare</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En SQS-kö sparar meddelanden tills någon hämtat dem och tagit bort dem.</li>
+    <li>Hämtat är inte borta: meddelandet är osynligt en stund och tas bort först när mottagaren säger till.</li>
+    <li>Kraschar mottagaren blir meddelandet synligt igen. Efter fyra dagar tar kön bort det själv.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html">AWS: What is Amazon SQS?</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0112-synkront-och-asynkront.html">Förra: Synkront och asynkront</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0114-producent-och-konsument.html">Nästa: Producent och konsument</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -28,7 +28,7 @@
 
 <p>Du sätter den i funktionens <a href="0078-lambda-funktion.html">konfiguration</a> i konsolen, där du också ställer in <a href="0086-timeout.html">timeout</a>. Det är samma sorts <a href="0044-miljovariabel.html">miljövariabel som i lektion 44</a>, ett namn med ett värde, men du skriver inget <code>export</code> i terminalen. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html">AWS: Working with Lambda environment variables</a>)</span></p>
 
-<p>Under Configuration → Environment variables → Edit → Add environment variable fyller du i nyckel och värde. Nyckeln är namnet, <code class="copyable">TABLE_NAME</code>. Värdet är tabellens namn, <code class="copyable">v42-customers</code>. Sedan Save. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#create-environment-variables">AWS: Creating environment variables</a>)</span></p>
+<p>Under Configuration → Environment variables → Edit → Add environment variable fyller du i nyckel och värde. Nyckeln är namnet, <code>TABLE_NAME</code>. Värdet är tabellens namn, <code>v42-customers</code>. Sedan Save. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#create-environment-variables">AWS: Creating environment variables</a>)</span></p>
 
 <p>Tabellnamnet hör hemma i konfigurationen, inte i koden. Då kan samma kod köra mot en annan tabell: du byter värdet, inte koden.</p>
 </section>

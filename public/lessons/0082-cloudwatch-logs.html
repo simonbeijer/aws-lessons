@@ -36,7 +36,7 @@
 <section class="explain">
 <h2>Var ligger loggen?</h2>
 
-<p>I logggruppen <code>/aws/lambda/&lt;namn&gt;</code>. Funktionen <code>v42-hello</code> loggar till <code class="copyable">/aws/lambda/v42-hello</code>. En logggrupp samlar loggen för en funktion. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs.html">AWS: Sending Lambda logs to CloudWatch Logs</a>)</span></p>
+<p>I logggruppen <code>/aws/lambda/&lt;namn&gt;</code>. Funktionen <code>v42-hello</code> loggar till <code>/aws/lambda/v42-hello</code>. En logggrupp samlar loggen för en funktion. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs.html">AWS: Sending Lambda logs to CloudWatch Logs</a>)</span></p>
 
 <p>Gruppen är uppdelad i loggströmmar. En loggström är rader i tidsordning från en kopia av funktionen. Lambda kan köra flera kopior, var och en med egen ström. Varför kommer i nästa lektion. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html">AWS: Viewing Lambda logs</a>, <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatchLogsConcepts.html">AWS: CloudWatch Logs concepts</a>)</span></p>
 

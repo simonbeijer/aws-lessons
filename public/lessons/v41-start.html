@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start v41: bygg och testa ett API</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Start · v41</span>
+</nav>
+
+<p class="lesson-no">Start · v41</p>
+<h1>Veckan i överblick: bygg och testa ett API</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad veckans API blir och var varje begrepp passar in.
+</div>
+
+<section class="explain">
+<h2>Vad bygger vi?</h2>
+
+<p>Ett <a href="0053-rest-api.html">REST-API</a> (Representational State Transfer, Application Programming Interface) i <a href="0057-express.html">Express</a> på din EC2-server. Det svarar med <a href="0052-json.html">JSON</a> (JavaScript Object Notation) ur databasen RDS och nås från din dator på port 3000.</p>
+
+<svg viewBox="0 0 640 250" role="img" aria-label="Din dator anropar Express på EC2 på port 3000. EC2 anropar databasen RDS på port 5432." style="width:100%;height:auto;margin:16px 0;font-size:14px">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+  <g fill="#fff" stroke="#2563eb" stroke-width="2">
+    <rect x="10" y="90" width="150" height="70" rx="8"/>
+    <rect x="245" y="90" width="150" height="70" rx="8"/>
+    <rect x="480" y="90" width="150" height="70" rx="8"/>
+    <rect x="10" y="10" width="150" height="44" rx="8" stroke-dasharray="5 4"/>
+  </g>
+  <g fill="#111827" text-anchor="middle">
+    <text x="85" y="120" font-weight="700">Din dator</text><text x="85" y="142">curl, Postman</text>
+    <text x="320" y="120" font-weight="700">EC2 v40-web</text><text x="320" y="142">Express</text>
+    <text x="555" y="120" font-weight="700">RDS v40-db</text><text x="555" y="142">PostgreSQL</text>
+    <text x="85" y="37">React på Amplify</text>
+  </g>
+  <g stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#ah)">
+    <path d="M160,125 H243"/><path d="M395,125 H478"/><path d="M85,56 V88" stroke-dasharray="5 4"/>
+  </g>
+  <g fill="#6b7280" text-anchor="middle" font-size="13">
+    <text x="202" y="185">port 3000,</text><text x="202" y="203">bara My IP</text>
+    <text x="437" y="185">port 5432, bara från</text><text x="437" y="203">webbserverns grupp</text>
+  </g>
+</svg>
+</section>
+
+<section class="explain">
+<h2>Vad liknar det?</h2>
+
+<p>En Express-server på din Mac på <a href="0058-localhost.html">localhost</a>:3000. Samma kod, samma curl och Postman, samma <a href="0050-statuskod.html">statuskoder</a>.</p>
+
+<p>Det håller inte här: EC2 har en egen publik adress bakom en <a href="0034-security-group.html">security group</a>, och databasen når du bara via webbservern. En sida på HTTPS (HTTP Secure) får inte heller anropa HTTP (Hypertext Transfer Protocol), vilket lokalt aldrig händer.</p>
+</section>
+
+<section class="explain">
+<h2>Veckans begrepp</h2>
+
+<ol>
+  <li><a href="0048-http-anrop-och-svar.html">HTTP-anrop och svar</a>: det som går mellan pilarna</li>
+  <li><a href="0049-http-metod.html">HTTP-metod</a>: säger vad anropet gör</li>
+  <li><a href="0050-statuskod.html">Statuskod</a>: hur det gick</li>
+  <li><a href="0051-header.html">Header</a>: extra uppgifter i anropet</li>
+  <li><a href="0052-json.html">JSON</a>: formen på svaret</li>
+  <li><a href="0053-rest-api.html">REST-API</a>: hur anropen formas</li>
+  <li><a href="0054-curl.html">curl</a>: anropa från terminalen</li>
+  <li><a href="0055-postman.html">Postman</a>: anropa med ett program</li>
+  <li><a href="0056-network-fliken.html">Network-fliken</a>: se webbläsarens anrop</li>
+  <li><a href="0057-express.html">Express</a>: servern på EC2</li>
+  <li><a href="0058-localhost.html">localhost</a>: din egen dator</li>
+  <li><a href="0059-sql-parameter.html">SQL-parameter</a>: SQL (Structured Query Language), värden till databasen</li>
+  <li><a href="0060-process-i-bakgrunden.html">Process i bakgrunden</a>: servern lever kvar</li>
+  <li><a href="0061-variabel-i-postman.html">Variabel i Postman</a>: adressen på ett ställe</li>
+  <li><a href="0062-test-i-postman.html">Test i Postman</a>: kontrollerar svaret</li>
+  <li><a href="0063-negativt-test.html">Negativt test</a>: kontrollerar felen</li>
+  <li><a href="0064-yaml.html">YAML</a>: YAML Ain't Markup Language, formatet OpenAPI-filen skrivs i</li>
+  <li><a href="0065-openapi.html">OpenAPI</a>: API:et beskrivet i en fil</li>
+  <li><a href="0066-swagger-ui.html">Swagger UI</a>: prova anrop på en sida</li>
+  <li><a href="0067-autentisering.html">Autentisering</a>: vem anropar</li>
+  <li><a href="0068-agarkontroll.html">Ägarkontroll</a>: vems objekt det är</li>
+  <li><a href="0069-cors.html">CORS</a> (Cross-Origin Resource Sharing): webbläsarens spärr mellan Amplify och EC2</li>
+  <li><a href="0070-mixed-content.html">Mixed content</a>: HTTPS-sida mot HTTP-server</li>
+</ol>
+</section>
+
+<section class="explain">
+<h2>Efter veckan</h2>
+
+<p>Du kan anropa API:et med curl, Postman och Swagger UI, läsa statuskoderna, och förklara varför databasen och webbservern nås olika.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Hur når din dator databasen i bilden?</p>
+  <div class="options">
+    <button class="opt" data-why="Databasen släpper in port 5432 bara från webbserverns security group, inte från din dator.">Direkt, på port 5432 från din dator</button>
+    <button class="opt" data-why="Port 3000 är webbserverns port, inte databasens.">Direkt, på port 3000 från din Mac</button>
+    <button class="opt" data-correct data-why="Bara webbservern släpps in, så anropet går via Express.">Inte direkt, bara via Express på EC2</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. I vilken ordning går ett anrop genom bilden?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Datorn anropar Express på EC2, som frågar databasen och svarar tillbaka.">Din dator, EC2 med Express, sedan RDS</button>
+    <button class="opt" data-why="Databasen släpper inte in din dator, så anropet måste gå via webbservern.">Din dator, RDS, sedan EC2 med Express</button>
+    <button class="opt" data-why="Anropet startar hos klienten, alltså din dator, inte hos servern.">EC2 med Express, din dator, sedan RDS</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Veckans API är Express på EC2 mot RDS, nått från din dator på port 3000.</li>
+    <li>Det liknar localhost, men EC2 och databasen ligger bakom security groups.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html">AWS RDS: Working with a DB instance in a VPC</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0047-egen-ami.html">Förra: Egen AMI</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0048-http-anrop-och-svar.html">Nästa: HTTP-anrop och svar</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,4 +1,4 @@
-// Delat script för alla lektioner: quiz, klickbara val (picker) och kopiera-knappar.
+// Delat script för alla lektioner: quiz, klickbara val (picker) och klar-markering.
 //
 // Quiz:
 //   <div class="quiz-q">
@@ -16,7 +16,7 @@
 //     <div class="picker-panel" id="p1">...</div>
 //   </div>
 //
-// Kopiera: alla <pre> får en knapp. Inline: <code class="copyable">text</code>.
+// Inga kopiera-knappar (SKILL.md): varken på <pre> eller inline-kod.
 
 (function () {
   function setupQuiz() {
@@ -62,53 +62,6 @@
     });
   }
 
-  function copyText(text, btn) {
-    function done() {
-      var old = btn.textContent;
-      btn.textContent = "Kopierat";
-      setTimeout(function () { btn.textContent = old; }, 1500);
-    }
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(done, function () { fallback(text); done(); });
-    } else {
-      fallback(text);
-      done();
-    }
-  }
-
-  function fallback(text) {
-    var ta = document.createElement("textarea");
-    ta.value = text;
-    ta.style.position = "fixed";
-    ta.style.opacity = "0";
-    document.body.appendChild(ta);
-    ta.select();
-    try { document.execCommand("copy"); } catch (e) { /* inget att göra */ }
-    document.body.removeChild(ta);
-  }
-
-  function makeBtn(getText) {
-    var btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "copy-btn";
-    btn.textContent = "Kopiera";
-    btn.addEventListener("click", function () { copyText(getText(), btn); });
-    return btn;
-  }
-
-  function setupCopy() {
-    document.querySelectorAll("pre").forEach(function (pre) {
-      var wrap = document.createElement("div");
-      wrap.className = "copy-wrap";
-      pre.parentNode.insertBefore(wrap, pre);
-      wrap.appendChild(pre);
-      wrap.appendChild(makeBtn(function () { return pre.innerText.replace(/\n$/, ""); }));
-    });
-    document.querySelectorAll(".copyable").forEach(function (el) {
-      el.insertAdjacentElement("afterend", makeBtn(function () { return el.innerText; }));
-    });
-  }
-
   // Klick på "Nästa: ..." markerar den här lektionen som klar på startsidan.
   // Samma nyckel och format som index.html.
   function setupDoneOnNext() {
@@ -130,7 +83,6 @@
   document.addEventListener("DOMContentLoaded", function () {
     setupQuiz();
     setupPickers();
-    setupCopy();
     setupDoneOnNext();
   });
 })();

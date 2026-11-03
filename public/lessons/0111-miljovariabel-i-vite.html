@@ -97,9 +97,9 @@
 <div class="quiz-q">
   <p class="q">2. Du sparar ett nytt värde på <code>VITE_API_URL</code> i Amplify. När når det sidan?</p>
   <div class="options">
-    <button class="opt" data-why="Save sparar bara värdet; sidan har det gamla inbyggt tills nästa bygge.">Direkt, när du trycker Save</button>
-    <button class="opt" data-why="Lambda har inget med sidans variabel att göra; den byggs in av Vite.">När Lambda startar en miljö</button>
     <button class="opt" data-correct data-why="Vite bygger in värdet i dist/, så det behövs ett nytt bygge.">Efter nästa bygge av dist/</button>
+    <button class="opt" data-why="Lambda har inget med sidans variabel att göra; den byggs in av Vite.">När Lambda startar en miljö</button>
+    <button class="opt" data-why="Save sparar bara värdet; sidan har det gamla inbyggt tills nästa bygge.">Direkt, när du trycker Save</button>
   </div>
   <p class="feedback" aria-live="polite"></p>
 </div>
@@ -108,8 +108,8 @@
   <p class="q">3. Repetition från lektion 44: <code>DB_PASSWORD</code> låg i en miljövariabel på servern. Varför får lösenordet inte ligga i en <code>VITE_</code>-variabel?</p>
   <div class="options">
     <button class="opt" data-why="Vite läser vilket värde som helst; det som gör det farligt är att värdet byggs in i sidan.">Vite kan bara läsa in värden med https</button>
-    <button class="opt" data-correct data-why="Värdet byggs in i sidans JavaScript, som varje besökare laddar ner.">Värdet byggs in i sidan som alla laddar</button>
     <button class="opt" data-why="Amplify läser variabler från konsolen; problemet är att värdet hamnar i sidan.">Amplify kan inte läsa en fil med lösenord</button>
+    <button class="opt" data-correct data-why="Värdet byggs in i sidans JavaScript, som varje besökare laddar ner.">Värdet byggs in i sidan som alla laddar</button>
   </div>
   <p class="feedback" aria-live="polite"></p>
 </div>
@@ -134,7 +134,7 @@
 <nav class="bottomnav">
   <a href="0110-throttling.html">Förra: Throttling</a>
   <a href="../index.html">Alla lektioner</a>
-  <span class="disabled">Nästa: Synkront och asynkront</span>
+  <a href="0112-synkront-och-asynkront.html">Nästa: Synkront och asynkront</a>
 </nav>
 
 </main>

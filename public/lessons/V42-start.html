@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start v42: serverlösa lösningar</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Start · V42</span>
+</nav>
+
+<p class="lesson-no">Start · V42</p>
+<h1>Veckan i överblick: serverlösa lösningar</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Vad veckans lösning blir och var varje begrepp passar in.
+</div>
+
+<section class="explain">
+<h2>Vad bygger vi?</h2>
+
+<p>Ett kund-API utan egen server, <a href="0077-serverlost.html">serverlöst</a>. React-appen på Amplify anropar en HTTPS-adress i <a href="0103-http-api.html">API Gateway</a>. Den anropar <a href="0078-lambda-funktion.html">Lambda</a>-funktionen <code>v42-api</code>, som läser och skriver <a href="0088-dynamodb.html">DynamoDB</a>-tabellen <code>v42-customers</code>.</p>
+
+<svg viewBox="0 0 640 190" role="img" aria-label="Amplify anropar API Gateway över HTTPS. API Gateway anropar Lambda v42-api. Lambda anropar DynamoDB v42-customers med en execution role." style="width:100%;height:auto;margin:16px 0;font-size:14px">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+  <g fill="#fff" stroke="#2563eb" stroke-width="2">
+    <rect x="5" y="40" width="135" height="70" rx="8"/>
+    <rect x="170" y="40" width="135" height="70" rx="8"/>
+    <rect x="335" y="40" width="135" height="70" rx="8"/>
+    <rect x="500" y="40" width="135" height="70" rx="8"/>
+  </g>
+  <g fill="#111827" text-anchor="middle">
+    <text x="72" y="70" font-weight="700">Amplify</text><text x="72" y="92">React-appen</text>
+    <text x="237" y="70" font-weight="700">API Gateway</text><text x="237" y="92">route</text>
+    <text x="402" y="70" font-weight="700">Lambda</text><text x="402" y="92">v42-api</text>
+    <text x="567" y="70" font-weight="700">DynamoDB</text><text x="567" y="92">v42-customers</text>
+  </g>
+  <g stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#ah)">
+    <path d="M140,75 H168"/><path d="M305,75 H333"/><path d="M470,75 H498"/>
+  </g>
+  <g fill="#6b7280" text-anchor="middle" font-size="13">
+    <text x="155" y="135">HTTPS</text><text x="320" y="135">integration</text><text x="485" y="135">execution role</text>
+  </g>
+</svg>
+</section>
+
+<section class="explain">
+<h2>Vad liknar det?</h2>
+
+<p>Express-API:et från v41. Samma routes, <a href="0052-json.html">JSON</a>, <a href="0050-statuskod.html">statuskoder</a>, curl och Postman.</p>
+
+<p>Det håller inte här: ingen server att logga in på, ingen process som väntar. Funktionen startas per anrop. <a href="0082-cloudwatch-logs.html">Loggen</a> ligger i CloudWatch, <a href="0104-route-i-api-gateway.html">routen</a> och <a href="0109-cors-i-api-gateway.html">CORS</a> i API Gateway, inte i koden.</p>
+</section>
+
+<section class="explain">
+<h2>Veckans begrepp</h2>
+
+<ul>
+  <li>Terminalen: <a href="0071-aws-cloudshell.html">CloudShell</a>, <a href="0072-aws-cli.html">AWS CLI</a> (Command Line Interface), <a href="0073-skalvariabel.html">skalvariabel</a>, <a href="0074-kommandosubstitution.html">kommandosubstitution</a>, <a href="0075-application-load-balancer.html">Application Load Balancer</a>, <a href="0076-arn.html">ARN</a> (Amazon Resource Name)</li>
+  <li>Funktionen: <a href="0079-runtime.html">runtime</a>, <a href="0080-handler.html">handler</a>, <a href="0081-event-och-testhandelse.html">event och testhändelse</a></li>
+  <li>Körningen: <a href="0083-exekveringsmiljo.html">exekveringsmiljö</a>, <a href="0084-kallstart.html">kallstart</a>, <a href="0085-duration-och-billed-duration.html">duration</a>, <a href="0086-timeout.html">timeout</a></li>
+  <li>Rättigheter: <a href="0087-execution-role.html">execution role</a>, <a href="0093-minsta-mojliga-behorighet.html">minsta möjliga behörighet</a>, <a href="0102-accessdeniedexception.html">AccessDeniedException</a>, <a href="0107-resource-based-policy.html">resource-based policy</a></li>
+  <li>Tabellen: <a href="0089-item-och-attribut.html">item</a>, <a href="0090-partitionsnyckel.html">partitionsnyckel</a>, <a href="0091-on-demand-lage.html">on-demand</a>, <a href="0092-dynamodb-operationer.html">operationer</a>, <a href="0100-platshallare-i-uttryck.html">platshållare</a>, <a href="0101-conditionexpression.html">ConditionExpression</a></li>
+  <li>Koden: <a href="0094-miljovariabel-i-lambda.html">miljövariabel</a>, <a href="0095-aws-sdk.html">AWS SDK</a> (Software Development Kit), <a href="0096-documentclient.html">DocumentClient</a>, <a href="0099-uuid.html">UUID</a> (Universally Unique Identifier)</li>
+  <li>Mellan Gateway och funktion: <a href="0097-handelse-fran-api-gateway.html">händelse</a>, <a href="0098-svar-till-api-gateway.html">svar</a></li>
+  <li>API Gateway: <a href="0105-integration.html">integration</a>, <a href="0106-stage-och-invoke-url.html">stage</a>, <a href="0110-throttling.html">throttling</a></li>
+  <li>Webbläsaren: <a href="0108-preflight.html">preflight</a>, <a href="0111-miljovariabel-i-vite.html">miljövariabel i Vite</a></li>
+</ul>
+</section>
+
+<section class="explain">
+<h2>Efter veckan</h2>
+
+<p>Du kan peka ut kedjan i bilden och vilken roll som ger vilken rättighet, läsa en AccessDeniedException, och säga var CORS, routen och gränsen ligger.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. I vilken ordning går ett anrop genom bilden?</p>
+  <div class="options">
+    <button class="opt" data-why="API Gateway tar emot anropet först och skickar det vidare till Lambda.">Amplify, Lambda, API Gateway, sedan DynamoDB</button>
+    <button class="opt" data-correct data-why="Amplify anropar API Gateway, som anropar Lambda, som läser DynamoDB.">Amplify, API Gateway, Lambda, sedan DynamoDB</button>
+    <button class="opt" data-why="Anropet börjar hos Amplify, inte hos API Gateway.">API Gateway, Amplify, Lambda, sedan DynamoDB</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Var ställs CORS in?</p>
+  <div class="options">
+    <button class="opt" data-why="Koden skickar bara svaret, CORS ställs in i API Gateway.">I Lambda-funktionens egen kod</button>
+    <button class="opt" data-why="Tabellen känner inte till webbläsaren, CORS ställs in i API Gateway.">I DynamoDB-tabellen med kunderna</button>
+    <button class="opt" data-correct data-why="CORS ställs in i API Gateway, inte i koden.">I API Gateways CORS-inställning</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Amplify anropar API Gateway, som anropar Lambda, som använder DynamoDB.</li>
+    <li>Likt Express i v41, men utan server: routen och CORS ligger i API Gateway.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html">AWS Lambda: What is AWS Lambda?</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0070-mixed-content.html">Förra: Mixed content</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0071-aws-cloudshell.html">Nästa: AWS CloudShell</a>
+</nav>
+
+</main>
+</body>
+</html>
