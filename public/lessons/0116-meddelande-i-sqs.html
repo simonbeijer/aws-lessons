@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meddelande i SQS</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 116 · V43, 5 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 116</p>
+<h1>Meddelande i SQS</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att ett meddelande är en text, ofta JSON, som ligger i fältet Message body. När det skickas ger kön det ett message ID.
+</div>
+
+<section class="explain">
+<h2>Vad är ett meddelande?</h2>
+
+<p>Ett meddelande är en text som du skickar till kön. Texten står i fältet Message body och måste ha minst ett tecken. Den får vara <a href="0052-json.html">JSON</a>, XML (Extensible Markup Language, text med taggar) eller vanlig text. Producenten skriver den, och konsumenten läser den senare. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html">AWS: SendMessage</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad är ett message ID?</h2>
+
+<p>Message ID är en identifierare som SQS sätter på meddelandet när det skickats. Du väljer den inte. Svaret på skickandet innehåller den, och det visar att kön tog emot meddelandet. Meddelandet ligger sedan kvar i kön. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-queue-message-identifiers.html">AWS: Message identifiers</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad kan Message body innehålla?</p>
+  <div class="options">
+    <button class="opt" data-why="Meddelandet måste ha minst ett tecken, ett tomt fält skickas inte.">Inget alls, det får vara tomt</button>
+    <button class="opt" data-why="En bild är ingen text, meddelandet måste vara JSON, XML eller vanlig text.">Bara en bild, till exempel PNG</button>
+    <button class="opt" data-correct data-why="Message body är en text, och JSON är ett vanligt val.">En text, till exempel en JSON</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vem sätter meddelandets message ID, och när?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="SQS sätter message ID och skickar tillbaka det i svaret.">SQS, när meddelandet skickas</button>
+    <button class="opt" data-why="Du väljer inte message ID, det sätts efter att meddelandet har skickats.">Du, innan meddelandet skickas</button>
+    <button class="opt" data-why="ID:t finns redan när meddelandet ligger i kön, före all hämtning.">Konsumenten, när den hämtar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 115: vilken kö håller ordningen?</p>
+  <div class="options">
+    <button class="opt" data-why="Standardkön är förvald men lovar ingen ordning.">Standard, den som är förvald</button>
+    <button class="opt" data-correct data-why="FIFO håller ordningen, och namnet slutar på .fifo.">FIFO, namnet slutar på .fifo</button>
+    <button class="opt" data-why="FIFO-kön håller ordningen, så någon kö har ordning.">Ingen, kön har ingen ordning</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett meddelande är en text i Message body: JSON, XML eller vanlig text.</li>
+    <li>SQS sätter ett message ID när meddelandet skickas, och svaret innehåller det.</li>
+    <li>Meddelandet ligger kvar i kön efter att det skickats.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html">AWS: SendMessage</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0115-standardko.html">Förra: Standardkö</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0117-hamtat-ar-inte-borta.html">Nästa: Hämtat är inte borta</a>
+</nav>
+
+</main>
+</body>
+</html>

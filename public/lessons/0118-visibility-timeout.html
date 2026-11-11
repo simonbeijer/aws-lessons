@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visibility timeout</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 118 · V43, 7 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 118</p>
+<h1>Visibility timeout</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att ett hämtat meddelande är osynligt för andra i 30 sekunder och blir synligt igen om ingen tagit bort det. Tiden ska vara längre än jobbet tar.
+</div>
+
+<section class="explain">
+<h2>Vad är visibility timeout?</h2>
+
+<p>Visibility timeout är tiden ett hämtat meddelande är osynligt för andra konsumenter. Det är den osynliga stunden från <a href="0117-hamtat-ar-inte-borta.html">förra lektionen</a>. Den räknas från hämtningen och är 30 sekunder som standard för en kö. Tas meddelandet inte bort med DeleteMessage innan tiden gått ut, blir det synligt igen. Samma eller en annan konsument kan då hämta det. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html">AWS: Visibility timeout</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Hur lång ska tiden vara?</h2>
+
+<p>Längre än jobbet tar. Är den kortare blir meddelandet synligt medan konsumenten ännu jobbar, och en annan konsument kan hämta det. Är den mycket längre dröjer det innan ett misslyckat meddelande kan hämtas igen. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html">AWS: Visibility timeout</a>)</span></p>
+
+<p>Hämtar <a href="0114-producent-och-konsument.html">Lambda meddelandet åt en funktion</a> gäller även funktionens <a href="0077-miljo-kallstart-timeout.html">timeout</a>. Kön får inte ha kortare visibility timeout än funktionen. AWS rekommenderar minst sex gånger funktionens timeout, alltså 60 sekunder för en funktion på 10 sekunder. Kursen ger funktionen 10 sekunder och kön 30 sekunder, vilket klarar kravet men inte rekommendationen. Gäller gör AWS rekommendation. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-configure.html">AWS: SQS-trigger för Lambda</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Jobbet tar längre tid än visibility timeout. Vad kan hända?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Meddelandet är synligt igen och en annan konsument kan hämta det.">En annan konsument kan hämta det</button>
+    <button class="opt" data-why="Kön väntar inte, tiden går ut oavsett jobbet.">Kön väntar tills jobbet är klart</button>
+    <button class="opt" data-why="Kön tar aldrig bort något själv, det görs med DeleteMessage.">Kön tar bort det åt konsumenten</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Funktionens timeout är 20 sekunder. Vad rekommenderar AWS för kön?</p>
+  <div class="options">
+    <button class="opt" data-why="Rekommendationen är minst sex gånger funktionens timeout, inte 30.">Normalt 30 sekunder</button>
+    <button class="opt" data-why="Kön får inte vara kortare än funktionen, så högst 20 går inte.">Högst 20 sekunder</button>
+    <button class="opt" data-correct data-why="Sex gånger 20 sekunder är 120 sekunder, och det är minimum.">Minst 120 sekunder</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. När börjar visibility timeout räknas?</p>
+  <div class="options">
+    <button class="opt" data-why="Meddelandet är osynligt först när det hämtats, inte när det skickas.">Från sändningen</button>
+    <button class="opt" data-why="Raderas meddelandet är det borta, då finns ingen tid att räkna.">Från raderingen</button>
+    <button class="opt" data-correct data-why="Tiden räknas från hämtningen, då meddelandet blir osynligt.">Från hämtningen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Visibility timeout är tiden ett hämtat meddelande är osynligt, 30 sekunder som standard.</li>
+    <li>Tas det inte bort med DeleteMessage innan tiden gått ut, blir det synligt igen.</li>
+    <li>Tiden ska vara längre än jobbet. Med Lambda rekommenderar AWS minst sex gånger funktionens timeout.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html">AWS: Visibility timeout</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0117-hamtat-ar-inte-borta.html">Förra: Hämtat är inte borta</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0119-receive-count.html">Nästa: Receive count</a>
+</nav>
+
+</main>
+</body>
+</html>

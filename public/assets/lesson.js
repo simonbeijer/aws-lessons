@@ -21,6 +21,16 @@
 (function () {
   function setupQuiz() {
     document.querySelectorAll(".quiz-q").forEach(function (q) {
+      // Svaren blandas vid varje sidladdning, så ordningen i HTML-filen spelar ingen roll.
+      var box = q.querySelector(".options");
+      if (box) {
+        var list = Array.prototype.slice.call(box.querySelectorAll(".opt"));
+        for (var i = list.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = list[i]; list[i] = list[j]; list[j] = t;
+        }
+        list.forEach(function (o) { box.appendChild(o); });
+      }
       var opts = q.querySelectorAll(".opt");
       var fb = q.querySelector(".feedback");
       opts.forEach(function (opt) {

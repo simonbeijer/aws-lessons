@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handler och event</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 75 · V42, 5 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 75 · V42, 5 av 15 i veckan</p>
+<h1>Handler och event</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Förra lektionen sa att Lambda kör din kod när en händelse kommer. Den här visar var koden börjar och vad den får in: handlern tar emot det anroparen skickar och lämnar tillbaka svaret. Innan något annat anropar funktionen kan du själv vara anroparen, med en testhändelse.
+</div>
+
+<section class="explain">
+<h2>Vad är en handler?</h2>
+
+<p>Handlern är den funktion i koden som Lambda anropar varje gång en händelse kommer. Så här ser en ut:</p>
+
+<pre><code>export const handler = async (event, context) =&gt; {
+  return { message: "Hej!" };
+};</code></pre>
+
+<p>Den får in två saker. <code>event</code> är händelsen, alltså det anroparen skickar med. <code>context</code> är information om själva anropet. Det handlern returnerar blir svaret till anroparen. I <a href="0057-express.html">Express</a> skickade du svaret med <code>res.json</code>. Här returnerar du det.</p>
+
+<p><code>export</code> gör att Lambda utanför filen kan anropa funktionen. <code>async</code> låter den vänta på annat, till exempel en annan AWS-tjänst (Amazon Web Services).</p>
+</section>
+
+<section class="explain">
+<h2>Hur hittar Lambda den?</h2>
+
+<p>Inställningen Handler under Runtime settings pekar ut den: <code>index.handler</code> betyder funktionen <code>handler</code> i filen <code>index.mjs</code>.</p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Byter du namn på filen eller funktionen hittar Lambda inte handlern. Felet heter <code>Runtime.HandlerNotFound</code>. Ändra tillbaka, eller ändra Handler så att den stämmer.</p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Hur skriver man ett event?</h2>
+
+<p>Ett event är <a href="0052-json.html">JSON</a> (JavaScript Object Notation). Med eventet <code>{ "name": "Alice" }</code> ger <code>event.name</code> värdet <code>"Alice"</code>.</p>
+
+<p>En testhändelse är ett event du själv skriver, så att du är anroparen. I konsolen står en Test-knapp i editorn. Man ger händelsen namn under Event name och skriver JSON i rutan Event JSON. Save sparar den, Test kör funktionen med den som <code>event</code> och visar svaret. Behöver funktionen ingen indata räcker <code>{}</code>.</p>
+
+<p>Sparade händelser körs igen med ett klick, upp till 10 per funktion som bara du ser. Utan Save försvinner händelsen när man lämnar konsolen.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Inställningen Handler är <code>index.handler</code>. Vad pekar den på?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Före punkten står filnamnet, efter punkten funktionens namn.">Funktionen handler i filen index.mjs</button>
+    <button class="opt" data-why="Det är ingen mapp; före punkten står filen och efter den funktionen.">Filen handler.mjs i en mapp som heter index</button>
+    <button class="opt" data-why="Det är ingen webbsida; index är filen och handler är funktionen.">Webbsidan index.html som visar koden</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Testhändelsen är <code>{ "name": "Alice" }</code>. Handlern slutar med <code>return event.name;</code>. Vad blir svaret?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är namnet i paret; event.name ger värdet som hör till det.">Texten name, namnet i JSON:en</button>
+    <button class="opt" data-correct data-why="Det handlern returnerar blir svaret, och event.name är värdet för name.">Texten Alice, värdet i paret</button>
+    <button class="opt" data-why="event är hela objektet, men event.name ger bara värdet för name.">Hela JSON-objektet med Alice i</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Du ändrar texten i <code>return</code> i editorn och klickar Test. Svaret är det gamla. Varför?</p>
+  <div class="options">
+    <button class="opt" data-why="Testhändelsen styr indata, inte vilken kod som körs.">Testhändelsen måste skrivas om först</button>
+    <button class="opt" data-why="Handlern hittas på namnet; ett fel där ger ett felmeddelande, inte gammalt svar.">Lambda hittar inte handlern längre</button>
+    <button class="opt" data-correct data-why="Ny kod gäller först efter Deploy, så funktionen kör den gamla koden.">Du har inte klickat Deploy efter ändringen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Handlern är funktionen Lambda anropar. <code>index.handler</code> är funktionen <code>handler</code> i <code>index.mjs</code>. Stämmer inte namnen blir felet <code>Runtime.HandlerNotFound</code>.</li>
+    <li>Handlern får <code>event</code> (det anroparen skickar med) och <code>context</code> (information om anropet). Det den returnerar blir svaret.</li>
+    <li>Ett event är JSON, och <code>event.name</code> ger värdet för <code>name</code>.</li>
+    <li>En testhändelse är ett event du skriver själv. <code>{}</code> räcker utan indata. Upp till 10 sparas per funktion.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html">AWS Lambda: Define Lambda function handler in Node.js</a>.</p>
+<p>Om event och testhändelser: <a href="https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html">AWS Lambda: Testing functions in the console</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/concepts-event-driven-architectures.html">AWS Lambda: Creating event-driven architectures with Lambda</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0074-serverlost-och-lambda.html">Förra: Serverlöst och Lambda-funktion</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0076-loggar-och-report-raden.html">Nästa: Loggar och REPORT-raden</a>
+</nav>
+
+</main>
+</body>
+</html>

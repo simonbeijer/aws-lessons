@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tillfälligt och permanent fel</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 134 · V43, 23 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 134</p>
+<h1>Tillfälligt och permanent fel</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att ett tillfälligt fel ska kastas, så att kön försöker igen, och att ett permanent fel ska loggas och hoppas över, så att meddelandet inte fastnar.
+</div>
+
+<section class="explain">
+<h2>Vilka fel går över?</h2>
+
+<p>Ett tillfälligt fel kan gå över av sig själv, så ett nytt försök kan lyckas. Exempel i DynamoDB är <a href="0110-throttling.html">throttling</a> (för många anrop) och <a href="0050-statuskod.html">5xx-fel</a> från tjänsten. Ett permanent fel ger samma svar varje gång. <a href="0079-lasa-och-skriva-i-dynamodb.html">ConditionalCheckFailedException</a> är ett sådant: villkoret <code>attribute_exists(id)</code> är falskt, alltså finns kunden inte. DynamoDB anger att felet inte ska försökas igen, och inget antal försök får kunden att dyka upp. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html">AWS: Error handling with DynamoDB</a>)</span></p>
+
+<p><a href="0095-aws-sdk.html">SDK:n</a> gör själv några försök med väntetid innan ett tillfälligt fel når din kod. Det som kommer fram till handlern har alltså redan misslyckats flera gånger. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html#Programming.Errors.RetryAndBackoff">AWS: Error retries and exponential backoff</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Kasta eller logga?</h2>
+
+<p>Vid ett tillfälligt fel kastar <a href="0075-handler-och-event.html">handlern</a> felet. Då tas inte meddelandet bort, och kön ger ett <a href="0133-aterforsok.html">nytt försök</a>. Vid ett permanent fel fångar den det med <a href="0098-svar-till-api-gateway.html">try/catch</a>, loggar det och returnerar utan fel. Då tar <a href="0129-sqs-trigger.html">triggern</a> bort meddelandet. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html">AWS: felhantering för SQS</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a>)</span></p>
+
+<p>Kastar du ett permanent fel också, försöks meddelandet i onödan tills <a href="0123-maxreceivecount.html">maxReceiveCount</a> passerats, och hamnar i <a href="0122-dodbrevsko.html">dödbrevskön</a>.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vilket fel är permanent?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Kunden dyker inte upp hur många försök det än blir.">Att kunden inte finns</button>
+    <button class="opt" data-why="Throttling går över av sig själv, så ett nytt försök kan lyckas.">Throttling i en tabell</button>
+    <button class="opt" data-why="Ett 5xx-fel kan gå över, så ett nytt försök kan lyckas.">Ett 500 från tabellen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Kunden finns inte. Vad gör funktionen?</p>
+  <div class="options">
+    <button class="opt" data-why="Ett kast ger nya försök, men kunden finns inte vid något av dem.">Kastar så att kön försöker igen</button>
+    <button class="opt" data-why="Funktionen väntar inte själv, för nya försök kommer från kön när den kastar.">Väntar och prövar själv igen nu</button>
+    <button class="opt" data-correct data-why="Felet är permanent, och returnerar handlern utan fel tas meddelandet bort.">Loggar och går vidare utan fel</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. maxReceiveCount är 3. Funktionen kastar varje gång för att kunden inte finns. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Ett kast tar inte bort meddelandet, utan det blir synligt igen.">Raderas efter det första kastet</button>
+    <button class="opt" data-why="Meddelandet flyttas till dödbrevskön när gränsen passerats.">Ligger kvar i huvudkön ständigt</button>
+    <button class="opt" data-correct data-why="Varje kast ger ett nytt försök, och efter tre flyttas meddelandet till dödbrevskön.">Tre försök och sedan dödbrevskön</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Tillfälligt fel kan gå över. Permanent fel ger samma svar varje gång.</li>
+    <li>Tillfälligt: kasta, så ger kön ett nytt försök.</li>
+    <li>Permanent: logga och returnera utan fel, så tas meddelandet bort.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html">AWS: felhantering för SQS</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0133-aterforsok.html">Förra: Återförsök</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0135-minst-en-gang.html">Nästa: Minst en gång</a>
+</nav>
+
+</main>
+</body>
+</html>

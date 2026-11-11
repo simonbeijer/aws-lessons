@@ -28,9 +28,9 @@
 
 <p>AWS SDK är ett bibliotek med färdig kod för att anropa AWS-tjänster. SDK står för software development kit. För Node.js heter det AWS SDK for JavaScript v3. <span class="src">(<a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/welcome.html">AWS: What's the AWS SDK for JavaScript?</a>)</span></p>
 
-<p>SDK:n har ett paket per tjänst. <code>@aws-sdk/client-dynamodb</code> anropar till exempel DynamoDB, databastjänsten från <a href="0088-dynamodb.html">lektion 88</a>. <span class="src">(<a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/getting-started-nodejs.html">AWS: Get started with Node.js</a>)</span></p>
+<p>SDK:n har ett paket per tjänst. <code>@aws-sdk/client-dynamodb</code> anropar till exempel DynamoDB, databastjänsten från <a href="0078-dynamodb-tabell-item-nyckel.html">lektion 78</a>. <span class="src">(<a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/getting-started-nodejs.html">AWS: Get started with Node.js</a>)</span></p>
 
-<p>Alla Node.js-runtimes som Lambda stöder har SDK:n med. Därför behövs ingen <code>npm install</code> i konsolens <a href="0079-runtime.html">editor</a>. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html#nodejs-example-sdk-usage">AWS: Using the SDK for JavaScript v3 in your handler</a>)</span></p>
+<p>Alla Node.js-runtimes som Lambda stöder har SDK:n med. Därför behövs ingen <code>npm install</code> i konsolens <a href="0074-serverlost-och-lambda.html">editor</a>. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html#nodejs-example-sdk-usage">AWS: Using the SDK for JavaScript v3 in your handler</a>)</span></p>
 </section>
 
 <section class="explain">
@@ -53,9 +53,9 @@ export const handler = async (event) =&gt; {
 <section class="explain">
 <h2>Varför utanför handlern?</h2>
 
-<p>Utanför handlern skapas klienten en gång per miljö, inte vid varje anrop. Koden utanför handlern körs bara när en ny <a href="0083-exekveringsmiljo.html">exekveringsmiljö</a> startar, vid en <a href="0084-kallstart.html">kallstart</a>. Sedan återanvänds den i varje anrop. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html#nodejs-handler-state">AWS: Using global state</a>)</span></p>
+<p>Utanför handlern skapas klienten en gång per miljö, inte vid varje anrop. Koden utanför handlern körs bara när en ny <a href="0077-miljo-kallstart-timeout.html">exekveringsmiljö</a> startar, vid en <a href="0077-miljo-kallstart-timeout.html">kallstart</a>. Sedan återanvänds den i varje anrop. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html#nodejs-handler-state">AWS: Using global state</a>)</span></p>
 
-<p>Inuti handlern skapas klienten om vid varje anrop. Anropen tar längre tid, och Lambda tar betalt för <a href="0085-duration-och-billed-duration.html">tiden funktionen kör</a>. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html#function-code">AWS: Best practices, function code</a>)</span></p>
+<p>Inuti handlern skapas klienten om vid varje anrop. Anropen tar längre tid, och Lambda tar betalt för <a href="0076-loggar-och-report-raden.html">tiden funktionen kör</a>. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html#function-code">AWS: Best practices, function code</a>)</span></p>
 
 <div class="picker">
   <div class="picker-buttons">

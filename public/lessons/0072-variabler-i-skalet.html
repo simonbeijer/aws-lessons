@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Variabler i skalet</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="notis">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 72 · V42, 2 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 72 · V42, 2 av 15 i veckan</p>
+<h1>Variabler i skalet</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Ett kommando i terminalen behöver ofta svaret från det förra, till exempel id:na för subnäten. En variabel i skalet sparar ett värde under ett namn, så att du slipper kopiera det mellan kommandona.
+</div>
+
+<section class="explain">
+<h2>Hur sparar du ett värde?</h2>
+
+<p>Skalet (bash i CloudShell) är programmet som läser det du skriver i terminalen. Du sparar ett värde utan mellanslag runt likhetstecknet och läser det med <code>$</code> före namnet. Skalet byter ut <code>$API</code> mot värdet innan kommandot körs, som <a href="0061-variabel-i-postman.html"><code>{{baseUrl}}</code> i Postman</a>.</p>
+
+<pre><code>API=https://ab12cd34ef.execute-api.eu-north-1.amazonaws.com
+curl -i $API/customers</code></pre>
+
+<p>Värdet kan också komma från ett kommando. <code>$(...)</code> kör det som står inuti och byts mot texten det skriver ut. Därför behövs <code>--output text</code>: utan den hamnar JSON (JavaScript Object Notation) i variabeln.</p>
+
+<pre><code>SUBNETS=$(aws ec2 describe-subnets \
+  --region eu-north-1 \
+  --query 'Subnets[].SubnetId' \
+  --output text)</code></pre>
+
+<p><code>echo "$SUBNETS"</code> visar värdet, och <code>$SUBNETS</code> ger id:na till nästa kommando. Variabeln finns bara i det här skalet och försvinner när terminalen stängs.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du glömmer <code>--output text</code> i <code>SUBNETS=$(aws ec2 describe-subnets ...)</code>. Vad hamnar i variabeln?</p>
+  <div class="options">
+    <button class="opt" data-why="Kommandot fungerar utan --output text, svaret blir bara JSON i stället.">Inget, kommandot avbryts med fel</button>
+    <button class="opt" data-correct data-why="Variabeln får exakt det som kommandot skriver ut, och utan --output text är det JSON.">JSON, med citattecken runt varje id</button>
+    <button class="opt" data-why="Skalet ändrar inte texten, så JSON-tecknen följer med.">Id:na, skalet tar bort JSON-tecknen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du sparar <code>API=https://...</code> i CloudShell och stänger sedan terminalen. Finns variabeln kvar i nästa terminal?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Variabeln finns bara i skalet, och det skalet är borta när du stänger terminalen.">Nej, den fanns bara i det skalet</button>
+    <button class="opt" data-why="Variabler sparas inte på kontot, bara i skalet som körde dem.">Ja, den sparas på ditt konto</button>
+    <button class="opt" data-why="Ett nytt skal börjar utan de variabler som ett annat skal hade.">Ja, nya skal ärver den automatiskt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>API=https://...</code> sparar ett värde, utan mellanslag runt <code>=</code>. <code>$API</code> läser det, och <code>echo "$API"</code> visar det.</li>
+    <li><code>NAMN=$(aws ... --output text)</code> sparar det kommandot skriver ut. Utan <code>--output text</code> blir det JSON.</li>
+    <li>Variabeln finns bara i det skalet, och försvinner när terminalen stängs.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://www.gnu.org/software/bash/manual/html_node/Shell-Parameters.html">GNU Bash Reference Manual: Shell Parameters</a>.</p>
+<p>Om <code>$(...)</code>: <a href="https://www.gnu.org/software/bash/manual/html_node/Command-Substitution.html">GNU Bash: Command Substitution</a>. Om <code>--output text</code>: <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-output-format.html">AWS CLI: Setting the output format</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0071-cloudshell-och-aws-cli.html">Förra: CloudShell och AWS CLI</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0073-load-balancer-och-arn.html">Nästa: Application Load Balancer och ARN</a>
+</nav>
+
+</main>
+</body>
+</html>

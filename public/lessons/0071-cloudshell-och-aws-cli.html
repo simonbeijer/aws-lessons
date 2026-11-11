@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CloudShell och AWS CLI</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 71 · V42, 1 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 71 · V42, 1 av 15 i veckan</p>
+<h1>CloudShell och AWS CLI</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Hittills har allt i AWS (Amazon Web Services) gjorts genom att klicka i konsolen. Veckans första test görs i stället helt med kommandon, och senare anropas API:et med curl. Därför börjar veckan i CloudShell, en terminal i konsolen, och med AWS CLI (Command Line Interface), programmet som skickar kommandona.
+</div>
+
+<section class="explain">
+<h2>Vad är CloudShell?</h2>
+
+<p>CloudShell är en <a href="0036-ec2-instance-connect.html">terminal</a> i webbläsaren som öppnas med ikonen <code>&gt;_</code> i menyraden i konsolen. Den körs hos AWS, inte på din Mac, och programmet <code>aws</code> finns redan installerat.</p>
+
+<p>Du loggar inte heller in en gång till, för CloudShell använder inloggningen från konsolen. Loggade du in som din <a href="0004-iam-user.html">IAM user</a> (Identity and Access Management), körs kommandona som den, med dess behörigheter.</p>
+</section>
+
+<section class="explain">
+<h2>Hur är ett kommando byggt?</h2>
+
+<p>Delarna kommer i samma ordning: <code>aws</code>, tjänst, åtgärd och flaggor. Så här listar du dina <a href="0023-subnat.html">subnät</a>:</p>
+
+<pre><code>aws ec2 describe-subnets --region eu-north-1</code></pre>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Del</th><th>I exemplet</th><th>Vad den gör</th></tr>
+  <tr><td>Tjänst</td><td><code>ec2</code></td><td>Tjänsten, här EC2 (Elastic Compute Cloud).</td></tr>
+  <tr><td>Åtgärd</td><td><code>describe-subnets</code></td><td>Vad den ska göra.</td></tr>
+  <tr><td>Flagga</td><td><code>--region eu-north-1</code></td><td>Skickar kommandot till Europe (Stockholm).</td></tr>
+</table>
+</div>
+
+<p>Flaggorna börjar med <code>--</code> och får stå i vilken ordning som helst efter åtgärden. Utan <code>--region</code> gäller den <a href="0008-region.html">region</a> som konsolen stod på när du öppnade CloudShell. Kontrollera den först.</p>
+</section>
+
+<section class="explain">
+<h2>Vad gör --query och --output?</h2>
+
+<p>Svaret blir en lång <a href="0052-json.html">JSON</a> (JavaScript Object Notation) med alla fält. <code>--query</code> väljer ut den del du vill ha, och <code>--output text</code> skriver den som vanlig text.</p>
+
+<pre><code>aws ec2 describe-subnets \
+  --region eu-north-1 \
+  --query 'Subnets[].SubnetId' \
+  --output text</code></pre>
+
+<p><code>Subnets[].SubnetId</code> betyder: ta <code>SubnetId</code> från varje subnät i listan <code>Subnets</code>. Ett <code>\</code> sist på raden betyder att kommandot fortsätter på nästa rad.</p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="cli-utan">Utan båda</button>
+    <button class="chip" data-target="cli-query">Bara --query</button>
+    <button class="chip" data-target="cli-text">Båda</button>
+  </div>
+  <div class="picker-panel" id="cli-utan">
+    <p>Alla fält (förkortat):</p>
+<pre><code>{
+    "Subnets": [
+        {
+            "AvailabilityZone": "eu-north-1a",
+            "CidrBlock": "172.31.16.0/20",
+            "SubnetId": "subnet-0a1b2c3d4e5f60001",
+            ...</code></pre>
+  </div>
+  <div class="picker-panel" id="cli-query">
+    <p>Bara id:na, som JSON:</p>
+<pre><code>[
+    "subnet-0a1b2c3d4e5f60001",
+    "subnet-0a1b2c3d4e5f60002"
+]</code></pre>
+  </div>
+  <div class="picker-panel" id="cli-text">
+    <p>Som text:</p>
+<pre><code>subnet-0a1b2c3d4e5f60001	subnet-0a1b2c3d4e5f60002</code></pre>
+  </div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du loggade in i konsolen som din IAM user och öppnar CloudShell. Som vem körs kommandona?</p>
+  <div class="options">
+    <button class="opt" data-why="CloudShell använder inloggningen från konsolen, och där loggade du in som din IAM user.">Som root user, som äger själva kontot</button>
+    <button class="opt" data-why="CloudShell är redan inloggad med samma inloggning som konsolen.">Som ingen, tills du loggar in igen</button>
+    <button class="opt" data-correct data-why="CloudShell får inloggningen från konsolen, så kommandona har din IAM users behörigheter.">Som din IAM user och dess behörighet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du kör <code>describe-subnets</code> med <code>--query 'Subnets[].SubnetId'</code> men utan <code>--output text</code>. Hur ser svaret ut?</p>
+  <div class="options">
+    <button class="opt" data-why="Vanlig text kräver --output text; utan den kommer svaret som JSON.">Som vanlig text, id:na på en rad</button>
+    <button class="opt" data-correct data-why="--query väljer ut id:na, men utan --output text skrivs de fortfarande som JSON.">Som JSON, en lista med bara id:na</button>
+    <button class="opt" data-why="--query har redan valt ut id:na, så de andra fälten är borta.">Som JSON, med alla fält i svaret</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Konsolen står på Europe (Ireland). Du kör ett kommando i CloudShell med <code>--region eu-north-1</code>. Vart går det?</p>
+  <div class="options">
+    <button class="opt" data-why="Flaggan --region går före regionen från konsolen, för just det kommandot.">Till Europe (Ireland), där konsolen står</button>
+    <button class="opt" data-correct data-why="--region väljer region för just det här kommandot, och eu-north-1 är Stockholm.">Till Europe (Stockholm), som flaggan säger</button>
+    <button class="opt" data-why="Ett kommando skickas till en region, den som --region anger.">Till båda regionerna samtidigt, som kopior</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>CloudShell öppnas med <code>&gt;_</code> i konsolen och är redan inloggad som din IAM user, med samma behörigheter. <code>aws</code> finns installerat.</li>
+    <li>Ett kommando är <code>aws</code>, tjänst, åtgärd och flaggor, till exempel <code>aws ec2 describe-subnets --region eu-north-1</code>.</li>
+    <li>Utan <code>--region</code> gäller konsolens region. <code>--region</code> väljer region för just det kommandot.</li>
+    <li><code>--query</code> väljer ut en del av svaret. <code>--output text</code> skriver den som vanlig text i stället för JSON.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-commandstructure.html">AWS CLI: Command structure</a>.</p>
+<p>Om CloudShell: <a href="https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html">AWS: What is AWS CloudShell?</a>, <a href="https://docs.aws.amazon.com/cloudshell/latest/userguide/working-with-aws-cli.html">AWS: Manage AWS services from CLI in CloudShell</a> och <a href="https://docs.aws.amazon.com/cloudshell/latest/userguide/working-with-aws-cloudshell.html#region-selection">AWS: Working in AWS Regions</a>.</p>
+<p>Om svaret: <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-filter.html">AWS CLI: Filtering output</a> och <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-output-format.html">AWS CLI: Setting the output format</a>. Om flaggor: <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-options.html">AWS CLI: Command line options</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="V42-start.html">Förra: Veckan i överblick</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0072-variabler-i-skalet.html">Nästa: Variabler i skalet</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -52,7 +52,7 @@
 
 <p>API Gateway svarar <code>429 Too Many Requests</code>, med kroppen <code>{"message":"Too Many Requests"}</code>. Koden börjar på 4, så det räknas som <a href="0050-statuskod.html">klientens fel</a>. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-throttling.html">AWS: Throttle requests to your HTTP APIs</a>)</span></p>
 
-<p>Funktionen körs inte. Anropet syns därför inte i funktionens logg i <a href="0082-cloudwatch-logs.html">CloudWatch Logs</a>. Så skyddar gränsen funktionen, och <a href="0088-dynamodb.html">DynamoDB</a> bakom den, från en klient som skickar för många anrop.</p>
+<p>Funktionen körs inte. Anropet syns därför inte i funktionens logg i <a href="0076-loggar-och-report-raden.html">CloudWatch Logs</a>. Så skyddar gränsen funktionen, och <a href="0078-dynamodb-tabell-item-nyckel.html">DynamoDB</a> bakom den, från en klient som skickar för många anrop.</p>
 
 <div class="box good">
   <span class="box-title">Gör så här</span>

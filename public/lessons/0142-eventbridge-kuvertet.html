@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EventBridge-kuvertet</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 142 · V43, 31 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 142</p>
+<h1>EventBridge-kuvertet</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att EventBridge lägger id, version, account, region och time runt innehållet i detail, och att konsumenten därför läser <code>body.detail ?? body</code>.
+</div>
+
+<section class="explain">
+<h2>Vad är kuvertet?</h2>
+
+<p>Kuvertet är det yttre JSON-objektet kring din händelse. Du skickar Source, DetailType och Detail (<a href="0141-putevents.html">lektion 141</a>), och EventBridge lägger till resten. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/ref/events-structure.html">AWS: Event structure</a>)</span></p>
+
+<pre><code>{
+  "version": "0",
+  "id": "6a7e8feb-b491-4cf7-a9f1-bf3703467718",
+  "detail-type": "CustomerCreated",
+  "source": "kundregister",
+  "account": "111122223333",
+  "time": "2026-10-20T08:15:00Z",
+  "region": "eu-north-1",
+  "detail": { "customerId": "42" }
+}</code></pre>
+
+<p><code>id</code> är ett <a href="0099-uuid.html">UUID</a> som skapas för varje händelse, och med det kan du följa händelsen genom reglerna till målen. Det kan också vara en nyckel för <a href="0136-idempotens.html">idempotens</a>. <code>time</code> säger när händelsen hände, inte när den kom fram. Kursen säger att EventBridge lägger till <code>detail-type</code> och <code>source</code>. AWS säger att avsändaren anger dem för egna händelser, och det gäller. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEventsRequestEntry.html">AWS: PutEventsRequestEntry</a>)</span> Ditt eget innehåll ligger kvar oförändrat i <code>detail</code>.</p>
+</section>
+
+<section class="explain">
+<h2>Varför body.detail ?? body?</h2>
+
+<p>För att samma funktion ska klara meddelanden både med och utan kuvert. Kön får hela kuvertet som meddelandets <code>body</code>, eftersom EventBridge skickar hela händelsen som JSON om du inte ställer in något annat på målet. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutTargets.html">AWS: PutTargets</a>)</span> Body är en sträng. Efter <code>JSON.parse</code> (<a href="0131-event-fran-sqs.html">lektion 131</a>) ligger kundens data i <code>body.detail</code>.</p>
+
+<p>Ett meddelande som skickas direkt till kön med <a href="0126-sendmessage.html">SendMessage</a> har inget kuvert och alltså ingen <code>detail</code>. Operatorn <code>??</code> tar högersidan om vänstersidan saknas, så <code>body.detail ?? body</code> ger då hela <code>body</code>.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du skickar Source, DetailType och Detail. Vad lägger EventBridge själv till?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="EventBridge sätter id, version, account och region, och time om du inte anger den.">id, version, account och region</button>
+    <button class="opt" data-why="Source och DetailType har du redan angett, och body är inget fält i kuvertet.">Source, detail-type och en body</button>
+    <button class="opt" data-why="Detail skickade du själv, och kuvertet har fler fält än så.">Enbart fältet detail som objekt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Repetition från lektion 131: kön lämnar kuvertet i <code>body</code>. Vad krävs innan <code>body.detail</code> går att läsa?</p>
+  <div class="options">
+    <button class="opt" data-why="Body är en sträng, så body.detail finns inte förrän den är tolkad.">Inget, body är redan objekt</button>
+    <button class="opt" data-correct data-why="JSON.parse gör strängen i body till ett objekt med fältet detail.">Köra JSON.parse på hela body</button>
+    <button class="opt" data-why="En ny hämtning ger samma sträng, och den måste ändå tolkas.">Hämta om meddelandet från kön</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. <code>body</code> saknar <code>detail</code>. Vad ger <code>body.detail ?? body</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="?? ger ett värde i stället för ett fel när detail saknas.">Ett fel, för detail saknas</button>
+    <button class="opt" data-correct data-why="Saknas detail tar ?? högersidan, alltså hela body.">Hela body, med alla fälten</button>
+    <button class="opt" data-why="?? tar högersidan, inte ett tomt objekt.">Ett tomt objekt, alltså {}</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>EventBridge lägger id, version, account, region och time runt din händelse. Source och detail-type anger du själv.</li>
+    <li>Ditt innehåll ligger i <code>detail</code>. Kuvertet är hela det yttre objektet.</li>
+    <li>Konsumenten läser <code>body.detail ?? body</code> och klarar både kuvert och ett meddelande som skickats direkt till kön.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/eventbridge/latest/ref/events-structure.html">AWS: Event structure</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0141-putevents.html">Förra: PutEvents</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0143-sns-amne.html">Nästa: SNS-ämne</a>
+</nav>
+
+</main>
+</body>
+</html>

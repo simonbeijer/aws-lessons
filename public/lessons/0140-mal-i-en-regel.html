@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mål i en regel</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 140 · V43, 29 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 140</p>
+<h1>Mål i en regel</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en regel kan ha flera mål, till exempel en SQS-kö, ett SNS-ämne och en logggrupp, och att ett nytt mål läggs till på regeln utan att något hos källan ändras.
+</div>
+
+<section class="explain">
+<h2>Vad är ett mål?</h2>
+
+<p>Ett mål (target) är en resurs som EventBridge skickar händelsen till när den matchar regelns event pattern. En regel kan ha upp till fem mål. De får händelsen samtidigt, så tre mål ger tre leveranser. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html">AWS: Targets</a>, <a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-quota.html">AWS: Quotas</a>, <a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rules.html">AWS: Rules</a>)</span></p>
+
+<ul>
+  <li>SQS-kö (<a href="0113-sqs-ko.html">lektion 113</a>): händelsen sparas i kön tills någon hämtar den.</li>
+  <li>SNS-ämne (topic, <a href="0011-sns.html">lektion 11</a>): SNS skickar händelsen vidare till prenumeranterna, till exempel en e-postadress.</li>
+  <li>Logggrupp (<a href="0076-loggar-och-report-raden.html">lektion 76</a>): händelsen blir en loggrad.</li>
+</ul>
+</section>
+
+<section class="explain">
+<h2>Hur läggs ett mål till?</h2>
+
+<p>Målet hör till regeln. Källan skickar bara händelsen till <a href="0138-eventbridge-och-event-bus.html">bussen</a> och vet inte vilka mål som finns. Ett fjärde mål är därför en rad till i regeln, och källan ändras inte.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Repetition från lektion 139: mönstret har <code>detail-type</code> CustomerCreated, men källan skickar customercreated. Vad får målen?</p>
+  <div class="options">
+    <button class="opt" data-why="Matchningen är exakt, så händelsen rättas aldrig.">Händelsen, men med små bokstäver</button>
+    <button class="opt" data-correct data-why="Skiftläget räknas, så regeln matchar inte och inget mål får händelsen.">Ingen händelse, ingen träff alls</button>
+    <button class="opt" data-why="Utan träff skickas händelsen inte till något mål.">Händelsen, men bara till loggen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Ett nytt mål läggs till på regeln. Vad måste ändras hos källan?</p>
+  <div class="options">
+    <button class="opt" data-why="Källan skickar bara till bussen och känner inte till målen.">Den måste skicka även till målet</button>
+    <button class="opt" data-correct data-why="Målen hör till regeln, så källan behöver inte ändras.">Ingenting, den vet inget om målen</button>
+    <button class="opt" data-why="Listan över mål finns i regeln, inte hos källan.">Den måste känna till alla målen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Regeln har tre mål: en kö, ett ämne och en logggrupp. Hur många leveranser ger en matchande händelse?</p>
+  <div class="options">
+    <button class="opt" data-why="Varje mål får händelsen, den delas inte upp.">En, som delas upp mellan målen</button>
+    <button class="opt" data-why="Alla mål får händelsen, inte bara det första.">En, men bara till första målet</button>
+    <button class="opt" data-correct data-why="Varje mål får händelsen, så tre mål ger tre leveranser.">Tre, en leverans till varje mål</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett mål är en resurs som en matchande händelse skickas till. En regel kan ha upp till fem mål, och varje mål får händelsen.</li>
+    <li>Målen hör till regeln. Ett nytt mål läggs till där, utan att källan ändras.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html">AWS: Targets</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0139-regel-och-event-pattern.html">Förra: Regel och event pattern</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0141-putevents.html">Nästa: PutEvents</a>
+</nav>
+
+</main>
+</body>
+</html>

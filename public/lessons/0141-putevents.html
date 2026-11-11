@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PutEvents</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 141 · V43, 30 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 141</p>
+<h1>PutEvents</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att PutEvents skickar en lista Entries med Source, DetailType och Detail (JSON som sträng) till en event bus, att FailedEntryCount i svaret visar hur många poster som inte togs emot, och att anroparen behöver <code>events:PutEvents</code> på bussens ARN.
+</div>
+
+<section class="explain">
+<h2>Vad skickar PutEvents?</h2>
+
+<p>PutEvents skickar egna händelser till EventBridge, som <a href="0126-sendmessage.html">SendMessage</a> skickar meddelanden till en kö. Anropet har en lista <code>Entries</code> med 1 till 10 poster, och varje post är en händelse. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html">AWS: PutEvents</a>)</span> I JavaScript skickas det med <code>PutEventsCommand</code> från SDK:t. <span class="src">(<a href="https://docs.aws.amazon.com/code-library/latest/ug/eventbridge_example_eventbridge_PutEvents_section.html">AWS: PutEvents med SDK</a>)</span></p>
+
+<pre><code>{
+  "Entries": [
+    {
+      "Source": "kundregister",
+      "DetailType": "CustomerCreated",
+      "Detail": "{\"customerId\": \"42\"}"
+    }
+  ]
+}</code></pre>
+
+<p><code>Source</code>, <code>DetailType</code> och <code>Detail</code> krävs i varje post. Source och DetailType blir <code>source</code> och <code>detail-type</code> i händelsen, de fält regelns event pattern matchar på (<a href="0139-regel-och-event-pattern.html">lektion 139</a>). <code>Detail</code> är händelsens innehåll: ett giltigt <a href="0052-json.html">JSON</a>-objekt som sträng, gjord med <code>JSON.stringify</code> som MessageBody. <code>EventBusName</code> är valfritt, och utan det används default-bussen. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEventsRequestEntry.html">AWS: PutEventsRequestEntry</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad svarar EventBridge?</h2>
+
+<p>Svaret är <a href="0050-statuskod.html">HTTP</a> 200 och en egen <code>Entries</code>-lista i samma ordning som anropet. Varje post har antingen ett <code>EventId</code> eller en <code>ErrorCode</code>. <code>FailedEntryCount</code> är antalet poster som misslyckades. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html">AWS: PutEvents</a>)</span></p>
+
+<p>Misslyckas en post fortsätter EventBridge med resten. Du måste själv hitta de misslyckade posterna och skicka dem i ett nytt anrop, så 200 räcker inte som bevis. En buss som inte finns ger också 200 och räknas inte i FailedEntryCount: händelsen släpps. Kursmaterialet säger FailedEntryCount 1, men AWS dokumentation gäller. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-putevents.html">AWS: Sending events with PutEvents</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vilken behörighet krävs?</h2>
+
+<p>Den som anropar PutEvents, till exempel en funktions <a href="0080-execution-role-och-behorighet.html">execution role</a>, behöver en <a href="0005-iam-policy.html">IAM policy</a> som tillåter åtgärden <code>events:PutEvents</code>. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-permissions-reference.html">AWS: Permissions reference</a>)</span> I policyns <code>Resource</code> står bussens <a href="0073-load-balancer-och-arn.html">ARN</a>: <code>arn:aws:events:region:konto:event-bus/namn</code>. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-manage-iam-access.html">AWS: Managing access</a>, <a href="https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-template-list.html#eventbridge-put-events-policy">AWS: Exempelpolicy</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Repetition från lektion 139: vilka två fält i posten matchar regelns event pattern?</p>
+  <div class="options">
+    <button class="opt" data-why="EventBusName väljer buss, och mönstret matchar på source och detail-type.">Source och EventBusName</button>
+    <button class="opt" data-why="Detail är innehållet, och mönstret matchar på source och detail-type.">Detail och DetailType</button>
+    <button class="opt" data-correct data-why="Source och DetailType blir source och detail-type, som mönstret matchar på.">Source och DetailType</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Anropet har tre poster och svaret har FailedEntryCount 1. Vad hände med de två andra?</p>
+  <div class="options">
+    <button class="opt" data-why="EventBridge fortsätter med övriga poster när en misslyckas.">De avvisades också, med fel</button>
+    <button class="opt" data-why="EventBridge skickar inte om poster åt dig, det måste du göra själv.">De skickas om i bakgrunden</button>
+    <button class="opt" data-correct data-why="Övriga poster behandlas, så de har fått varsitt EventId.">De togs emot, med EventId</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Hur skickas Detail i en post?</p>
+  <div class="options">
+    <button class="opt" data-why="Detail är en sträng, inte ett objekt i anropet.">Som ett objekt, inte text</button>
+    <button class="opt" data-correct data-why="Detail är ett giltigt JSON-objekt, skickat som en sträng.">Som JSON-text i en sträng</button>
+    <button class="opt" data-why="Detail är ett JSON-objekt, inte en lista med fält.">Som en lista med fältnamn</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>PutEvents skickar 1 till 10 poster i Entries. Varje post måste ha Source, DetailType och Detail, där Detail är JSON som sträng.</li>
+    <li>Svaret är 200 även när poster misslyckas. Kontrollera FailedEntryCount och skicka om de misslyckade själv.</li>
+    <li>Anroparen behöver <code>events:PutEvents</code> på bussens ARN i sin IAM policy.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html">AWS: PutEvents</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0140-mal-i-en-regel.html">Förra: Mål i en regel</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0142-eventbridge-kuvertet.html">Nästa: EventBridge-kuvertet</a>
+</nav>
+
+</main>
+</body>
+</html>

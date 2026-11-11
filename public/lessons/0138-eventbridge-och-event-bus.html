@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EventBridge och event bus</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 138 · V43, 27 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 138</p>
+<h1>EventBridge och event bus</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att EventBridge tar emot händelser på en event bus, till exempel <code>default</code>, och skickar dem vidare enligt regler.
+</div>
+
+<section class="explain">
+<h2>Vad är en event bus?</h2>
+
+<p>En event bus är den router som tar emot <a href="0137-handelse.html">händelser</a> och levererar dem till noll eller fler mål (targets). EventBridge är AWS-tjänsten som driver bussarna. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html">AWS: Event buses</a>)</span></p>
+
+<p>Källan skickar händelsen till bussen. EventBridge jämför den med varje regel (rule) på bussen. En regel som matchar skickar händelsen vidare till sitt mål.</p>
+</section>
+
+<section class="explain">
+<h2>Vad är default-bussen?</h2>
+
+<p>Default event bus finns i varje AWS-konto. Den tar emot händelser från AWS-tjänster i kontot, och egna händelser hamnar också där om ingen annan buss anges. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEventsRequestEntry.html">AWS: PutEventsRequestEntry</a>)</span> En regel hör till en viss buss och gäller bara händelser som just den bussen får. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html">AWS: Event buses</a>)</span></p>
+
+<p>Eftersom reglerna sitter på bussen, och inte hos källan, läggs en ny mottagare till utan att källan ändras.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad gör en event bus?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Bussen är en router: den tar emot händelser och levererar dem till noll eller fler mål.">Tar emot och levererar vidare</button>
+    <button class="opt" data-why="Det är en kö som lagrar meddelanden, inte en event bus.">Lagrar varje händelse åt kön</button>
+    <button class="opt" data-why="Bussen ändrar inte händelsen, den tar emot den och skickar den vidare.">Skriver om JSON i händelserna</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vilken buss tar emot händelser från AWS-tjänster i kontot?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Default event bus finns i varje konto och tar emot händelser från AWS-tjänsterna i kontot.">Default event bus på kontot</button>
+    <button class="opt" data-why="Bussen finns redan i kontot och behöver inte skapas först.">Bussen skapar du själv först</button>
+    <button class="opt" data-why="Händelserna går via en buss, inte direkt till målen.">Ingen buss, direkt till målet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition: vad vet källan om vilka som får händelsen?</p>
+  <div class="options">
+    <button class="opt" data-why="Med en kö känner avsändaren kön, men en händelse går via bussen.">Köns URL för varje mottagare</button>
+    <button class="opt" data-why="Regeln sitter på bussen, och källan känner inte till den.">Namnet på varje enskild regel</button>
+    <button class="opt" data-correct data-why="Källan anger bara vad som hände, och bussen avgör vilka som får den.">Inget alls, bussen väljer dem</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>EventBridge tar emot händelser på en event bus och skickar dem vidare till mål enligt regler.</li>
+    <li>Default-bussen finns i varje konto. Reglerna sitter på bussen, så nya mottagare kräver ingen ändring i källan.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html">AWS: Event buses</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0137-handelse.html">Förra: Händelse</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0139-regel-och-event-pattern.html">Nästa: Regel och event pattern</a>
+</nav>
+
+</main>
+</body>
+</html>

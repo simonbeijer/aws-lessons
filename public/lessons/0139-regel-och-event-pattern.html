@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regel och event pattern</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 139 · V43, 28 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 139</p>
+<h1>Regel och event pattern</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att regeln matchar händelsen på <code>source</code> och <code>detail-type</code>, och att värdena måste vara exakt likadana, med samma skiftläge, i händelsen och i regeln.
+</div>
+
+<section class="explain">
+<h2>Vad är en event pattern?</h2>
+
+<p>En event pattern är ett JSON-mönster i en regel som beskriver vilka fält i en <a href="0137-handelse.html">händelse</a> som ska matcha. Händelsen matchar eller matchar inte, det finns inget mellanläge. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html">AWS: Event patterns</a>)</span></p>
+
+<p><code>source</code> säger vem som skickade händelsen. <code>detail-type</code> säger vad som hände. Båda ligger på översta nivån i händelsen. Varje värde i mönstret står i en lista med hakparenteser, och händelsen matchar om fältet har något av värdena.</p>
+
+<pre><code>{
+  "source": ["kundregister"],
+  "detail-type": ["CustomerCreated"]
+}</code></pre>
+</section>
+
+<section class="explain">
+<h2>Hur exakt är matchningen?</h2>
+
+<p>Strängar jämförs tecken för tecken, och skiftläget (stora och små bokstäver) räknas. <code>CustomerCreated</code> matchar alltså inte <code>customercreated</code>, och en felstavad <code>source</code> ger ingen träff. Händelsen skickas då inte vidare. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-pattern.html">AWS: Skapa event patterns</a>)</span></p>
+
+<p>Fält som inte står i mönstret ignoreras. Mönstret ovan matchar också en händelse som har fler fält, så länge de två finns med exakt rätt värde.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Repetition: vad gör en regel när en händelse matchar?</p>
+  <div class="options">
+    <button class="opt" data-why="Regeln raderar inte händelsen, den skickar den vidare.">Raderar händelsen direkt</button>
+    <button class="opt" data-why="Händelsen ändras inte av regeln, den skickas oförändrad vidare.">Ändrar händelsernas fält</button>
+    <button class="opt" data-correct data-why="En regel som matchar skickar händelsen vidare.">Skickar händelsen vidare</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Mönstret har <code>detail-type</code> CustomerCreated, men källan skickar customercreated. Matchar det?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Matchningen är tecken för tecken, så customercreated är ett annat värde.">Nej, versalerna måste vara lika</button>
+    <button class="opt" data-why="Skiftläget ignoreras inte, så stora och små bokstäver räknas som olika.">Ja, versaler gör ingen skillnad</button>
+    <button class="opt" data-why="Båda fälten i mönstret måste matcha, så en träff på source räcker inte.">Ja, förutsatt att source passar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Händelsen har fler fält än mönstret. Vad händer med dem?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Fält som inte står i mönstret ignoreras när regeln matchar.">Regeln ignorerar dem helt</button>
+    <button class="opt" data-why="Fler fält hindrar inte träffen, bara de som står i mönstret räknas.">Händelsen matchar då inte</button>
+    <button class="opt" data-why="Regeln tar inte bort fält, den ignorerar dem vid matchningen.">De raderas ur händelsen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En event pattern är ett JSON-mönster som regeln matchar händelsen mot, på bland annat <code>source</code> och <code>detail-type</code>.</li>
+    <li>Matchningen är exakt och skiftlägeskänslig, så värdena måste vara likadana i händelsen och i regeln. Övriga fält ignoreras.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-pattern.html">AWS: Skapa event patterns</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0138-eventbridge-och-event-bus.html">Förra: EventBridge och event bus</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0140-mal-i-en-regel.html">Nästa: Mål i en regel</a>
+</nav>
+
+</main>
+</body>
+</html>

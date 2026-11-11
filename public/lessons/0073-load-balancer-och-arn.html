@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Application Load Balancer och ARN</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 73 · V42, 3 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 73 · V42, 3 av 15 i veckan</p>
+<h1>Application Load Balancer och ARN</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  En lastbalanserare tar emot trafik och fördelar den på flera servrar. Vecka 45 behöver en, men ett nytt konto kan vara spärrat i dagar, så kontot testas redan nu med kommandon. Svaret när den skapas är dess ARN (Amazon Resource Name), och det behövs för att ta bort den igen.
+</div>
+
+<section class="explain">
+<h2>Vad gör en lastbalanserare?</h2>
+
+<p>En Application Load Balancer (ALB) står framför flera <a href="0029-ec2-instans.html">servrar</a>: den tar emot alla anrop och skickar varje till en server bakom som svarar. Application betyder att den hanterar <a href="0048-http-anrop-och-svar.html">HTTP-anrop</a>.</p>
+
+<p>Den kräver <a href="0023-subnat.html">subnät</a> i minst två <a href="0022-availability-zone.html">Availability Zones</a>, så att trafiken kommer fram även om en zon går ner. Testet tar subnäten i kontots default <a href="0020-vpc.html">VPC</a> (Virtual Private Cloud), med ett subnät per zon. <code>aws elbv2 create-load-balancer</code> får dem från <code>$SUBNETS</code>. <code>elbv2</code> är Elastic Load Balancing version 2.</p>
+
+<p>Lastbalanseraren kostar så länge den finns, så testet tar bort den direkt. Men vissa nya konton är spärrade, och då blir felet:</p>
+
+<pre><code>This AWS account currently does not support creating load balancers.</code></pre>
+
+<p>Bara AWS Support kan häva spärren, och det kan ta dagar. Öppna Support Center, välj Create case och sedan Account and billing support, som inte kräver supportplan.</p>
+
+<div class="box note">
+  <span class="box-title">Ej bekräftat</span>
+  <p>Spärren beskrivs bara på forumet re:Post.</p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad är ARN:et?</h2>
+
+<p>Lyckas skapandet svarar AWS med ARN:et, lastbalanserarens fullständiga namn. Det pekar ut exakt en resurs bland alla konton och regioner. Borttagningen kräver det, inte namnet, så det sparas med <code>$(...)</code>.</p>
+
+<pre>arn:aws:elasticloadbalancing:eu-north-1:123456789012:loadbalancer/app/v42-lb-test/50dc6c495c0c9188</pre>
+
+<p>Efter <code>arn:aws:</code> kommer fyra delar:</p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="arn-tjanst">elasticloadbalancing</button>
+    <button class="chip" data-target="arn-region">eu-north-1</button>
+    <button class="chip" data-target="arn-konto">123456789012</button>
+    <button class="chip" data-target="arn-resurs">loadbalancer/app/...</button>
+  </div>
+  <div class="picker-panel" id="arn-tjanst"><p>Tjänsten som resursen hör till.</p></div>
+  <div class="picker-panel" id="arn-region"><p><a href="0008-region.html">Regionen</a> där resursen finns, här Stockholm.</p></div>
+  <div class="picker-panel" id="arn-konto"><p>Kontonumret, tolv siffror. I ditt ARN står ditt eget.</p></div>
+  <div class="picker-panel" id="arn-resurs"><p>Typen <code>loadbalancer/app</code>, sedan namnet och ett id som AWS ger den.</p></div>
+</div>
+
+<p>Samma form står i <code>Resource</code> i en <a href="0015-bucket-policy.html">bucket policy</a>, och senare i veckan för en DynamoDB-tabell: <code>arn:aws:dynamodb:eu-north-1:123456789012:table/namn</code>.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du får <code>This AWS account currently does not support creating load balancers</code>. Vad gör du?</p>
+  <div class="options">
+    <button class="opt" data-why="Felet beror inte på kommandot; spärren sitter på kontot tills AWS Support hävt den.">Kör kommandot igen om en stund</button>
+    <button class="opt" data-correct data-why="Spärren sitter på kontot, och bara AWS Support kan häva den.">Öppnar ett ärende hos AWS Support</button>
+    <button class="opt" data-why="Mer behörighet hjälper inte; spärren sitter på hela kontot.">Ger din IAM user mer behörighet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du vill ta bort lastbalanseraren <code>v42-lb-test</code>. Vad behöver kommandot?</p>
+  <div class="options">
+    <button class="opt" data-why="Namnet räcker inte här; borttagningen pekar ut resursen med dess ARN.">Bara namnet, v42-lb-test</button>
+    <button class="opt" data-why="Subnäten behövs när lastbalanseraren skapas, inte när den tas bort.">Subnäten som den skapades i</button>
+    <button class="opt" data-correct data-why="Ett ARN pekar ut exakt en resurs, och borttagningen tar emot det.">Dess ARN, sparat vid skapandet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Vad säger <code>eu-north-1</code> i lastbalanserarens ARN?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Delen efter tjänsten är regionen där resursen finns.">Regionen där lastbalanseraren finns</button>
+    <button class="opt" data-why="Zonen ligger inte i ARN:et; där står bara region, konto och resurs.">Zonen som lastbalanseraren körs i</button>
+    <button class="opt" data-why="Kontot anges med tolv siffror, efter regionen.">Kontot som äger lastbalanseraren</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En ALB tar emot alla anrop och skickar varje till en server bakom som svarar. Den kräver subnät i minst två zoner, och testet tar dem från default VPC.</li>
+    <li>Lastbalanseraren kostar så länge den finns, så testet tar bort den direkt.</li>
+    <li>Vissa nya konton är spärrade tills AWS Support hävt det. Det kan ta dagar, så prova tidigt.</li>
+    <li>Ett ARN pekar ut exakt en resurs: <code>arn:aws:</code>, tjänst, region, konto, resurs. Det får du tillbaka vid skapandet, och det behövs för att ta bort och i <code>Resource</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html">AWS: What is an Application Load Balancer?</a></p>
+<p>Om zonerna: <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html">AWS: How Elastic Load Balancing works</a>. Om spärren: <a href="https://repost.aws/questions/QU3nPcv2OES9Kq5aw1QySYZg/aws-free-tier-account-not-sure-why-create-load-balancer-gives">AWS re:Post</a>. Om Support: <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-get-answers.html#billing-support">AWS: Contacting Support</a>.</p>
+<p>Om ARN: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference-arns.html">AWS IAM: Identify AWS resources with ARNs</a>, <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_resource.html">AWS IAM: Resource</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0072-variabler-i-skalet.html">Förra: Variabler i skalet</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0074-serverlost-och-lambda.html">Nästa: Serverlöst och Lambda-funktion</a>
+</nav>
+
+</main>
+</body>
+</html>

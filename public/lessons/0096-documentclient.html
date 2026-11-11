@@ -26,7 +26,7 @@
 <section class="explain">
 <h2>Hur vill DynamoDB ha värdena?</h2>
 
-<p>DynamoDB, databastjänsten från <a href="0088-dynamodb.html">lektion 88</a>, vill ha en typ runt varje värde. Den tar emot <a href="0052-json.html">JSON</a>. Varje värde ligger i ett eget objekt, där namnet är en bokstav som säger <a href="0089-item-och-attribut.html">typen</a>: <code>S</code> för text (String), <code>N</code> för tal (Number). Namnet Alice skrivs <code>{ "S": "Alice" }</code>. Även tal skickas som text: <code>{ "N": "34" }</code>. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.LowLevelAPI.html#Programming.LowLevelAPI.DataTypeDescriptors">AWS: Data type descriptors</a>)</span></p>
+<p>DynamoDB, databastjänsten från <a href="0078-dynamodb-tabell-item-nyckel.html">lektion 78</a>, vill ha en typ runt varje värde. Den tar emot <a href="0052-json.html">JSON</a>. Varje värde ligger i ett eget objekt, där namnet är en bokstav som säger <a href="0078-dynamodb-tabell-item-nyckel.html">typen</a>: <code>S</code> för text (String), <code>N</code> för tal (Number). Namnet Alice skrivs <code>{ "S": "Alice" }</code>. Även tal skickas som text: <code>{ "N": "34" }</code>. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.LowLevelAPI.html#Programming.LowLevelAPI.DataTypeDescriptors">AWS: Data type descriptors</a>)</span></p>
 </section>
 
 <section class="explain">
@@ -53,7 +53,7 @@
 <section class="explain">
 <h2>Hur skapas den?</h2>
 
-<p>Den skapas av en vanlig <code>DynamoDBClient</code>. <code>DynamoDBDocumentClient.from</code> tar klienten från <a href="0095-aws-sdk.html">lektion 95</a> och lägger DocumentClient runt den. Kommandona hämtas ur samma paket, till exempel <code>PutCommand</code>, som sparar ett <a href="0089-item-och-attribut.html">item</a>, som <a href="0092-dynamodb-operationer.html">PutItem</a>. <span class="src">(<a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/migrate-dynamodb-doc-client.html">AWS: DynamoDB document client</a>)</span></p>
+<p>Den skapas av en vanlig <code>DynamoDBClient</code>. <code>DynamoDBDocumentClient.from</code> tar klienten från <a href="0095-aws-sdk.html">lektion 95</a> och lägger DocumentClient runt den. Kommandona hämtas ur samma paket, till exempel <code>PutCommand</code>, som sparar ett <a href="0078-dynamodb-tabell-item-nyckel.html">item</a>, som <a href="0079-lasa-och-skriva-i-dynamodb.html">PutItem</a>. <span class="src">(<a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/migrate-dynamodb-doc-client.html">AWS: DynamoDB document client</a>)</span></p>
 
 <pre><code>import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";

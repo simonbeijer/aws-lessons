@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Läsa och skriva i DynamoDB</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="fördjupning">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 79 · V42, 9 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 79 · V42, 9 av 15 i veckan</p>
+<h1>Hur läser och skriver man i DynamoDB?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Kunderna ligger i en tabell, men funktionen måste kunna hämta, spara, ändra och ta bort dem. Varje sådan åtgärd är en operation med eget namn. Att ändra en kund är knepigast: den som ändrar en kund som inte finns skapar i stället en ny.
+</div>
+
+<section class="explain">
+<h2>Vilka operationer finns?</h2>
+
+<p>Du pratar med DynamoDB genom operationer, ett <a href="0078-dynamodb-tabell-item-nyckel.html">anrop</a> per sak. Fyra gäller ett enda item, som du pekar ut med <code>id</code>. Den femte, <code>Scan</code>, gäller alla.</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Operation</th><th>Gör</th></tr></thead>
+  <tbody>
+    <tr><td><code>GetItem</code></td><td>Hämtar itemet med ett visst <code>id</code>.</td></tr>
+    <tr><td><code>PutItem</code></td><td>Sparar ett helt item. Samma <code>id</code> ersätter det gamla.</td></tr>
+    <tr><td><code>UpdateItem</code></td><td>Ändrar enskilda attribut i ett item.</td></tr>
+    <tr><td><code>DeleteItem</code></td><td>Tar bort itemet med ett visst <code>id</code>.</td></tr>
+    <tr><td><code>Scan</code></td><td>Läser varje item i tabellen.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Scan tar inget <code>id</code>, så den måste gå igenom allt. Med on-demand betalar du per läsning, och en Scan läser varje item. Därför kostar den mer ju större tabellen är.</p>
+</section>
+
+<section class="explain">
+<h2>Hur ändrar man ett attribut?</h2>
+
+<p>PutItem skriver över hela itemet. Vill du bara byta namn på en kund tar du UpdateItem, som vill ha ett uttryck (expression): en kort text som säger vad som ska ändras. <code>SET</code> ger ett attribut ett nytt värde. Anropet ser ut så här, med <code>Key</code> som pekar ut itemet i tabellen <code>v42-customers</code>:</p>
+
+<pre><code>{
+  TableName: "v42-customers",
+  Key: { id: "demo-1" },
+  UpdateExpression: "SET #n = :n",
+  ExpressionAttributeNames:  { "#n": "name" },
+  ExpressionAttributeValues: { ":n": "Carol" }
+}</code></pre>
+
+<p><code>#n</code> och <code>:n</code> är platshållare. <code>#</code> först betyder alias, ett ersättningsnamn för ett attribut, och <code>:</code> först betyder värde. <code>ExpressionAttributeNames</code> säger att <code>#n</code> är attributet <code>name</code>, och <code>ExpressionAttributeValues</code> att <code>:n</code> är Carol.</p>
+
+<p>Varför inte skriva <code>SET name = :n</code>? Eftersom <code>name</code> är ett reserverat ord. DynamoDB använder ordet själv, så det får inte stå i ett uttryck. Flera hundra ord är reserverade, som <code>status</code> och <code>date</code>. Attributet heter fortfarande <code>name</code> i itemet. Utan alias stoppas anropet:</p>
+
+<pre><code>ValidationException: Invalid UpdateExpression:
+Attribute name is a reserved keyword</code></pre>
+</section>
+
+<section class="explain">
+<h2>Vad om itemet inte finns?</h2>
+
+<p>UpdateItem skapar det. Ändrar du kunden <code>finns-inte</code> blir det ett nytt item med bara <code>id</code> och <code>name</code>. DeleteItem är lika tyst: tar du bort ett item som inte finns blir det inget fel, och koden skulle svara som om kunden togs bort.</p>
+
+<p>Lösningen är ett villkor i <code>ConditionExpression</code>. Det måste vara sant, annars görs ingenting och anropet kastar ett fel. Villkoret <code>attribute_exists(id)</code> är sant bara om itemet har attributet <code>id</code>. Varje item har det, så villkoret betyder att itemet måste finnas.</p>
+
+<pre><code>ConditionExpression: "attribute_exists(id)"</code></pre>
+
+<p>Felet heter <code>ConditionalCheckFailedException</code>. Koden fångar det och svarar med statuskoden 404 (Not Found), att kunden inte finns. Andra fel fångas inte och blir 5xx. Samma villkor och samma 404 gäller DeleteItem.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Funktionen ska visa alla kunder i tabellen. Vilken operation passar?</p>
+  <div class="options">
+    <button class="opt" data-why="GetItem hämtar bara ett item, det med ett visst id.">GetItem, som hämtar ett item</button>
+    <button class="opt" data-correct data-why="Scan tar inget id och läser varje item i tabellen.">Scan, som läser hela tabellen</button>
+    <button class="opt" data-why="UpdateItem ändrar ett item. Den läser inte ut några andra.">UpdateItem, som ändrar ett item</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. I <code>SET #n = :n</code> finns två platshållare. Vad är de?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="# är ett alias för ett attributnamn och : är ett värde. Båda förklaras i objekten bredvid uttrycket.">Ett attributalias och det nya värdet</button>
+    <button class="opt" data-why="Tabellen anges i TableName, och itemet pekas ut med Key.">Tabellen och itemet som ändras</button>
+    <button class="opt" data-why="Båda gäller i samma anrop. Tecknet först avgör vad de är.">Två alias för två olika attributnamn</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Du ändrar en kund med ett <code>id</code> som inte finns, utan något villkor. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Utan villkor märker DynamoDB ingen skillnad, så inget fel kastas.">Felet ConditionalCheckFailedException</button>
+    <button class="opt" data-correct data-why="UpdateItem skapar itemet när id saknas. Därför behövs attribute_exists(id).">Ett nytt item skapas med id:t</button>
+    <button class="opt" data-why="Det är bara om du anger villkoret som anropet kan misslyckas.">Anropet misslyckas med ett fel</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">4. Repetition: PutItem sparar ett item med ett <code>id</code> som redan finns. Vad blir resultatet?</p>
+  <div class="options">
+    <button class="opt" data-why="PutItem lägger inte till attribut i det gamla itemet.">De nya attributen läggs till i det gamla</button>
+    <button class="opt" data-why="Utan villkor nekas inget. Samma id är inget fel.">Anropet nekas, eftersom id:t redan finns</button>
+    <button class="opt" data-correct data-why="Samma id pekar ut samma item, och PutItem ersätter det helt.">Det nya itemet ersätter det gamla helt</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>GetItem</code>, <code>PutItem</code>, <code>UpdateItem</code> och <code>DeleteItem</code> gäller ett item med ett visst <code>id</code>. <code>Scan</code> läser hela tabellen och kostar mer ju större den är.</li>
+    <li>I <code>SET #n = :n</code> är <code>#n</code> ett alias för ett attributnamn och <code>:n</code> ett värde. ExpressionAttributeNames och ExpressionAttributeValues säger vad de står för.</li>
+    <li><code>name</code> är ett reserverat ord, liksom <code>status</code> och <code>date</code>, och måste ha ett alias i uttryck.</li>
+    <li>UpdateItem skapar ett item som inte finns, och DeleteItem ger inget fel. <code>attribute_exists(id)</code> i ConditionExpression stoppar båda. Felet ConditionalCheckFailedException görs om till 404.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html">Amazon DynamoDB: Working with items and attributes</a>.</p>
+<p>Om Scan: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html">Scanning tables</a>. Om uttryck och alias: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html">Update expressions</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ExpressionAttributeNames.html">Expression attribute names</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ExpressionAttributeValues.html">Expression attribute values</a> och <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html">Reserved words</a>. Om villkoret: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html">Condition expressions</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html">UpdateItem</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteItem.html">DeleteItem</a> och <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html">Error handling</a>. Felmeddelandet om reserverat ord kommer från kursmaterialet.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0078-dynamodb-tabell-item-nyckel.html">Förra: DynamoDB: tabell, item och nyckel</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0080-execution-role-och-behorighet.html">Nästa: Execution role och minsta möjliga behörighet</a>
+</nav>
+
+</main>
+</body>
+</html>

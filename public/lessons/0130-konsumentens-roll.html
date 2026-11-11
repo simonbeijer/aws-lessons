@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konsumentens roll</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 130 · V43, 19 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 130</p>
+<h1>Konsumentens roll</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att konsumentens roll är en execution role med AWSLambdaSQSQueueExecutionRole, att den måste finnas innan triggern skapas, och att jobbet får en egen policy med bara UpdateItem.
+</div>
+
+<section class="explain">
+<h2>Vad ger AWSLambdaSQSQueueExecutionRole?</h2>
+
+<p><code>AWSLambdaSQSQueueExecutionRole</code> är en <a href="0005-iam-policy.html">AWS managed policy</a> som låter funktionens <a href="0080-execution-role-och-behorighet.html">execution role</a> hämta och ta bort meddelanden ur kön. Den tillåter <code>sqs:ReceiveMessage</code> (hämta), <code>sqs:DeleteMessage</code> (ta bort, <a href="0117-hamtat-ar-inte-borta.html">lektion 117</a>) och <code>sqs:GetQueueAttributes</code> (läsa köns inställningar), plus loggar. I <a href="0080-execution-role-och-behorighet.html">lektion 80</a> fick rollen bara skriva loggar. Rollen med den policyn är konsumentens roll. <span class="src">(<a href="https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSLambdaSQSQueueExecutionRole.html">AWS: AWSLambdaSQSQueueExecutionRole</a>)</span></p>
+
+<p>Policyn har <code>"Resource": "*"</code>, så den gäller alla köer i kontot, inte en viss kö. Det är bredare än jobbet behöver.</p>
+</section>
+
+<section class="explain">
+<h2>När läggs den på?</h2>
+
+<p>Före <a href="0129-sqs-trigger.html">SQS-triggern</a>. Triggern hämtar från kön med funktionens roll, så rollen måste redan ha rättigheterna när triggern skapas. Saknas de går triggern inte att skapa. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-configure.html">AWS: SQS-trigger för Lambda</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad får jobbet?</h2>
+
+<p>En egen policy med bara <code>dynamodb:UpdateItem</code> på tabellens <a href="0073-load-balancer-och-arn.html">ARN</a>. Konsumentens jobb är att skriva <code>welcome_sent_at</code>, tiden då kunden välkomnades, med UpdateItem (<a href="0079-lasa-och-skriva-i-dynamodb.html">lektion 79</a>). Den ska inte kunna läsa alla kunder eller ta bort någon. Så följer rollen <a href="0080-execution-role-och-behorighet.html">minsta möjliga behörighet</a>. <span class="src">(<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege">AWS: Least privilege</a>, <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/iam-policy-example-data-crud.html">AWS: DynamoDB-policy</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad tillåter AWSLambdaSQSQueueExecutionRole mot kön?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Policyn ger ReceiveMessage och DeleteMessage, alltså hämta och ta bort.">Hämta och radera meddelanden</button>
+    <button class="opt" data-why="SendMessage är producentens rättighet, inte konsumentens.">Skicka och ordna meddelanden</button>
+    <button class="opt" data-why="Policyn ändrar inga köinställningar, den kan bara läsa dem.">Skapa och ändra köegenskaper</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad ska vara klart innan triggern skapas?</p>
+  <div class="options">
+    <button class="opt" data-why="Kön behöver inga meddelanden för att triggern ska skapas.">Kön måste lagra meddelanden</button>
+    <button class="opt" data-why="Funktionen behöver inte vara körd, men rollen måste ha rättigheterna.">Funktionen måste vara körd</button>
+    <button class="opt" data-correct data-why="Triggern hämtar med rollen, så SQS-policyn måste redan finnas där.">Rollen måste ha SQS-policyn</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition: vad tillåter AWSLambdaBasicExecutionRole?</p>
+  <div class="options">
+    <button class="opt" data-why="Köer kräver SQS-policyn, som rollen inte har från början (lektion 80).">Hämta från köerna</button>
+    <button class="opt" data-correct data-why="Bara loggar: CreateLogGroup, CreateLogStream och PutLogEvents (lektion 80).">Bara skriva loggar</button>
+    <button class="opt" data-why="DynamoDB kräver en egen policy, som rollen inte har från början (lektion 80).">Skriva i DynamoDB</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>AWSLambdaSQSQueueExecutionRole ger ReceiveMessage, DeleteMessage och GetQueueAttributes på alla köer, plus loggar.</li>
+    <li>Rollen måste ha den innan SQS-triggern skapas.</li>
+    <li>Jobbet får en egen policy med bara UpdateItem på tabellen.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSLambdaSQSQueueExecutionRole.html">AWS: AWSLambdaSQSQueueExecutionRole</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0129-sqs-trigger.html">Förra: SQS-trigger</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0131-event-fran-sqs.html">Nästa: Event från SQS</a>
+</nav>
+
+</main>
+</body>
+</html>

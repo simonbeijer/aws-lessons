@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spara först, skicka sedan</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 128 · V43, 17 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 128</p>
+<h1>Spara först, skicka sedan</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att API:et sparar kunden före SendMessage, och att ett fel i SendMessage ger ett 5xx-fel fast kunden redan finns: två skrivningar till två system.
+</div>
+
+<section class="explain">
+<h2>Vilken skrivning kommer först?</h2>
+
+<p>API:et sparar kunden i tabellen med <code>PutItem</code> (<a href="0079-lasa-och-skriva-i-dynamodb.html">lektion 79</a>), i koden <code>PutCommand</code> (<a href="0096-documentclient.html">lektion 96</a>), och skickar sedan meddelandet med <code>SendMessage</code> (<a href="0126-sendmessage.html">lektion 126</a>). Först därefter svarar det med 201. Meddelandet säger att en kund har skapats, så kunden måste finnas när det skickas.</p>
+
+<pre>await db.send(new PutCommand({ ... }));           // 1. spara kunden
+await sqs.send(new SendMessageCommand({ ... }));  // 2. skicka meddelandet
+return json(201, customer);                       // 3. svara</pre>
+
+<p>Det är två skrivningar till två olika system, <a href="0078-dynamodb-tabell-item-nyckel.html">DynamoDB</a> och <a href="0113-sqs-ko.html">SQS</a>. AWS kallar det <em>dual write</em>. Den andra kan misslyckas fast den första har lyckats. Ett mönster som löser det heter transactional outbox (se huvudkällan). <span class="src">(<a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS: Transactional outbox</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad händer om SendMessage felar?</h2>
+
+<p>Kunden finns kvar i tabellen, men inget meddelande ligger på kön. Ett fel kan vara att rollen saknar <code>sqs:SendMessage</code>, vilket ger <a href="0080-execution-role-och-behorighet.html">AccessDeniedException</a>. PutItem ångras inte. Fångar koden inte felet får klienten ett <a href="0098-svar-till-api-gateway.html">5xx-fel</a>.</p>
+
+<p>Klienten tror då att inget sparades. Skickar den om anropet sparas kunden en gång till, så kunden finns två gånger. Ingen konsument har fått något meddelande om den första.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vilken skrivning görs först i API:et?</p>
+  <div class="options">
+    <button class="opt" data-why="Meddelandet skickas efter att kunden har sparats, inte före.">Meddelandet läggs på kön</button>
+    <button class="opt" data-correct data-why="Meddelandet säger att kunden finns, så kunden sparas innan det skickas.">Kunden sparas med PutItem</button>
+    <button class="opt" data-why="Svaret skickas sist, när båda skrivningarna är gjorda.">Svaret går till klienten</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. SendMessage felar efter PutItem. Vad gäller för kunden?</p>
+  <div class="options">
+    <button class="opt" data-why="PutItem lyckades redan, så kunden sparades.">Kunden saknas helt i tabellen</button>
+    <button class="opt" data-correct data-why="PutItem har redan lyckats och ångras inte när SendMessage felar.">Kunden ligger kvar i tabellen</button>
+    <button class="opt" data-why="Inget tar bort kunden, tabellen vet inget om felet i kön.">Kunden tas bort från tabellen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Klienten får ett 5xx-fel och skickar om anropet. Vad blir resultatet?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Den första kunden finns redan, och omskicket sparar en till.">Samma kund finns två gånger</button>
+    <button class="opt" data-why="Tabellen vet inget om felet i kön, så den nekar inte.">Tabellen nekar den nya kunden</button>
+    <button class="opt" data-why="PutItem ångras inte, så den första kunden finns kvar.">Den första kunden raderas då</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>API:et sparar kunden med PutItem, skickar sedan meddelandet med SendMessage och svarar sist.</li>
+    <li>Det är två skrivningar till två system, och den andra kan misslyckas fast den första lyckades.</li>
+    <li>Felar SendMessage finns kunden kvar utan meddelande, och klienten får ett 5xx-fel. Skickar den om finns kunden två gånger.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS: Transactional outbox pattern</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0127-meddelandets-innehall.html">Förra: Meddelandets innehåll</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0129-sqs-trigger.html">Nästa: SQS-trigger</a>
+</nav>
+
+</main>
+</body>
+</html>

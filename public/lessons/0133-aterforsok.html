@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Återförsök</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 133 · V43, 22 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 133</p>
+<h1>Återförsök</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att ett kast i handlern gör att meddelandet kommer tillbaka efter visibility timeout och till slut hamnar i dödbrevskön, medan den som anropade API:et redan fått 201.
+</div>
+
+<section class="explain">
+<h2>Hur blir det ett nytt försök?</h2>
+
+<p>Kastar funktionen ett fel tar <a href="0129-sqs-trigger.html">triggern</a> inte bort meddelandena. De blir synliga i kön igen efter <a href="0118-visibility-timeout.html">visibility timeout</a>, och då hämtas de på nytt. Det nya försöket är bara en ny hämtning. Tiden mellan försöken är inte en fast siffra, eftersom Lambda kan vänta allt längre när felen upprepas. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html">AWS: felhantering för SQS</a>)</span></p>
+
+<p>Varje hämtning ökar <a href="0119-receive-count.html">receive count</a>. Blir den större än <a href="0123-maxreceivecount.html">maxReceiveCount</a> flyttar kön meddelandet till <a href="0122-dodbrevsko.html">dödbrevskön</a>. Med värdet 3 sker det efter tre misslyckade körningar. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html">AWS: SetQueueAttributes</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad får anroparen?</h2>
+
+<p>Anroparen har redan fått sitt svar. API:et svarade <a href="0050-statuskod.html">201</a> när <a href="0126-sendmessage.html">SendMessage</a> lagt meddelandet på kön, och då hade ingen funktion körts. Ett kast i handlern ändrar inte det svaret. Det skiljer sig från <a href="0098-svar-till-api-gateway.html">ett kast i en funktion bakom API:et</a>, där felet går tillbaka till den som anropade. Här syns felet bara i dödbrevskön.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Funktionen kastar. När kommer meddelandet tillbaka?</p>
+  <div class="options">
+    <button class="opt" data-why="Meddelandet är dolt under visibility timeout, så det kommer inte tillbaka direkt.">Direkt när funktionen kastat</button>
+    <button class="opt" data-correct data-why="Meddelandet blir synligt igen när visibility timeout gått.">När visibility timeout gått</button>
+    <button class="opt" data-why="Ett kast raderar inget, så det blir ett nytt försök.">Aldrig, kastet raderar det</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. maxReceiveCount är 3 och funktionen kastar varje gång. Var hamnar meddelandet?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Efter tre misslyckade körningar flyttar kön meddelandet till dödbrevskön.">I dödbrevskön efter tre kast</button>
+    <button class="opt" data-why="Kön flyttar meddelandet när gränsen passerats, det ligger inte kvar för alltid.">Kvar i huvudkön utan gräns</button>
+    <button class="opt" data-why="Kön raderar det inte, utan flyttar det till dödbrevskön (lektion 122).">Raderat efter de tre kasten</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. API:et svarade 201 efter SendMessage. Sedan kastar funktionen. Vad får anroparen?</p>
+  <div class="options">
+    <button class="opt" data-why="Anropet var klart när funktionen kördes, så inget svar skickas senare.">Ett felsvar i efterhand</button>
+    <button class="opt" data-why="Anroparen får bara ett svar, och det kom redan.">Ett andra svar senare</button>
+    <button class="opt" data-correct data-why="Anropet var redan klart, så felet syns bara i dödbrevskön.">Inget, 201 gavs redan</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett kast tar inte bort meddelandet. Det blir synligt igen efter visibility timeout och hämtas på nytt.</li>
+    <li>Varje hämtning ökar receive count. Efter maxReceiveCount hamnar meddelandet i dödbrevskön.</li>
+    <li>Anroparen har redan fått 201. Felet syns bara i dödbrevskön.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0132-batch-size.html">Förra: Batch size</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0134-tillfalligt-och-permanent-fel.html">Nästa: Tillfälligt och permanent fel</a>
+</nav>
+
+</main>
+</body>
+</html>

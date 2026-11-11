@@ -26,7 +26,7 @@
 <section class="explain">
 <h2>Vad är ett HTTP API?</h2>
 
-<p>Ett HTTP API är en av API-typerna i API Gateway. Det tar emot anrop och skickar dem vidare till en <a href="0078-lambda-funktion.html">Lambda-funktion</a> eller till en annan server. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html">AWS: API Gateway HTTP APIs</a>)</span></p>
+<p>Ett HTTP API är en av API-typerna i API Gateway. Det tar emot anrop och skickar dem vidare till en <a href="0074-serverlost-och-lambda.html">Lambda-funktion</a> eller till en annan server. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html">AWS: API Gateway HTTP APIs</a>)</span></p>
 
 <p>I <a href="0070-mixed-content.html">lektion 70</a> gav API Gateway ditt API en HTTPS-adress. Här ser du vad som händer med anropet när det kommer fram.</p>
 </section>
@@ -39,7 +39,7 @@
 <ol>
   <li><strong>Matchar en route.</strong> En route är metod plus sökväg, som i <a href="0057-express.html">Express</a>.</li>
   <li><strong>Gör ett event.</strong> Anropet görs om till ett <a href="0097-handelse-fran-api-gateway.html">event i JSON</a>, med samma form som testhändelsen.</li>
-  <li><strong>Anropar funktionen.</strong> Lambda kör funktionen, och <a href="0080-handler.html">handlern</a> får eventet.</li>
+  <li><strong>Anropar funktionen.</strong> Lambda kör funktionen, och <a href="0075-handler-och-event.html">handlern</a> får eventet.</li>
   <li><strong>Gör ett HTTP-svar.</strong> Objektet som handlern <a href="0098-svar-till-api-gateway.html">returnerar</a> blir HTTP-svaret till klienten.</li>
 </ol>
 </section>
@@ -102,7 +102,7 @@
 <p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
 
 <nav class="bottomnav">
-  <a href="0102-accessdeniedexception.html">Förra: AccessDeniedException</a>
+  <a href="0080-execution-role-och-behorighet.html">Förra: AccessDeniedException</a>
   <a href="../index.html">Alla lektioner</a>
   <a href="0104-route-i-api-gateway.html">Nästa: Route i API Gateway</a>
 </nav>

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Receive count</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 119 · V43, 8 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 119</p>
+<h1>Receive count</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att receive count är hur många gånger ett meddelande har hämtats utan att tas bort. Varje hämtning räknas, och antalet försök är begränsat.
+</div>
+
+<section class="explain">
+<h2>Vad är receive count?</h2>
+
+<p>Receive count är antalet gånger ett meddelande har hämtats utan att tas bort. Varje meddelande har sin egen räknare. Första hämtningen ger 1. Blir meddelandet synligt igen efter <a href="0118-visibility-timeout.html">visibility timeout</a> och hämtas på nytt, blir det 2. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html">AWS: ReceiveMessage</a>)</span></p>
+
+<p>I SQS-konsolen finns knappen Poll for messages på sidan Send and receive messages. Den hämtar meddelanden ur kön och visar sedan receive count för varje hämtat meddelande. I API:t heter värdet ApproximateReceiveCount. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/step-receive-delete-message.html">AWS: Receive and delete a message</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad räknas som hämtning?</h2>
+
+<p>Kursen säger att även konsolens Poll for messages räknas, som en konsument: meddelandet blir osynligt under visibility timeout, och varje gång konsolen visar det igen ökar receive count.</p>
+
+<div class="box note">
+  <span class="box-title">AWS säger annat</span>
+  AWS skriver att meddelanden som hämtas i konsolen förblir synliga för ny hämtning, och säger inte att konsolens hämtning ökar receive count. Gäller gör AWS.
+</div>
+
+<p>Antalet försök är begränsat. Vad som händer när de är slut kommer i en senare lektion.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad är receive count?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Receive count räknar hämtningar utan borttagning, per meddelande.">Antal hämtningar utan att raderas</button>
+    <button class="opt" data-why="Det är antal hämtningar, inte antal skickade meddelanden.">Antal skickade meddelanden i kön</button>
+    <button class="opt" data-why="Det räknar hämtningar av ett meddelande, inte konsumenter.">Antal konsumenter som läser kön</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Ett meddelande hämtas, tas inte bort och hämtas igen. Vad är receive count?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Två hämtningar utan borttagning ger 2.">Receive count är 2</button>
+    <button class="opt" data-why="Första hämtningen ger 1 och den andra ökar det, så det är 2.">Receive count är 1</button>
+    <button class="opt" data-why="Räknaren nollställs inte av att meddelandet blir synligt.">Receive count är 0</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Vad gör att ett hämtat meddelande kan hämtas en andra gång?</p>
+  <div class="options">
+    <button class="opt" data-why="Receive count minskar inte, det bara ökar.">Receive count sjönk till noll</button>
+    <button class="opt" data-correct data-why="Utan borttagning blir det synligt igen när tiden gått ut.">Visibility timeout hann gå ut</button>
+    <button class="opt" data-why="Ett skickat meddelande hämtas inte igen av att det skickas.">Det skickades till kön igen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Receive count är hur många gånger ett meddelande hämtats utan att tas bort.</li>
+    <li>Konsolen visar det efter Poll for messages.</li>
+    <li>Antalet försök är begränsat. Mer om det kommer i en senare lektion.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/step-receive-delete-message.html">AWS: Receive and delete a message</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0118-visibility-timeout.html">Förra: Visibility timeout</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0120-long-polling.html">Nästa: Long polling</a>
+</nav>
+
+</main>
+</body>
+</html>

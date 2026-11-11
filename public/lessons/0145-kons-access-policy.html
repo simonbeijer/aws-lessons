@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Köns access policy</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 145 · V43, 34 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 145</p>
+<h1>Köns access policy</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att köns resource-based policy släpper in <code>events.amazonaws.com</code> med <code>sqs:SendMessage</code>, och bara från regelns ARN (<code>aws:SourceArn</code>).
+</div>
+
+<section class="explain">
+<h2>Vad släpper policyn in?</h2>
+
+<p>Köns access policy är köns <a href="0107-resource-based-policy.html">resource-based policy</a>. Utan en sats i den får en EventBridge-<a href="0139-regel-och-event-pattern.html">regel</a> inte lägga händelser i kön. En ny kö har en tom policy, så satsen måste läggas till. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#eb-sqs-permissions">AWS: Amazon SQS permissions</a>)</span></p>
+
+<pre><code>{
+  "Effect": "Allow",
+  "Principal": { "Service": "events.amazonaws.com" },
+  "Action": "sqs:SendMessage",
+  "Resource": "arn:aws:sqs:eu-north-1:123456789012:v43-orders",
+  "Condition": {
+    "ArnEquals": {
+      "aws:SourceArn": "arn:aws:events:eu-north-1:123456789012:rule/v43-customer-created"
+    }
+  }
+}</code></pre>
+
+<p><code>events.amazonaws.com</code> är EventBridges namn som tjänst, som <code>apigateway.amazonaws.com</code> i lektion 107. <code>sqs:SendMessage</code> är samma åtgärd som <a href="0126-sendmessage.html">SendMessage</a>. Resource är köns <a href="0073-load-balancer-och-arn.html">ARN</a>. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#eb-sqs-permissions">AWS: Amazon SQS permissions</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad gör villkoret?</h2>
+
+<p>Villkoret begränsar satsen till en enda regel. <code>aws:SourceArn</code> är ARN:et på den som skickar, och <code>ArnEquals</code> kräver att det är exakt regelns ARN. Utan villkoret skulle varje EventBridge-regel få skicka till kön. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#eb-sqs-permissions">AWS: Amazon SQS permissions</a>)</span></p>
+
+<p>Regelns ARN har formen <code>arn:aws:events:{region}:{konto}:rule/{regelnamn}</code> på default-bussen. Saknas satsen eller stämmer inte regelnamnet får kön inget från regeln. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html">AWS: Resource-based policies</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad gör villkoret på <code>aws:SourceArn</code> i köns policy?</p>
+  <div class="options">
+    <button class="opt" data-why="Åtgärden sqs:SendMessage står i Action, inte i villkoret.">Det styr vilka åtgärder som får ske</button>
+    <button class="opt" data-why="Köns ARN står i Resource, inte i villkoret.">Det väljer kön som satsen gäller för</button>
+    <button class="opt" data-correct data-why="Bara den regel vars ARN stämmer får skicka, inte andra regler.">Det släpper bara in en särskild regel</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Repetition från lektion 107: i vilken del av satsen står att det är EventBridge som får skicka?</p>
+  <div class="options">
+    <button class="opt" data-why="Action säger vad som får göras, inte vem.">I Action, som åtgärd SendMessage</button>
+    <button class="opt" data-why="Resource är det som skyddas, här kön.">I Resource, som köns ARN-adress</button>
+    <button class="opt" data-correct data-why="Principal säger vem som släpps in, här tjänsten events.amazonaws.com.">I Principal, som tjänstens namn</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Regeln har mål i kön, men kön får inget. Policyn är tom. Vad saknas?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Utan en sats som släpper in events.amazonaws.com får regeln inte skicka.">En sats som släpper in tjänsten</button>
+    <button class="opt" data-why="Händelsemönstret styr vilka händelser som matchar, inte om regeln får skicka.">Ett nytt mönster i själva regeln</button>
+    <button class="opt" data-why="Ett villkor begränsar en sats, men utan sats finns inget att begränsa.">Ett villkor som gäller hela kön</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Köns access policy är köns resource-based policy. Den är tom i en ny kö.</li>
+    <li>Satsen släpper in <code>events.amazonaws.com</code> med <code>sqs:SendMessage</code> på köns ARN.</li>
+    <li>Villkoret <code>aws:SourceArn</code> gör att bara regeln med det ARN:et får skicka.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html">AWS: Using resource-based policies for EventBridge</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0144-prenumeration.html">Förra: Prenumeration</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0146-eventbridge-scheduler.html">Nästa: EventBridge Scheduler</a>
+</nav>
+
+</main>
+</body>
+</html>

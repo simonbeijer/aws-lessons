@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event från SQS</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 131 · V43, 20 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 131</p>
+<h1>Event från SQS</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att eventet från SQS har listan Records med en post per meddelande, att body är en sträng som du tolkar med JSON.parse, och att attributes.ApproximateReceiveCount säger vilket försök det är.
+</div>
+
+<section class="explain">
+<h2>Hur ser eventet ut?</h2>
+
+<p>Eventet är ett objekt med nyckeln <code>Records</code>, en lista med en post per meddelande. <a href="0129-sqs-trigger.html">Triggern</a> hämtar meddelandena och lägger dem i listan, så listan kan ha flera poster. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#example-standard-queue-message-event">AWS: Lambda med SQS</a>)</span></p>
+
+<p>I <a href="0097-handelse-fran-api-gateway.html">lektion 97</a> gjorde API Gateway om anropet till ett <a href="0075-handler-och-event.html">event</a>. Här bygger Lambda strukturen. Av innehållet är bara <code>body</code> skrivet av producenten.</p>
+</section>
+
+<section class="explain">
+<h2>Vilka fält behövs?</h2>
+
+<p>Två fält i varje post: <code>body</code> och <code>attributes.ApproximateReceiveCount</code>. Båda är strängar. Så ser en post ut, förkortad: <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#example-standard-queue-message-event">AWS: Lambda med SQS</a>)</span></p>
+
+<pre><code>{
+  "Records": [
+    {
+      "body": "{\"id\":\"c-1042\",\"name\":\"Test Testsson\"}",
+      "attributes": { "ApproximateReceiveCount": "1" }
+    }
+  ]
+}</code></pre>
+
+<p><code>body</code> är <a href="0127-meddelandets-innehall.html">meddelandets innehåll</a> som text, även när texten är JSON, precis som <code>event.body</code> i lektion 97. Därför tolkas den med <code>JSON.parse</code>. <a href="0119-receive-count.html">Receive count</a> heter <code>ApproximateReceiveCount</code> i eventet och är texten <code>"1"</code>, inte talet 1.</p>
+
+<p>Koden går igenom listan post för post. Per post tolkar den <code>JSON.parse(record.body)</code> och läser <code>record.attributes.ApproximateReceiveCount</code>. Fältet <code>attributes</code> är det SQS själv lägger till om meddelandet.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vilken nyckel i eventet innehåller meddelandena?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Records är en lista med en post per meddelande.">Listan Records</button>
+    <button class="opt" data-why="Nyckeln heter Records, inte Entries.">Listan Entries</button>
+    <button class="opt" data-why="Nyckeln heter Records, inte Content.">Listan Content</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vilken typ har record.body när meddelandet innehåller JSON?</p>
+  <div class="options">
+    <button class="opt" data-why="Lambda tolkar inte JSON åt dig, body är kvar som text.">Ett objekt med JSON-fält</button>
+    <button class="opt" data-why="Listan är Records, varje body är en enda sträng.">En lista med JSON-poster</button>
+    <button class="opt" data-correct data-why="Body är alltid en sträng, så JSON måste tolkas med JSON.parse.">En sträng med JSON-text</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition: vad räknar ApproximateReceiveCount?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Receive count räknar hämtningar utan borttagning, per meddelande (lektion 119).">Hämtningar utan att raderas</button>
+    <button class="opt" data-why="Receive count gäller ett meddelande, inte hur många som ligger i kön (lektion 119).">Väntande meddelanden i kön</button>
+    <button class="opt" data-why="Det räknar hämtningar, inte lyckade anrop (lektion 119).">Lyckade anrop till handlern</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Eventet har listan Records, en post per meddelande.</li>
+    <li>body är en sträng. JSON tolkas med JSON.parse.</li>
+    <li>attributes.ApproximateReceiveCount är en sträng med antalet hämtningar.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#example-standard-queue-message-event">AWS: Lambda med SQS, exempel på event</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0130-konsumentens-roll.html">Förra: Konsumentens roll</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0132-batch-size.html">Nästa: Batch size</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Idempotens</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 136 · V43, 25 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 136</p>
+<h1>Idempotens</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att idempotent betyder att samma meddelande två gånger ger samma resultat som en gång, och att <code>if_not_exists(welcome_sent_at, :t)</code> skriver tiden bara första gången.
+</div>
+
+<section class="explain">
+<h2>Vad är idempotent?</h2>
+
+<p>Idempotent betyder att samma anrop, upprepat, ger samma effekt som ett enda. <a href="0049-http-metod.html">Lektion 49</a> visade det för HTTP-metoder. Här gäller det en funktion som får samma meddelande två gånger, vilket <a href="0135-minst-en-gang.html">en standardkö kan ge</a>: databasen ska se likadan ut efter andra körningen som efter första. <span class="src">(<a href="https://developer.mozilla.org/en-US/docs/Glossary/Idempotent">MDN: Idempotent</a>)</span></p>
+
+<p>Funktionen skriver tiden för välkomstmeddelandet i attributet <code>welcome_sent_at</code>. Med <code>SET welcome_sent_at = :t</code> skriver andra körningen över tiden med en ny. Då är funktionen inte idempotent. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.SET">AWS: Update expressions, SET</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vad gör if_not_exists?</h2>
+
+<p><code>if_not_exists(path, value)</code> ger <code>value</code> om attributet <code>path</code> saknas i itemet, annars det som redan står där. Den finns bara i <code>SET</code> i ett <a href="0079-lasa-och-skriva-i-dynamodb.html">uttryck</a> (update expression). <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.SET">AWS: Update expressions, SET</a>)</span></p>
+
+<pre><code>UpdateExpression: "SET welcome_sent_at = if_not_exists(welcome_sent_at, :t)"</code></pre>
+
+<p>Andra körningen skickar ett nytt <code>:t</code>, men attributet finns, så första tiden ligger kvar. Bara attributet är skyddat: en loggrad skrivs ändå två gånger, och ett mejl hade skickats två gånger.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad betyder idempotent?</p>
+  <div class="options">
+    <button class="opt" data-why="Ett upprepat anrop ska inte ge en ny effekt varje gång.">Upprepade anrop ger olika effekter</button>
+    <button class="opt" data-why="Idempotent betyder inte att anropet bara får göras en gång.">Anropet fungerar aldrig två gånger</button>
+    <button class="opt" data-correct data-why="Flera likadana anrop lämnar servern i samma läge som ett enda.">Upprepade anrop ger samma effekter</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Attributet welcome_sent_at finns redan. Vad ger if_not_exists(welcome_sent_at, :t)?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Finns attributet ger if_not_exists det som redan står där, och :t ignoreras.">Det värde som redan finns</button>
+    <button class="opt" data-why="Det nya värdet :t används bara när attributet saknas.">Det nya värdet, alltså :t</button>
+    <button class="opt" data-why="if_not_exists ger aldrig ett tomt värde när attributet finns.">Ett tomt värde, utan text</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition: varför måste koden klara samma meddelande två gånger?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är inte orsaken; funktionen kan läsa meddelandet som vanligt.">Funktionen kan inte läsa det alls</button>
+    <button class="opt" data-correct data-why="En standardkö levererar minst en gång, så dubbletter kan komma fram.">Kön kan leverera det flera gånger</button>
+    <button class="opt" data-why="Meddelandets storlek har inget med dubbletter att göra.">Meddelandet var för stort för kön</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Idempotent: samma meddelande två gånger ger samma resultat som en gång.</li>
+    <li><code>SET welcome_sent_at = if_not_exists(welcome_sent_at, :t)</code> skriver tiden bara första gången. Loggrader och mejl skyddas inte av det.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html">AWS: Update expressions</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0135-minst-en-gang.html">Förra: Minst en gång</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0137-handelse.html">Nästa: Händelse</a>
+</nav>
+
+</main>
+</body>
+</html>

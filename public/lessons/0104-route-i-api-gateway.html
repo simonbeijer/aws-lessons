@@ -48,7 +48,7 @@ DELETE /customers/{id}</code></pre>
 <section class="explain">
 <h2>Ingen matchande route</h2>
 
-<p>Matchar ingen route svarar API Gateway själv 404 med <code>{"message":"Not Found"}</code>, och funktionen körs inte. Anropet syns därför inte i funktionens logg i <a href="0082-cloudwatch-logs.html">CloudWatch Logs</a>. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-routes.html#http-api-develop-routes.evaluation">AWS: Routing API requests</a>; statuskoden och loggen: kursmaterialet v42)</span></p>
+<p>Matchar ingen route svarar API Gateway själv 404 med <code>{"message":"Not Found"}</code>, och funktionen körs inte. Anropet syns därför inte i funktionens logg i <a href="0076-loggar-och-report-raden.html">CloudWatch Logs</a>. <span class="src">(<a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-routes.html#http-api-develop-routes.evaluation">AWS: Routing API requests</a>; statuskoden och loggen: kursmaterialet v42)</span></p>
 
 <p>Både API Gateway och koden kan svara 404. Kroppen visar vem som svarade.</p>
 

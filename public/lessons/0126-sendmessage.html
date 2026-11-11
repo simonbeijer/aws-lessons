@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SendMessage</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 126 · V43, 15 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 126</p>
+<h1>SendMessage</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att <code>SendMessageCommand</code> med <code>QueueUrl</code> och <code>MessageBody</code> lägger ett meddelande på kön, och att rollen bara får <code>sqs:SendMessage</code> på den kön.
+</div>
+
+<section class="explain">
+<h2>Vad gör SendMessage?</h2>
+
+<p>SendMessage lägger ett meddelande på den kö som <code>QueueUrl</code> pekar ut (<a href="0125-kons-url-och-arn.html">lektion 125</a>). Producenten anropar den med <a href="0095-aws-sdk.html">AWS SDK</a>. <code>MessageBody</code> är en sträng, så ett objekt görs om med <code>JSON.stringify</code> som i <a href="0098-svar-till-api-gateway.html">lektion 98</a>. Ett lyckat anrop svarar med meddelandets message ID. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html">AWS: SendMessage</a>, <a href="https://docs.aws.amazon.com/code-library/latest/ug/sqs_example_sqs_SendMessage_section.html">AWS: SendMessage med SDK for JavaScript</a>)</span></p>
+
+<pre><code>import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+
+const client = new SQSClient({});
+const queueUrl = process.env.QUEUE_URL;
+
+await client.send(new SendMessageCommand({
+  QueueUrl: queueUrl,
+  MessageBody: JSON.stringify({ id: 7 })
+}));</code></pre>
+
+<p><code>queueUrl</code> läses från miljövariabeln <code>QUEUE_URL</code>, precis som <code>TABLE_NAME</code> i <a href="0094-miljovariabel-i-lambda.html">lektion 94</a>. Då kan samma kod skicka till en annan kö i en annan miljö.</p>
+</section>
+
+<section class="explain">
+<h2>Vad får rollen göra?</h2>
+
+<p>Funktionens <a href="0080-execution-role-och-behorighet.html">execution role</a> får bara <code>sqs:SendMessage</code> på en enda kö, med köns ARN som resurs (<a href="0125-kons-url-och-arn.html">lektion 125</a>). Det är <a href="0080-execution-role-och-behorighet.html">minsta möjliga behörighet</a>: en handling på en resurs. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-api-permissions-reference.html">AWS: SQS API permissions</a>)</span></p>
+
+<pre>{
+  "Effect": "Allow",
+  "Action": "sqs:SendMessage",
+  "Resource": "arn:aws:sqs:eu-north-1:123456789012:v43-customer-events"
+}</pre>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vilken del av anropet pekar ut kön?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="QueueUrl är köns webbadress, och den talar om vilken kö meddelandet hamnar i.">Parametern QueueUrl i anropet</button>
+    <button class="opt" data-why="MessageId är meddelandets id i svaret, den pekar inte ut någon kö.">Parametern MessageId i anropet</button>
+    <button class="opt" data-why="Anropet har ingen QueueName, kön pekas ut med QueueUrl.">Parametern QueueName i anropet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Kunden är ett objekt i koden. Hur sätter du MessageBody?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="MessageBody är en sträng, så objektet görs om med JSON.stringify.">Objektet omgjort till JSON-text</button>
+    <button class="opt" data-why="Ett objekt är ingen sträng, så det går inte att skicka som det är.">Objektet skickat utan ändringar</button>
+    <button class="opt" data-why="MessageBody är ett enda fält med en sträng, det delas inte upp.">Objektet skickat som fältlista</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Varför får rollen bara sqs:SendMessage?</p>
+  <div class="options">
+    <button class="opt" data-why="Det finns fler SQS-åtgärder, till exempel ReceiveMessage.">Andra åtgärder finns inte i tjänsten</button>
+    <button class="opt" data-why="Behörigheter ändrar varken priset eller hastigheten.">Fler åtgärder kostar mer per anrop</button>
+    <button class="opt" data-correct data-why="Med minsta möjliga behörighet (lektion 80) kan en bugg inte göra mer än att skicka.">En bugg kan bara skicka meddelanden</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>SendMessageCommand</code> med <code>QueueUrl</code> och <code>MessageBody</code> lägger ett meddelande på kön, och svaret har message ID.</li>
+    <li>Kroppen är en sträng, så objekt går genom <code>JSON.stringify</code>.</li>
+    <li>Rollen får bara <code>sqs:SendMessage</code> på en kö, med köns ARN.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html">AWS: SendMessage</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0125-kons-url-och-arn.html">Förra: Köns URL och ARN</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0127-meddelandets-innehall.html">Nästa: Meddelandets innehåll</a>
+</nav>
+
+</main>
+</body>
+</html>

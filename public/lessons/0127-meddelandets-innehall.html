@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meddelandets innehåll</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 127 · V43, 16 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 127</p>
+<h1>Meddelandets innehåll</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att meddelandet bara bär det konsumenten behöver (typ, id, namn, tid), inte hela objektet, och att det är en kopia som kan bli inaktuell.
+</div>
+
+<section class="explain">
+<h2>Vad står i meddelandet?</h2>
+
+<p>Meddelandet om en ny kund bär fyra fält: typ, id, namn och tid. Typen är <code>CustomerCreated</code>, så <a href="0114-producent-och-konsument.html">konsumenten</a> ser vad som har hänt. Id är kundens id i tabellen och <code>created_at</code> är tiden. Allt ligger i <code>MessageBody</code>, som är en sträng (<a href="0126-sendmessage.html">lektion 126</a>). <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html">AWS: SendMessage</a>)</span></p>
+
+<pre>{
+  "type": "CustomerCreated",
+  "id": "c-1042",
+  "name": "Test Testsson",
+  "created_at": "2026-10-26T09:15:00Z"
+}</pre>
+
+<p>Hela kunden skickas inte. Där kan det finnas sådant som konsumenten inte ska se, till exempel ett lösenord. Meddelandet får det konsumenten behöver plus ett id, så att resten går att hämta ur tabellen.</p>
+</section>
+
+<section class="explain">
+<h2>Varför kan det bli inaktuellt?</h2>
+
+<p>Meddelandet är en kopia av kundens data från när det skickades. Ändras namnet i tabellen från <code>FEL Testsson</code> till <code>Test Testsson</code> medan meddelandet väntar, står det fortfarande <code>FEL Testsson</code> i meddelandet. Det kan vänta länge: kön behåller det 4 dagar som standard (<a href="0121-message-retention-period.html">lektion 121</a>). <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html">AWS: SetQueueAttributes</a>)</span> Därför hämtar konsumenten färska uppgifter ur tabellen med id:t om de kan ha ändrats.</p>
+
+<p>Att hålla meddelandet smalt är ett designval, inte en AWS-regel. AWS visar både händelser med data och händelser med bara en identifierare. <span class="src">(<a href="https://aws.amazon.com/event-driven-architecture/">AWS: Event-driven architecture</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad bär meddelandet om en ny kund?</p>
+  <div class="options">
+    <button class="opt" data-why="Hela kunden kan innehålla sådant som konsumenten inte ska se, till exempel ett lösenord.">Hela kunden med alla fält</button>
+    <button class="opt" data-correct data-why="Typ, id, namn och tid är det konsumenten behöver, och id:t räcker för att hämta resten.">Typ, id, namn och tidpunkt</button>
+    <button class="opt" data-why="Ett ARN pekar ut tabellen, inte kunden, och utan namn och tid får konsumenten för lite.">Bara tabellens ARN och id</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Namnet ändras i tabellen medan meddelandet väntar. Vilket namn står i meddelandet?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Meddelandet är en kopia från när det skickades, så det ändras inte.">Det gamla namnet kvar</button>
+    <button class="opt" data-why="Meddelandet är en kopia och följer inte med när tabellen ändras.">Det nya namnet direkt</button>
+    <button class="opt" data-why="Namnet står kvar i kopian, det tas inte bort.">Inget namn längre alls</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Vad gör konsumenten om namnet kan ha ändrats?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Tabellen har den färska versionen, och id:t i meddelandet pekar ut kunden.">Läser kunden ur tabellen igen</button>
+    <button class="opt" data-why="Kopian kan vara gammal, så den går inte att lita på här.">Litar på namnet i meddelandet</button>
+    <button class="opt" data-why="Producenten skickar bara ett meddelande per händelse, och kopian blir ändå gammal.">Ber producenten skicka det igen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Meddelandet bär typ, id, namn och tid, inte hela objektet.</li>
+    <li>Det är en kopia från när det skickades och kan bli inaktuell medan det väntar i kön.</li>
+    <li>Behövs färska uppgifter hämtar konsumenten dem ur tabellen med id:t.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html">AWS: SendMessage</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0126-sendmessage.html">Förra: SendMessage</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0128-spara-forst-skicka-sedan.html">Nästa: Spara först, skicka sedan</a>
+</nav>
+
+</main>
+</body>
+</html>

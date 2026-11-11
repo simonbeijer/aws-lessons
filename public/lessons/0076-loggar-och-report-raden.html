@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loggar och REPORT-raden</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 76 · V42, 6 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 76 · V42, 6 av 15 i veckan</p>
+<h1>Loggar och REPORT-raden</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Svaret säger bara vad funktionen returnerade. Vad som hände på vägen kan du inte se på någon server, för det finns ingen att logga in på. I stället skriver Lambda en logg: dina egna utskrifter och en rad per anrop som visar vad det tog i tid och minne.
+</div>
+
+<section class="explain">
+<h2>Var hamnar console.log?</h2>
+
+<p>På en egen server skrev <code>console.log</code> till terminalen. Lambda har ingen terminal att titta i, så allt funktionen skriver går till CloudWatch Logs, den del av <a href="0010-cloudwatch-larm.html">CloudWatch</a> som sparar loggar.</p>
+
+<pre><code>console.log("Händelse:", JSON.stringify(event));</code></pre>
+</section>
+
+<section class="explain">
+<h2>Var ligger loggen?</h2>
+
+<p>Varje funktion har en egen logggrupp, <code>/aws/lambda/&lt;namn&gt;</code>. Gruppen är uppdelad i loggströmmar. En ström är raderna i tidsordning från en kopia av funktionen, det som nästa lektion kallar en exekveringsmiljö. Lambda kan köra flera kopior samtidigt.</p>
+
+<p>Efter ett Test i editorn ser du ett utdrag av loggen under resultatet. Hela loggen ligger under fliken Monitor och View CloudWatch logs.</p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Skriv aldrig lösenord, nycklar eller personuppgifter med <code>console.log</code>. Alla i kontot vars IAM (Identity and Access Management) policy tillåter det kan läsa loggen.</p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad säger REPORT-raden?</h2>
+
+<p>Runt dina egna rader lägger Lambda START, END och sist REPORT, en sammanfattning av anropet:</p>
+
+<pre><code>REPORT RequestId: 3f1c7a2e-…  Duration: 14.21 ms  Billed Duration: 15 ms  Memory Size: 128 MB  Max Memory Used: 67 MB</code></pre>
+
+<p><code>RequestId</code> är anropets id. <code>Duration</code> är tiden handlern körde, i millisekunder (ms).</p>
+
+<p><code>Billed Duration</code> är körtiden du <a href="0074-serverlost-och-lambda.html">betalar för</a>: Duration avrundad uppåt till hel millisekund, här 14,21 till 15. Vid en kallstart (nästa lektion) räknas även starttiden in.</p>
+
+<p><code>Memory Size</code> är minnet funktionen har fått, här 128 MB (megabyte), det minsta. <code>Max Memory Used</code> är det mesta den använde. Ligger det nära Memory Size kan funktionen behöva mer minne.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Handlern gör <code>console.log("a")</code> och slutar med <code>return { x: 1 }</code>. Var syns vad?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Det handlern returnerar blir svaret till anroparen, och console.log går till loggen.">Svaret är objektet, texten a finns i loggen</button>
+    <button class="opt" data-why="Det är tvärtom: console.log skrivs inte till anroparen, och returvärdet blir svaret.">Svaret är texten a, objektet finns i loggen</button>
+    <button class="opt" data-why="Svaret är det handlern returnerar; console.log skriver inte till anroparens svar.">Båda blir svaret till anroparen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Funktionen <code>v42-hello</code> har två loggströmmar. Vad betyder det?</p>
+  <div class="options">
+    <button class="opt" data-why="Logggruppen är en per funktion; strömmarna ligger inuti den.">Funktionen har två logggrupper</button>
+    <button class="opt" data-correct data-why="Varje kopia av funktionen skriver sina rader i tidsordning till en egen ström.">Rader kommer från två kopior av funktionen</button>
+    <button class="opt" data-why="En ström är ingen reservkopia; den är raderna från en kopia av funktionen.">Den ena strömmen är en reservkopia</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. REPORT-raden visar <code>Duration: 14.21 ms</code>. Vad blir Billed Duration?</p>
+  <div class="options">
+    <button class="opt" data-why="Billed Duration avrundas uppåt, inte nedåt.">14 ms</button>
+    <button class="opt" data-correct data-why="Billed Duration är Duration avrundad uppåt till hel millisekund.">15 ms</button>
+    <button class="opt" data-why="Det är minnet som kan vara 128; tiden avrundas bara till hel millisekund.">128 ms</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Allt <code>console.log</code> skriver hamnar i CloudWatch Logs, i logggruppen <code>/aws/lambda/&lt;namn&gt;</code>, uppdelad i loggströmmar: en per kopia av funktionen. Du når den via Monitor och View CloudWatch logs.</li>
+    <li>Alla med behörighet kan läsa loggen. Skriv aldrig hemligheter i den.</li>
+    <li>Varje anrop slutar med en REPORT-rad. <code>Duration</code> är handlerns tid, <code>Billed Duration</code> är tiden du betalar för (uppåt avrundad), <code>Memory Size</code> är minnet funktionen fått och <code>Max Memory Used</code> det mesta den använde.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs.html">AWS Lambda: Sending Lambda function logs to CloudWatch Logs</a>.</p>
+<p>Om REPORT-raden och att läsa loggen: <a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html">AWS Lambda: Log and monitor Node.js Lambda functions</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html">AWS Lambda: Viewing Lambda logs</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html">AWS Lambda: Configure memory</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0075-handler-och-event.html">Förra: Handler och event</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0077-miljo-kallstart-timeout.html">Nästa: Exekveringsmiljö, kallstart och timeout</a>
+</nav>
+
+</main>
+</body>
+</html>

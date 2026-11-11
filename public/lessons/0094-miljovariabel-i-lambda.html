@@ -26,7 +26,7 @@
 <section class="explain">
 <h2>Var sätter du den?</h2>
 
-<p>Du sätter den i funktionens <a href="0078-lambda-funktion.html">konfiguration</a> i konsolen, där du också ställer in <a href="0086-timeout.html">timeout</a>. Det är samma sorts <a href="0044-miljovariabel.html">miljövariabel som i lektion 44</a>, ett namn med ett värde, men du skriver inget <code>export</code> i terminalen. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html">AWS: Working with Lambda environment variables</a>)</span></p>
+<p>Du sätter den i funktionens <a href="0074-serverlost-och-lambda.html">konfiguration</a> i konsolen, där du också ställer in <a href="0077-miljo-kallstart-timeout.html">timeout</a>. Det är samma sorts <a href="0044-miljovariabel.html">miljövariabel som i lektion 44</a>, ett namn med ett värde, men du skriver inget <code>export</code> i terminalen. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html">AWS: Working with Lambda environment variables</a>)</span></p>
 
 <p>Under Configuration → Environment variables → Edit → Add environment variable fyller du i nyckel och värde. Nyckeln är namnet, <code>TABLE_NAME</code>. Värdet är tabellens namn, <code>v42-customers</code>. Sedan Save. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#create-environment-variables">AWS: Creating environment variables</a>)</span></p>
 
@@ -40,13 +40,13 @@
 
 <pre><code>const TABLE = process.env.TABLE_NAME; // en gång per miljö</code></pre>
 
-<p>Raden står utanför <a href="0080-handler.html">handlern</a>. Den körs alltså en gång, när en ny <a href="0083-exekveringsmiljo.html">exekveringsmiljö</a> startar, vid en <a href="0084-kallstart.html">kallstart</a>. Varje anrop till miljön använder sedan samma värde. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#static-initialization">AWS: Optimizing static initialization</a>)</span></p>
+<p>Raden står utanför <a href="0075-handler-och-event.html">handlern</a>. Den körs alltså en gång, när en ny <a href="0077-miljo-kallstart-timeout.html">exekveringsmiljö</a> startar, vid en <a href="0077-miljo-kallstart-timeout.html">kallstart</a>. Varje anrop till miljön använder sedan samma värde. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#static-initialization">AWS: Optimizing static initialization</a>)</span></p>
 </section>
 
 <section class="explain">
 <h2>När gäller ett nytt värde?</h2>
 
-<p>Ett nytt värde gäller när Save är klar. Du behöver inte klicka <a href="0078-lambda-funktion.html">Deploy</a>: Deploy sparar kod, Save sparar konfigurationen. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/functions-states.html#functions-states-updating">AWS: Function states during updates</a>)</span></p>
+<p>Ett nytt värde gäller när Save är klar. Du behöver inte klicka <a href="0074-serverlost-och-lambda.html">Deploy</a>: Deploy sparar kod, Save sparar konfigurationen. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/functions-states.html#functions-states-updating">AWS: Function states during updates</a>)</span></p>
 
 <p>Lambda bygger varje ny miljö utifrån funktionens konfiguration, så miljön får variabeln. Den försvinner inte som i en stängd terminalflik. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html">AWS: Execution environment lifecycle</a>)</span></p>
 
@@ -103,7 +103,7 @@
 <p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
 
 <nav class="bottomnav">
-  <a href="0093-minsta-mojliga-behorighet.html">Förra: Minsta möjliga behörighet</a>
+  <a href="0080-execution-role-och-behorighet.html">Förra: Minsta möjliga behörighet</a>
   <a href="../index.html">Alla lektioner</a>
   <a href="0095-aws-sdk.html">Nästa: AWS SDK</a>
 </nav>

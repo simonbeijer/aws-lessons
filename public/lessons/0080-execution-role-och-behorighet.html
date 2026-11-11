@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Execution role och minsta möjliga behörighet</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="fördjupning">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 80 · V42, 10 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 80 · V42, 10 av 15 i veckan</p>
+<h1>Vad får funktionen göra i AWS?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Funktionen ska läsa och skriva i tabellen, men AWS släpper inte in vem som helst. Vad den får göra avgörs av dess execution role, och rollen ska bara få det uppgiften kräver. Saknas något svarar AWS med ett fel som säger exakt vad.
+</div>
+
+<section class="explain">
+<h2>Vilken roll har funktionen?</h2>
+
+<p>När funktionen anropar DynamoDB är den inte du. Den har en egen identitet, sin <strong>execution role</strong>: en <a href="0018-service-role.html">IAM (Identity and Access Management) role</a> som Lambda tar på sig varje gång funktionen körs.</p>
+
+<p>Rollen som konsolen skapar åt en ny funktion får bara skriva loggar. Den har en <a href="0005-iam-policy.html">policy</a> som heter <code>AWSLambdaBasicExecutionRole</code> följt av en ändelse, med tre handlingar: <code>logs:CreateLogGroup</code>, <code>logs:CreateLogStream</code> och <code>logs:PutLogEvents</code>. Därför hamnar <code>console.log</code> i <a href="0076-loggar-och-report-raden.html">logggruppen</a>. Allt annat, som att läsa en tabell, måste du lägga till i rollen.</p>
+
+<p>Vem som får ta på sig rollen står i dess trust policy, som för Amplifys roll i <a href="0018-service-role.html">lektion 18</a>:</p>
+
+<pre><code>"Principal": { "Service": "lambda.amazonaws.com" },
+"Action": "sts:AssumeRole"</code></pre>
+
+<p>Bara tjänsten Lambda får det. <code>sts:AssumeRole</code> betyder "ta på sig rollen", och <code>sts</code> står för Security Token Service.</p>
+</section>
+
+<section class="explain">
+<h2>Hur mycket behörighet?</h2>
+
+<p>Kundfunktionen behöver de fem operationerna från <a href="0079-lasa-och-skriva-i-dynamodb.html">förra lektionen</a>, men bara på en tabell. Därför får rollen en egen policy bredvid loggpolicyn:</p>
+
+<pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": [
+      "dynamodb:GetItem", "dynamodb:PutItem",
+      "dynamodb:UpdateItem", "dynamodb:DeleteItem",
+      "dynamodb:Scan"
+    ],
+    "Resource": "arn:aws:dynamodb:eu-north-1:123456789012:table/v42-customers"
+  }]
+}</code></pre>
+
+<p>Varje handling skrivs <code>tjänst:operation</code>. <code>Resource</code> är tabellens <a href="0073-load-balancer-och-arn.html">ARN (Amazon Resource Name)</a>, så regeln gäller bara den tabellen.</p>
+
+<p>Genvägen vore <code>AmazonDynamoDBFullAccess</code>, en AWS-policy med <code>dynamodb:*</code> på <code>"Resource": "*"</code>: alla operationer på alla tabeller i kontot. Då kan en bugg i koden ändra och ta bort items i vilken tabell som helst, eller hela tabeller. Rollen är det enda som begränsar vad koden kan göra. Det är minsta möjliga behörighet (least privilege): ge bara det uppgiften kräver.</p>
+</section>
+
+<section class="explain">
+<h2>Hur läser man AccessDeniedException?</h2>
+
+<p>Saknas behörigheten svarar AWS med <code>AccessDeniedException</code>. Tar du bort tabellpolicyn från rollen och kör en Scan står det så här i loggen:</p>
+
+<pre><code>AccessDeniedException: User: arn:aws:sts::123456789012:assumed-role/v42-api-role-abc123/v42-api
+is not authorized to perform: dynamodb:Scan on resource:
+arn:aws:dynamodb:eu-north-1:123456789012:table/v42-customers
+because no identity-based policy allows the dynamodb:Scan action</code></pre>
+
+<p>Meddelandet säger tre saker:</p>
+
+<ul>
+  <li><strong>Vem:</strong> <code>assumed-role/v42-api-role-abc123/v42-api</code> är en roll som någon tagit på sig, här funktionens execution role.</li>
+  <li><strong>Vad:</strong> <code>dynamodb:Scan</code>, skrivet som i policyn.</li>
+  <li><strong>På vad:</strong> tabellens ARN, som ska vara samma som i policyns <code>Resource</code>.</li>
+</ul>
+
+<p>Slutraden betyder att ingen identity-based policy, alltså ingen policy som sitter på rollen, tillåter Scan. Två orsaker är vanligast: policyn sitter inte på rollen, eller ARN:et i policyn pekar på fel tabell. Den som anropar API:et ser inget av detta, bara ett 5xx-fel. Svaret står i loggen.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du skapar en funktion i konsolen och ändrar inte rollen. Vad får funktionen göra i AWS?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Standardrollen har bara de tre logs-handlingarna. Allt annat måste läggas till.">Bara skriva loggar i CloudWatch Logs</button>
+    <button class="opt" data-why="Tabellåtkomst måste du ge rollen själv i en egen policy.">Läsa och skriva alla tabeller i kontot</button>
+    <button class="opt" data-why="Standardrollen ger inga rättigheter i andra tjänster än loggarna.">Använda de flesta tjänster i kontot</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. En bugg i koden anropar DeleteItem på en annan tabell än <code>v42-customers</code>. Vad händer med policyn ovan?</p>
+  <div class="options">
+    <button class="opt" data-why="DeleteItem står i policyn, men bara för den tabell som Resource pekar ut.">Anropet går igenom, DeleteItem är tillåtet</button>
+    <button class="opt" data-correct data-why="Resource gäller bara en tabell. Allt annat nekas.">Anropet nekas, eftersom Resource gäller en tabell</button>
+    <button class="opt" data-why="AWS stänger inte av funktionen. Anropet nekas bara.">Funktionen stängs av tills koden är rättad</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Felet börjar med <code>User: arn:aws:sts::123456789012:assumed-role/v42-api-role-abc123/v42-api</code>. Vem nekades?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är inte du som anropar tabellen, utan funktionen.">Din IAM user som är inloggad i konsolen</button>
+    <button class="opt" data-why="Tabellen är resursen, den som anropet gällde. Den nekar inte själv.">Tabellen som nekade anropet</button>
+    <button class="opt" data-correct data-why="assumed-role är en roll som någon tagit på sig, här funktionens execution role.">Rollen som Lambda tagit på sig</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">4. Repetition: en funktion ska bara hämta en kund med ett visst <code>id</code>. Vilken handling räcker enligt minsta möjliga behörighet?</p>
+  <div class="options">
+    <button class="opt" data-why="Scan läser hela tabellen. Det är mer än uppgiften kräver.">dynamodb:Scan, som läser alla items</button>
+    <button class="opt" data-correct data-why="GetItem hämtar ett item med ett visst id, och inget mer behövs.">dynamodb:GetItem, som hämtar ett item</button>
+    <button class="opt" data-why="dynamodb:* är alla operationer, motsatsen till minsta möjliga behörighet.">dynamodb:*, så att inget kan nekas</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Execution role är den IAM role Lambda tar på sig när funktionen körs. Konsolens roll har <code>AWSLambdaBasicExecutionRole-…</code> och får bara skriva loggar. Trust policyn släpper in <code>lambda.amazonaws.com</code>.</li>
+    <li>Funktionen får en egen policy med fem handlingar (<code>GetItem</code>, <code>PutItem</code>, <code>UpdateItem</code>, <code>DeleteItem</code>, <code>Scan</code>) och tabellens ARN i <code>Resource</code>, inte <code>AmazonDynamoDBFullAccess</code>. Då kan en bugg bara röra den tabellen.</li>
+    <li><code>AccessDeniedException</code> syns i loggen och ger klienten 5xx. Den säger vem (<code>assumed-role/...</code>), vad (<code>dynamodb:Scan</code>) och på vad (tabellens ARN), och betyder att rollen saknar en behörighet.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html">AWS Lambda: Defining Lambda function permissions with an execution role</a>.</p>
+<p>Om policyerna: <a href="https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSLambdaBasicExecutionRole.html">AWSLambdaBasicExecutionRole</a>, <a href="https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AmazonDynamoDBFullAccess.html">AmazonDynamoDBFullAccess</a> och <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege">Apply least-privilege permissions</a>. Om DynamoDB-policyer: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/security_iam_service-with-iam.html">Using identity-based policies</a>. Om <code>sts</code>: <a href="https://docs.aws.amazon.com/STS/latest/APIReference/welcome.html">AWS Security Token Service API Reference</a>. Om felet: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/troubleshoot_access-denied.html">Troubleshoot access denied error messages</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0079-lasa-och-skriva-i-dynamodb.html">Förra: Läsa och skriva i DynamoDB</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0081-koden-mot-dynamodb.html">Nästa: Koden mot DynamoDB</a>
+</nav>
+
+</main>
+</body>
+</html>

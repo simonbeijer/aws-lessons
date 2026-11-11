@@ -124,6 +124,15 @@ code {
 }
 .goal strong { display: block; margin-bottom: 4px; }
 
+/* Rutan "Kort sagt" överst: vad lektionen handlar om och varför den kommer nu */
+.kort {
+  background: var(--accent-bg);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+.kort strong { display: block; margin-bottom: 4px; }
+
 /* Rutor med fast betydelse */
 .box {
   border-radius: 10px;

@@ -26,7 +26,7 @@
 <section class="explain">
 <h2>Vad är en resource-based policy?</h2>
 
-<p>En resource-based policy är en policy som sitter på själva resursen, här din <a href="0078-lambda-funktion.html">Lambda-funktion</a>, och säger vem som får använda den. Det är samma idé som en <a href="0015-bucket-policy.html">bucket policy</a>: policyn säger själv vem den gäller, i <code>Principal</code>. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html">AWS: Resource-based policies in Lambda</a>)</span></p>
+<p>En resource-based policy är en policy som sitter på själva resursen, här din <a href="0074-serverlost-och-lambda.html">Lambda-funktion</a>, och säger vem som får använda den. Det är samma idé som en <a href="0015-bucket-policy.html">bucket policy</a>: policyn säger själv vem den gäller, i <code>Principal</code>. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html">AWS: Resource-based policies in Lambda</a>)</span></p>
 
 <p>I konsolen ser du den under Configuration → Permissions, längre ned under <strong>Resource-based policy statements</strong>. Varje statement är en regel. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html#access-control-resource-based-view">AWS: Viewing a function's resource-based policy</a>)</span></p>
 </section>
@@ -51,7 +51,7 @@
 <section class="explain">
 <h2>Vad skiljer den från rollen?</h2>
 
-<p>Skillnaden är riktningen. <a href="0087-execution-role.html">Execution role</a> säger vad funktionen får göra, till exempel läsa tabellen. Resource-based policy säger vem som får köra funktionen. Två riktningar, två policyer.</p>
+<p>Skillnaden är riktningen. <a href="0080-execution-role-och-behorighet.html">Execution role</a> säger vad funktionen får göra, till exempel läsa tabellen. Resource-based policy säger vem som får köra funktionen. Två riktningar, två policyer.</p>
 
 <div class="two-col">
   <div>

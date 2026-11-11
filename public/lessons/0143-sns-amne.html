@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SNS-ämne</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 143 · V43, 32 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 143</p>
+<h1>SNS-ämne</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att ett ämne trycker ut samma meddelande till alla prenumeranter direkt, medan en kö väntar på att konsumenten hämtar.
+</div>
+
+<section class="explain">
+<h2>Hur når meddelandet mottagarna?</h2>
+
+<p>Ett ämne (topic, <a href="0011-sns.html">lektion 11</a>) skickar varje meddelande vidare till alla prenumeranter direkt när det publicerats. En prenumerant är mottagaren som prenumerationen pekar på: en e-postadress, en kö, en Lambda-funktion och fler. <span class="src">(<a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html">AWS: What is Amazon SNS?</a>)</span></p>
+
+<p>Det kallas tryck (push). Mottagaren frågar aldrig efter nya meddelanden. <span class="src">(<a href="https://aws.amazon.com/sns/faqs/">AWS: SNS FAQ</a>)</span> I en <a href="0113-sqs-ko.html">kö</a> ligger meddelandet kvar tills konsumenten hämtar det (pull).</p>
+
+<p>När ämnet är mål i en regel (<a href="0140-mal-i-en-regel.html">lektion 140</a>) får det hela händelsen som JSON, så ett mejl till en prenumerant visar kuvertet (<a href="0142-eventbridge-kuvertet.html">lektion 142</a>). <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutTargets.html">AWS: PutTargets</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Sparar ämnet meddelandet?</h2>
+
+<p>SNS lagrar meddelandet, men du kan inte hämta det efteråt. SNS API Reference har <a href="https://docs.aws.amazon.com/sns/latest/api/API_Operations.html">ingen åtgärd för att hämta meddelanden</a>, bara för att skicka dem med Publish. En kö har ReceiveMessage.</p>
+
+<p>Kursen säger att ett ämne inte sparar något. AWS säger att SNS lagrar alla meddelanden det tar emot hållbart, med kopior på disk i flera <a href="0022-availability-zone.html">Availability Zones</a>. <span class="src">(<a href="https://aws.amazon.com/sns/faqs/">AWS: SNS FAQ</a>)</span> För lagringen gäller AWS.</p>
+
+<p>Går leveransen inte fram, gör SNS omförsök. När försöken är slut kasseras meddelandet, om ingen <a href="0122-dodbrevsko.html">dödbrevskö</a> är kopplad. <span class="src">(<a href="https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html">AWS: Delivery retries</a>)</span></p>
+
+<p>Vill du kunna hämta senare, låt en kö prenumerera. Då hamnar meddelandet också i kön. <span class="src">(<a href="https://aws.amazon.com/sns/faqs/">AWS: SNS FAQ</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du publicerar ett meddelande till ett ämne med tre prenumeranter. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Ämnet skickar samma meddelande till alla prenumeranter, inte till en.">Bara en av dem får meddelandet</button>
+    <button class="opt" data-why="Hämtning hör till en kö, medan ämnet trycker ut meddelandet.">Alla tre måste hämta det själva</button>
+    <button class="opt" data-correct data-why="Ämnet trycker ut samma meddelande till alla prenumeranter direkt.">Alla tre får det utan hämtning</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Hur får en konsument meddelandet från en kö?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="En kö väntar tills konsumenten hämtar meddelandet (pull).">Konsumenten hämtar det från kön</button>
+    <button class="opt" data-why="Att trycka ut är ämnets sätt (push), inte köns.">Kön trycker det till konsumenten</button>
+    <button class="opt" data-why="Ämnet ligger inte mellan kön och konsumenten, som hämtar själv.">Ämnet hämtar det åt konsumenten</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 142: ett ämne är mål i en regel, och inget är inställt på målet. Vad får ämnet?</p>
+  <div class="options">
+    <button class="opt" data-why="Utan inställning skickas hela händelsen, inte bara detail.">Bara innehållet i fältet detail</button>
+    <button class="opt" data-why="Utan inställning skickas alla fält, inte ett urval av dem.">Bara fälten source och region</button>
+    <button class="opt" data-correct data-why="Utan inställning på målet skickar EventBridge hela händelsen som JSON.">Hela händelsen med sitt kuvert</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett ämne trycker (push) ut samma meddelande till alla prenumeranter direkt. En kö väntar på att konsumenten hämtar (pull).</li>
+    <li>SNS lagrar meddelandet hållbart när det tas emot, men det går inte att hämta efteråt. Misslyckas leveransen kasseras det, om ingen dödbrevskö är kopplad.</li>
+    <li>Vill du hämta senare: låt en kö prenumerera på ämnet.</li>
+    <li>Som mål i en regel får ämnet hela händelsen som JSON.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html">AWS: What is Amazon SNS?</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0142-eventbridge-kuvertet.html">Förra: EventBridge-kuvertet</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0144-prenumeration.html">Nästa: Prenumeration</a>
+</nav>
+
+</main>
+</body>
+</html>

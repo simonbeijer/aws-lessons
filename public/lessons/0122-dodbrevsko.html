@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dödbrevskö</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 122 · V43, 11 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 122</p>
+<h1>Dödbrevskö</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en dödbrevskö (DLQ) är en vanlig kö som tar emot meddelanden som har misslyckats för många gånger, och att den skapas före huvudkön.
+</div>
+
+<section class="explain">
+<h2>Vad är en dödbrevskö?</h2>
+
+<p>En dödbrevskö är en vanlig SQS-kö dit meddelanden flyttas när de inte går att behandla. Den är bara utpekad som uppsamlingsplats. Har en konsument hämtat ett meddelande för många gånger utan att kunna behandla det, flyttar kön det dit. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html">AWS: Dead-letter queues</a>)</span></p>
+
+<p>Ett trasigt meddelande blockerar då inte resten av kön. Det ligger kvar i dödbrevskön, så att du kan titta på det och se varför det misslyckades. Hur många gånger som är "för många" ställs in på huvudkön, där dödbrevskön också väljs.</p>
+</section>
+
+<section class="explain">
+<h2>Hur kopplas den på?</h2>
+
+<p>Dödbrevskön skapas först, eftersom huvudkön pekar på den och bara kan peka på en kö som finns. Båda köerna ska ligga i samma AWS-konto och region. I konsolen väljs den under huvudkön: Dead-letter queue, Enabled, Choose queue. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html">AWS: Dead-letter queues</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad är en dödbrevskö?</p>
+  <div class="options">
+    <button class="opt" data-why="Det finns ingen egen kötyp för det, det är en vanlig kö.">En kötyp med särskilda regler</button>
+    <button class="opt" data-why="Den tar bara emot meddelanden som misslyckats, inte en kopia av allt.">En säkerhetskopia av varje kö</button>
+    <button class="opt" data-correct data-why="Det är en vanlig kö som är utpekad som uppsamlingsplats för misslyckade meddelanden.">En vanlig kö för felmeddelanden</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vilken kö skapas först?</p>
+  <div class="options">
+    <button class="opt" data-why="Huvudkön kan inte peka på en dödbrevskö som ännu inte finns.">Huvudkön först, dödbrevskön sist</button>
+    <button class="opt" data-correct data-why="Huvudkön ska peka på dödbrevskön, så den måste finnas först.">Dödbrevskön först, huvudkön sist</button>
+    <button class="opt" data-why="Ordningen spelar roll, dödbrevskön måste finnas först.">Båda köerna skapas tillsammans</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition: varför får en dödbrevskö 14 dagar retention?</p>
+  <div class="options">
+    <button class="opt" data-why="Retention-perioden påverkar inte hur snabbt kön svarar.">För att kön ska svara snabbare</button>
+    <button class="opt" data-why="Retention-perioden ändrar inte vad kön kostar (lektion 121).">För att kön ska kosta mindre</button>
+    <button class="opt" data-correct data-why="Felmeddelandena ska ligga kvar tills du har tittat på dem (lektion 121).">För att felen ska finnas kvar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En dödbrevskö är en vanlig kö där meddelanden som misslyckats för många gånger samlas, så att de inte blockerar huvudkön.</li>
+    <li>Den skapas före huvudkön, i samma konto och region, och huvudkön pekar sedan på den.</li>
+    <li>Meddelandena ligger kvar där så att du kan undersöka felet. Därför har den lång retention (<a href="0121-message-retention-period.html">lektion 121</a>).</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html">AWS: Dead-letter queues</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0121-message-retention-period.html">Förra: Message retention period</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0123-maxreceivecount.html">Nästa: maxReceiveCount</a>
+</nav>
+
+</main>
+</body>
+</html>

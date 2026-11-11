@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DLQ redrive</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 124 · V43, 13 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 124</p>
+<h1>DLQ redrive</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att DLQ redrive flyttar meddelanden från dödbrevskön tillbaka till huvudkön, och att de där räknas som nya meddelanden.
+</div>
+
+<section class="explain">
+<h2>Vad är DLQ redrive?</h2>
+
+<p>DLQ redrive flyttar meddelanden från dödbrevskön tillbaka till huvudkön, som också kallas källkön. Det gör du när felet är rättat och meddelandena ska få nya försök. SQS ändrar eller filtrerar inte meddelandena på vägen. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-dead-letter-queue-redrive.html">AWS: DLQ redrive</a>)</span></p>
+
+<p>I konsolen startas redrive från dödbrevskön, inte från huvudkön: Start DLQ redrive, Redrive to source queue(s) och sedan Redrive messages.</p>
+</section>
+
+<section class="explain">
+<h2>Vad händer med meddelandet?</h2>
+
+<p>Ett redrivet meddelande räknas som ett nytt meddelande. Det får ett nytt message ID, och retention-perioden börjar om. I <a href="0121-message-retention-period.html">lektion 121</a> räknades tiden i dödbrevskön från första skickandet, men redrive nollställer den. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-dead-letter-queue-redrive.html">AWS: DLQ redrive</a>)</span></p>
+
+<div class="box note">
+  <span class="box-title">Inte bekräftat av AWS</span>
+  I konsolen visas receive count som 0 efter redrive. AWS dokumentation säger inte det.
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vart flyttar redrive meddelandena?</p>
+  <div class="options">
+    <button class="opt" data-why="Dödbrevskön är där meddelandena redan ligger, redrive flyttar dem därifrån.">Till nästa dödbrevskö</button>
+    <button class="opt" data-correct data-why="Redrive flyttar meddelandena tillbaka till källkön, alltså huvudkön.">Tillbaka till huvudkön</button>
+    <button class="opt" data-why="Redrive flyttar meddelandena, de raderas inte.">Ingenstans, de raderas</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad händer med message ID vid redrive?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Meddelandet räknas som nytt och får ett nytt message ID.">Meddelandet får ett nytt ID</button>
+    <button class="opt" data-why="Meddelandet räknas som nytt, så ID:t byts ut.">Det behåller sitt gamla ID</button>
+    <button class="opt" data-why="Varje nytt meddelande får ett ID, så det saknas inte.">Meddelandet får inget ID alls</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition: när flyttas ett meddelande till dödbrevskön?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Receive count överstiger maxReceiveCount (lektion 123).">Det hämtades för många gånger</button>
+    <button class="opt" data-why="Retention styr hur länge det sparas, inte när det flyttas (lektion 121).">Det har sparats alltför länge</button>
+    <button class="opt" data-why="Det är inte en storleksgräns, det räknas hämtningar (lektion 123).">Det är större än maxstorleken</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>DLQ redrive flyttar meddelanden från dödbrevskön tillbaka till huvudkön (källkön) utan att ändra innehållet.</li>
+    <li>Start DLQ redrive finns på dödbrevskön.</li>
+    <li>Ett redrivet meddelande räknas som nytt: nytt message ID, och retention-perioden börjar om.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-dead-letter-queue-redrive.html">AWS: DLQ redrive</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0123-maxreceivecount.html">Förra: maxReceiveCount</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0125-kons-url-och-arn.html">Nästa: Köns URL och ARN</a>
+</nav>
+
+</main>
+</body>
+</html>

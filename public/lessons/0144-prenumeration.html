@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prenumeration</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 144 · V43, 33 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 144</p>
+<h1>Prenumeration</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en prenumeration med e-post måste bekräftas med länken i mejlet innan SNS skickar något till adressen.
+</div>
+
+<section class="explain">
+<h2>Vad är en prenumeration?</h2>
+
+<p>En prenumeration (subscription) kopplar ett <a href="0143-sns-amne.html">ämne</a> till en mottagare. <code>Protocol</code> anger hur meddelandet levereras och <code>Endpoint</code> vart det ska. För e-post är Protocol Email och Endpoint e-postadressen. <span class="src">(<a href="https://docs.aws.amazon.com/sns/latest/dg/sns-email-notifications.html">AWS: Email subscriptions</a>, <a href="https://docs.aws.amazon.com/sns/latest/api/API_Subscribe.html">AWS: Subscribe</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Varför måste den bekräftas?</h2>
+
+<p>Utan bekräftelse får adressen inga meddelanden. SNS mejlar adressen en länk, Confirm subscription, och först när ägaren av adressen klickat på den börjar meddelanden komma. SNS kan inte bekräfta åt ägaren. <span class="src">(<a href="https://docs.aws.amazon.com/sns/latest/dg/sns-email-notifications.html">AWS: Email subscriptions</a>, <a href="https://docs.aws.amazon.com/sns/latest/api/API_Subscribe.html">AWS: Subscribe</a>)</span></p>
+
+<p>Före klicket står prenumerationen som väntande. AWS API visar den som <code>pending confirmation</code> i stället för ett <a href="0073-load-balancer-och-arn.html">ARN</a>. <span class="src">(<a href="https://docs.aws.amazon.com/sns/latest/api/API_Subscribe.html">AWS: Subscribe</a>)</span> Tillståndet kallas också PendingConfirmation (<a href="0011-sns.html">lektion 11</a>). Efter klicket står den som Confirmed.</p>
+
+<p>Klickar ingen inom 48 timmar raderar SNS prenumerationen. <span class="src">(<a href="https://docs.aws.amazon.com/sns/latest/dg/sns-email-notifications.html">AWS: Email subscriptions</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Ett ämne har en e-postprenumeration där ingen har klickat på länken i mejlet. Ett meddelande publiceras. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Utan bekräftelse skickar SNS inget till adressen.">Adressen får mejlet och bekräftar sedan</button>
+    <button class="opt" data-correct data-why="Prenumerationen väntar på bekräftelse, så SNS skickar inget till adressen.">Inget skickas förrän länken är klickad</button>
+    <button class="opt" data-why="SNS kan inte bekräfta åt ägaren, så länken måste klickas av ägaren.">SNS bekräftar själv och skickar mejlet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vem bekräftar en e-postprenumeration?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Bara ägaren av adressen kan klicka på länken, inte SNS.">Den som äger adressen</button>
+    <button class="opt" data-why="SNS skickar länken men kan inte bekräfta åt ägaren.">SNS när mejlet skickats</button>
+    <button class="opt" data-why="Den som skapade ämnet bekräftar inte, bara adressens ägare kan det.">Den som skapade ämnet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 143: ett ämne har en bekräftad e-postprenumerant. Hur når ett nytt meddelande den?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Efter bekräftelsen trycker ämnet ut meddelandet direkt när det publicerats.">Ämnet trycker ut det direkt</button>
+    <button class="opt" data-why="Ämnet trycker ut meddelandet, adressen hämtar inget.">Adressen hämtar det hos SNS</button>
+    <button class="opt" data-why="Ämnet skickar direkt när något publiceras, utan att vänta på någon förfrågan.">Ämnet väntar på en förfrågan</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En prenumeration kopplar ett ämne till en mottagare, för e-post en adress.</li>
+    <li>Adressens ägare måste klicka på länken i mejlet. Före det är prenumerationen väntande och inget skickas.</li>
+    <li>Obekräftad prenumeration raderas efter 48 timmar.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/sns/latest/dg/sns-email-notifications.html">AWS: Email subscriptions</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0143-sns-amne.html">Förra: SNS-ämne</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0145-kons-access-policy.html">Nästa: Köns access policy</a>
+</nav>
+
+</main>
+</body>
+</html>

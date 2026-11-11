@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Serverlöst och Lambda-funktion</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 74 · V42, 4 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 74 · V42, 4 av 15 i veckan</p>
+<h1>Serverlöst och Lambda-funktion</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Med terminalen klar börjar veckans huvudsak: kund-API:et ska inte längre köras på en egen server utan som en Lambda-funktion. Det är AWS sätt att köra din kod utan att du har en server att sköta, och utan att betala för tid då ingen använder den.
+</div>
+
+<section class="explain">
+<h2>Vad betyder serverlöst?</h2>
+
+<p>Servern från v41 körde <a href="0057-express.html">Express</a> som en <a href="0060-process-i-bakgrunden.html">process</a> på <a href="0033-port.html">port 3000</a>. Den väntade på anrop hela tiden, och en <a href="0029-ec2-instans.html">EC2-instans</a> (Elastic Compute Cloud) kostar så länge den står på, även när ingen använder den.</p>
+
+<p>Serverlöst vänder på det. Servrar finns ändå, men AWS sköter dem. Du lämnar bara koden, och den körs först när något anropar den. Du betalar per anrop och för tiden koden körs, så utan anrop kostar den inget.</p>
+</section>
+
+<section class="explain">
+<h2>Vad är en Lambda-funktion?</h2>
+
+<p>Lambda är AWS tjänst för serverlös kod. En Lambda-funktion är din kod plus konfiguration, alltså inställningar som namn och runtime. Lambda kör koden när en händelse kommer, alltså när något <a href="0048-http-anrop-och-svar.html">anropar</a> funktionen. Sedan slutar den köra.</p>
+
+<p>Koden skrivs i en editor på funktionens sida i konsolen. Ny kod gäller först efter Deploy, knappen som sparar den i funktionen.</p>
+
+<div class="box good">
+  <span class="box-title">Gör så här</span>
+  <p>Ändra, klicka Deploy, vänta tills det är klart, kör sedan.</p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vad är en runtime?</h2>
+
+<p>Koden körs i en runtime, alltså språket och versionen, till exempel Node.js 22.x. Du väljer den när funktionen skapas, och kan byta den senare under Runtime settings.</p>
+
+<p>Runtime styr också vad som redan är installerat. I Node.js-runtime finns AWS SDK (Software Development Kit), färdig kod för att prata med andra AWS-tjänster, så du behöver ingen <code>npm install</code> i konsolens editor. Express finns inte, det måste du skicka med själv.</p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Står <code>Cannot find package</code> och paketet hör till AWS SDK: byt runtime under Runtime settings till Node.js 22.x eller nyare.</p>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Ingen anropar din Lambda-funktion på en vecka. Vad kostar och gör den?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Utan anrop körs ingenting, och du betalar per anrop och körtid.">Ingenting körs och ingenting kostas</button>
+    <button class="opt" data-why="Det gäller en server som står på; en funktion har ingen process som väntar.">Den väntar på en port och kostar per timme</button>
+    <button class="opt" data-why="Det finns ingen fast avgift; du betalar per anrop och körtid.">Den körs i bakgrunden mot en fast avgift</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du ändrar koden i editorn och kör funktionen direkt. Du får det gamla svaret. Varför?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Utan Deploy kör funktionen fortfarande den gamla koden.">Du har inte klickat på Deploy efter ändringen</button>
+    <button class="opt" data-why="Det finns ingen process att starta om; ny kod gäller efter Deploy.">Du har inte startat om processen med pkill node</button>
+    <button class="opt" data-why="Du körde ju direkt efter ändringen; utan Deploy gäller den nya koden aldrig.">Den nya koden gäller först vid nästa anrop</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Koden använder AWS SDK. Varför behövs ingen <code>npm install</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Deploy sparar koden men installerar inga paket.">Deploy kör npm install åt dig</button>
+    <button class="opt" data-correct data-why="AWS SDK ingår i Node.js-runtime, så paketet finns redan.">AWS SDK finns redan i Node.js-runtime</button>
+    <button class="opt" data-why="Editorn installerar inget; paketet ingår i runtime.">Editorn installerar alla paket själv</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Serverlöst: AWS sköter servrarna, du lämnar koden, och du betalar per anrop och körtid.</li>
+    <li>En Lambda-funktion är kod plus konfiguration. Den körs när en händelse kommer och slutar när koden är klar.</li>
+    <li>Ny kod gäller först efter Deploy.</li>
+    <li>Runtime är språk och version, till exempel Node.js 22.x. AWS SDK ingår, Express gör det inte.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html">AWS Lambda: What is AWS Lambda?</a></p>
+<p>Om funktionen: <a href="https://docs.aws.amazon.com/lambda/latest/dg/concepts-basics.html">AWS Lambda: How Lambda works</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/getting-started.html">AWS Lambda: Create your first Lambda function</a>. Om priset: <a href="https://aws.amazon.com/lambda/pricing/">AWS Lambda pricing</a>. Om serverlöst: <a href="https://aws.amazon.com/serverless/">AWS: Serverless</a>.</p>
+<p>Om runtime: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html">AWS Lambda: Lambda runtimes</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-nodejs.html">AWS Lambda: Building with Node.js</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0073-load-balancer-och-arn.html">Förra: Application Load Balancer och ARN</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0075-handler-och-event.html">Nästa: Handler och event</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DynamoDB: tabell, item och nyckel</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="fördjupning">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 78 · V42, 8 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 78 · V42, 8 av 15 i veckan</p>
+<h1>DynamoDB: tabell, item och nyckel</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  En Lambda-funktion kan inte lita på att något finns kvar till nästa anrop, så kunderna måste sparas någon annanstans. DynamoDB är en databas som AWS sköter åt dig. Du lägger kunderna i en tabell och betalar för läsningar, skrivningar och det som ligger lagrat, inte för en server som står på.
+</div>
+
+<section class="explain">
+<h2>Vad är DynamoDB?</h2>
+
+<p>DynamoDB är en databastjänst där du inte har någon server att sköta. Du väljer varken motor eller version, som du gjorde med PostgreSQL i <a href="0039-rds.html">RDS</a> (Relational Database Service). Det kallas managed: AWS sköter driften. Datan ligger i tabeller.</p>
+
+<p>Skillnaden mot PostgreSQL är hur koden når databasen. Där öppnar programmet en anslutning och håller den öppen. DynamoDB har ingen anslutning: varje läsning och varje skrivning är ett eget HTTPS-anrop (HyperText Transfer Protocol Secure) med ett svar. Det passar en funktion som inte har något att hålla öppet mellan anropen.</p>
+
+<p>Det finns inte heller något lösenord. IAM (Identity and Access Management) avgör varje anrop, och för en funktion är det dess roll.</p>
+</section>
+
+<section class="explain">
+<h2>Item och attribut</h2>
+
+<p>En rad i en tabell heter item. En kund är ett item. Ett item består av attribut, par av namn och värde. Så här ser ett item ut som JSON (JavaScript Object Notation):</p>
+
+<pre><code>{ "id": "demo-1", "name": "Alice" }</code></pre>
+
+<p>Itemet har två attribut, <code>id</code> och <code>name</code>. Varje värde har en typ, till exempel String för text eller Number för tal.</p>
+
+<p>I en relationsdatabas bestämmer schemat kolumnerna i förväg, och alla rader har samma. Här har varje item sina egna attribut. En kund med <code>created_at</code> kan ligga i samma tabell som en utan:</p>
+
+<pre><code>{ "id": "demo-2", "name": "Carol", "created_at": "2026-10-22" }</code></pre>
+</section>
+
+<section class="explain">
+<h2>Vad bestäms i förväg?</h2>
+
+<p>Bara en sak: partitionsnyckeln. När du skapar tabellen anger du nyckelns namn och typ, till exempel <code>id</code> med typen String. Alla andra attribut väljer varje item själv.</p>
+
+<p>Varje item måste ha partitionsnyckeln, annars sparas det inte. Värdet pekar ut ett enda item, så med ett <code>id</code> hämtar du den kunden direkt. Sparar du ett item med ett <code>id</code> som redan finns, ersätter det nya det gamla helt.</p>
+</section>
+
+<section class="explain">
+<h2>Vad kostar tabellen?</h2>
+
+<p>Tabellen har ett läge som styr hur du betalar, i fältet Capacity mode. Med on-demand betalar du per läsning och per skrivning. Du säger inte i förväg hur mycket trafik den ska klara, utan DynamoDB tar det som kommer. Utan anrop kostar läsningar och skrivningar inget, men datan som ligger där kostar per GB och månad.</p>
+
+<p>Alternativet heter provisioned. Då anger du hur många läsningar och skrivningar per sekund tabellen ska klara och betalar per timme för det, även när ingen använder den. On-demand är det förvalda när du behåller Default settings.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Funktionen ska spara en kund i DynamoDB. Vad måste koden hålla öppet mellan anropen?</p>
+  <div class="options">
+    <button class="opt" data-why="Det gör man mot en PostgreSQL-databas. DynamoDB har ingen anslutning.">En anslutning till databasen</button>
+    <button class="opt" data-correct data-why="Varje skrivning är ett eget anrop, så inget behöver hållas öppet.">Inget, varje skrivning är ett eget anrop</button>
+    <button class="opt" data-why="DynamoDB har inga lösenord eller inloggning. IAM avgör varje anrop.">En inloggning med användarnamn och lösenord</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Tabellen har partitionsnyckeln <code>id</code>. Alice finns med <code>id</code> och <code>name</code>. Du sparar Carol med <code>id</code>, <code>name</code> och <code>created_at</code>. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Bara partitionsnyckeln är bestämd i förväg, inte övriga attribut.">Carol nekas, eftersom Alice saknar created_at</button>
+    <button class="opt" data-why="DynamoDB lägger inte till attribut i andra items.">Alice får också ett tomt created_at</button>
+    <button class="opt" data-correct data-why="Carol har id, och övriga attribut väljer varje item själv.">Carol sparas med sina tre attribut</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Du sparar <code>{ "name": "Alice" }</code> i tabellen. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="DynamoDB hittar inte på något id åt dig.">DynamoDB skapar ett id automatiskt</button>
+    <button class="opt" data-correct data-why="Partitionsnyckeln saknas, så itemet sparas inte.">Det sparas inte, för id saknas</button>
+    <button class="opt" data-why="Utan partitionsnyckel kan itemet inte pekas ut, så det sparas inte alls.">Det sparas utan nyckel och går inte att hämta</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">4. En on-demand-tabell med 100 items får inga anrop på en månad. Vad betalar du för?</p>
+  <div class="options">
+    <button class="opt" data-why="Lagrad data kostar per GB och månad även utan anrop.">Ingenting, eftersom inga anrop gjorts</button>
+    <button class="opt" data-correct data-why="Läsningar och skrivningar kostar inget utan anrop, men datan kostar per GB och månad.">Bara datan som ligger lagrad i tabellen</button>
+    <button class="opt" data-why="Timpris gäller provisioned, inte on-demand.">En timavgift för att tabellen finns</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>DynamoDB är en managed databas utan server, motor eller version att sköta. Ingen anslutning: varje läsning och skrivning är ett eget HTTPS-anrop. IAM avgör varje anrop.</li>
+    <li>Ett item är en rad, ett attribut är ett par av namn och värde, och items i samma tabell kan ha olika attribut.</li>
+    <li>Partitionsnyckeln (här <code>id</code>, String) är det enda som bestäms i förväg. Ett item utan den sparas inte, och samma <code>id</code> ersätter det gamla itemet.</li>
+    <li>On-demand betyder betalning per läsning och skrivning, inget bokas i förväg. Lagrad data kostar ändå per GB och månad. Provisioned betalas per timme.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html">Amazon DynamoDB: What is Amazon DynamoDB?</a>.</p>
+<p>Om anslutningen: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SQLtoNoSQL.Accessing.html">Differences in accessing a relational (SQL) database and DynamoDB</a>. Om item, attribut och nyckel: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html">Amazon DynamoDB: Core components</a>. Om att spara items: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html">DynamoDB API Reference: PutItem</a>. Om on-demand: <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/on-demand-capacity-mode.html">Amazon DynamoDB: On-demand capacity mode</a> och <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html">Throughput capacity</a>. Kursmaterialet säger att tabellen kostar ingenting i vila, men enligt AWS gäller det bara läsningar och skrivningar, inte lagringen.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0077-miljo-kallstart-timeout.html">Förra: Exekveringsmiljö, kallstart och timeout</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0079-lasa-och-skriva-i-dynamodb.html">Nästa: Läsa och skriva i DynamoDB</a>
+</nav>
+
+</main>
+</body>
+</html>

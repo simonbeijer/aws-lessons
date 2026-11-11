@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exekveringsmiljö, kallstart och timeout</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 77 · V42, 7 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 77 · V42, 7 av 15 i veckan</p>
+<h1>Exekveringsmiljö, kallstart och timeout</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  REPORT-raden från förra lektionen ser olika ut från anrop till anrop. Det beror på att Lambda startar en miljö för koden och sparar den: de flesta anrop går snabbt, men ibland måste en ny miljö startas och då tar anropet längre. Tar ett anrop för lång tid avbryts det.
+</div>
+
+<section class="explain">
+<h2>Vad är en kallstart?</h2>
+
+<p>Lambda kör din kod i en exekveringsmiljö (execution environment), en isolerad plats med runtime och kod. Vid första anropet skapar Lambda miljön, laddar koden och kör det som står utanför handlern, sedan handlern. Efteråt fryser Lambda miljön men behåller den.</p>
+
+<p>Kommer ett nytt anrop återanvänds miljön och bara handlern körs. Anropet som skapar miljön är en kallstart (cold start), de andra är varma. Kod utanför handlern körs alltså en gång per miljö.</p>
+
+<p>Men Lambda kan ta bort en miljö när som helst, så koden kan inte räkna med att något finns kvar till nästa anrop.</p>
+</section>
+
+<section class="explain">
+<h2>Hur syns den?</h2>
+
+<p>Vid en kallstart har REPORT-raden fältet <code>Init Duration</code>, tiden det tog att starta miljön. Saknas fältet var anropet varmt.</p>
+
+<pre><code>REPORT …  Duration: 14.21 ms  Billed Duration: 197 ms  …  Init Duration: 182.47 ms</code></pre>
+
+<p>Starttiden ingår i Billed Duration: 14,21 + 182,47 = 196,68, avrundat till 197.</p>
+
+<p>Kallstart blir det när ingen miljö är ledig: första anropet, efter en ändring, efter en tid utan anrop, och när anrop kommer samtidigt, eftersom en miljö kör ett anrop i taget. Varje ny miljö får en egen <a href="0076-loggar-och-report-raden.html">loggström</a>.</p>
+</section>
+
+<section class="explain">
+<h2>Vad är timeout?</h2>
+
+<p>Timeout är den längsta tid ett anrop får köra: 3 sekunder som standard, högst 900 (15 minuter). När tiden går ut avbryts anropet utan svar, och före REPORT-raden står:</p>
+
+<pre><code>Task timed out after 3.00 seconds</code></pre>
+
+<p>Med AWS nyare loggformat saknas den raden, och REPORT-raden slutar i stället med <code>Status: timeout</code>. Du betalar för tiden fram till avbrottet.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du testar funktionen två gånger direkt efter varandra. Den andra REPORT-raden saknar <code>Init Duration</code>. Varför?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Miljön fanns kvar och återanvändes, så bara handlern kördes.">Miljön återanvändes, så bara handlern kördes</button>
+    <button class="opt" data-why="Fältet saknas för att ingen miljö skapades, inte för att raden är ofullständig.">Lambda skrev inte färdigt raden i loggen</button>
+    <button class="opt" data-why="Ett fel utanför handlern ger ett fel, inte en rad utan Init Duration.">Koden utanför handlern stoppades av ett fel</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Två anrop kommer samtidigt och den enda miljön är upptagen med det första. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Lambda köar inte, en miljö kör bara ett anrop i taget och en ny skapas.">Det andra väntar tills miljön är ledig</button>
+    <button class="opt" data-correct data-why="Det andra anropet får en ny miljö, alltså en kallstart och en ny loggström.">Det andra får en ny miljö och en kallstart</button>
+    <button class="opt" data-why="En miljö kör bara ett anrop i taget.">Båda körs i samma miljö på en gång</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Timeout är 1 sekund, men handlern behöver 2 sekunder. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Lambda väntar inte längre än timeout.">Lambda väntar tills handlern har svarat</button>
+    <button class="opt" data-why="Lambda ändrar aldrig timeout själv.">Lambda höjer timeout till 2 sekunder</button>
+    <button class="opt" data-correct data-why="Efter 1 sekund avbryts anropet och loggen visar Task timed out.">Anropet avbryts efter 1 sekund med ett fel</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Lambda kör koden i en exekveringsmiljö som fryses efter anropet och återanvänds, men kan tas bort när som helst. Kod utanför handlern körs en gång per miljö. En miljö kör ett anrop i taget.</li>
+    <li>Kallstart är ett anrop som måste skapa en ny miljö: första anropet, efter ändring, efter en tid utan anrop och vid samtidiga anrop. Den syns som <code>Init Duration</code> på REPORT-raden. Saknas fältet var anropet varmt. Starttiden ingår i Billed Duration.</li>
+    <li>Timeout är den längsta körtiden: 3 sekunder som standard, högst 900. När tiden går ut avbryts anropet, loggen visar <code>Task timed out</code> (eller <code>Status: timeout</code>) och du betalar fram till avbrottet.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html">AWS Lambda: Understanding the Lambda execution environment lifecycle</a>.</p>
+<p>Om kallstart: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html#cold-start-latency">Cold starts and latency</a>. Om samtidiga anrop: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html">AWS Lambda: Understanding Lambda function scaling</a>. Om timeout: <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html">AWS Lambda: Configure Lambda function timeout</a>. Om REPORT-raden: <a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html">AWS Lambda: Log and monitor Node.js Lambda functions</a>. Om att starttiden kostar: <a href="https://aws.amazon.com/blogs/compute/aws-lambda-standardizes-billing-for-init-phase/">AWS Lambda standardizes billing for INIT phase</a>.</p>
+<p>Kursmaterialets exempel visar Billed Duration 15 ms trots Init Duration 182,47 ms. Sedan augusti 2025 räknar AWS in starttiden, så på en kallstart blir Billed Duration större än Duration plus avrundning.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0076-loggar-och-report-raden.html">Förra: Loggar och REPORT-raden</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0078-dynamodb-tabell-item-nyckel.html">Nästa: DynamoDB: tabell, item och nyckel</a>
+</nav>
+
+</main>
+</body>
+</html>

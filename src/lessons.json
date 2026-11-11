@@ -520,174 +520,6 @@
       "title": "V42 – Serverlösa lösningar",
       "lessons": [
         {
-          "nr": null,
-          "file": "V42-start.html",
-          "title": "Veckan i överblick: serverlösa lösningar",
-          "goal": "Vad veckans lösning blir och var varje begrepp passar in.",
-          "tag": ""
-        },
-        {
-          "nr": 71,
-          "file": "0071-aws-cloudshell.html",
-          "title": "AWS CloudShell",
-          "goal": "Att CloudShell är en terminal i konsolen som redan är inloggad som din IAM user, och att regionen du valt i konsolen gäller där.",
-          "tag": "labb 0"
-        },
-        {
-          "nr": 72,
-          "file": "0072-aws-cli.html",
-          "title": "AWS CLI",
-          "goal": "Hur ett kommando som <code>aws elbv2 create-load-balancer --region eu-north-1</code> är byggt: tjänst, åtgärd och flaggor. Och vad <code>--query</code> och <code>--output text</code> gör med svaret.",
-          "tag": "labb 0"
-        },
-        {
-          "nr": 73,
-          "file": "0073-skalvariabel.html",
-          "title": "Skalvariabel",
-          "goal": "Att <code>API=https://...</code> sparar ett värde som <code>$API</code> läser i nästa kommando, och att variabeln utan <code>export</code> bara finns i skalet.",
-          "tag": "labb 0, 3"
-        },
-        {
-          "nr": 74,
-          "file": "0074-kommandosubstitution.html",
-          "title": "Kommandosubstitution",
-          "goal": "Att <code>SUBNETS=$(aws ...)</code> kör kommandot och sparar det som kommandot skriver ut i variabeln.",
-          "tag": "labb 0"
-        },
-        {
-          "nr": 75,
-          "file": "0075-application-load-balancer.html",
-          "title": "Application Load Balancer",
-          "goal": "Att en Application Load Balancer tar emot trafiken och fördelar den till servrarna bakom, att den kräver subnät i två zoner, och att ett nytt konto kan vara spärrat för den tills AWS Support hävt spärren.",
-          "tag": "labb 0"
-        },
-        {
-          "nr": 76,
-          "file": "0076-arn.html",
-          "title": "ARN",
-          "goal": "Vad delarna i ett ARN betyder: tjänst, region, konto och resurs. Och varför ett ARN för en bucket saknar region och konto.",
-          "tag": "labb 0, 2"
-        },
-        {
-          "nr": 77,
-          "file": "0077-serverlost.html",
-          "title": "Serverlöst",
-          "goal": "Att serverlöst betyder att du inte har någon server att sköta, och att du betalar per anrop i stället för medan en server står på.",
-          "tag": "labb 1"
-        },
-        {
-          "nr": 78,
-          "file": "0078-lambda-funktion.html",
-          "title": "Lambda-funktion",
-          "goal": "Att en Lambda-funktion är kod plus konfiguration som körs när en händelse kommer, utan server, port eller process som väntar, och att ny kod gäller först efter Deploy.",
-          "tag": "labb 1"
-        },
-        {
-          "nr": 79,
-          "file": "0079-runtime.html",
-          "title": "Runtime",
-          "goal": "Att runtime är språket och versionen funktionen körs i, till exempel Node.js 22.x, och att den styr vad som redan finns installerat.",
-          "tag": "labb 1–2"
-        },
-        {
-          "nr": 80,
-          "file": "0080-handler.html",
-          "title": "Handler",
-          "goal": "Att handlern är den exporterade funktionen Lambda anropar (<code>index.handler</code>), att den får <code>event</code> och <code>context</code>, och att det den returnerar blir svaret.",
-          "tag": "labb 1"
-        },
-        {
-          "nr": 81,
-          "file": "0081-event-och-testhandelse.html",
-          "title": "Event och testhändelse",
-          "goal": "Att event är det som anroparen skickar med, och att en testhändelse är ett event du själv skriver i JSON i konsolen.",
-          "tag": "labb 1–2"
-        },
-        {
-          "nr": 82,
-          "file": "0082-cloudwatch-logs.html",
-          "title": "CloudWatch Logs",
-          "goal": "Att allt <code>console.log</code> skriver hamnar i logggruppen <code>/aws/lambda/&lt;namn&gt;</code>, uppdelat i loggströmmar, och att alla med behörighet kan läsa loggen.",
-          "tag": "labb 1–4"
-        },
-        {
-          "nr": 83,
-          "file": "0083-exekveringsmiljo.html",
-          "title": "Exekveringsmiljö",
-          "goal": "Att exekveringsmiljön är den isolerade plats där Lambda kör din kod, att den återanvänds mellan anrop, och att en miljö bara kör ett anrop i taget.",
-          "tag": "labb 1–2"
-        },
-        {
-          "nr": 84,
-          "file": "0084-kallstart.html",
-          "title": "Kallstart",
-          "goal": "Att en kallstart är ett anrop där Lambda först måste skapa en ny exekveringsmiljö, och att du ser den som <code>Init Duration</code> på REPORT-raden i loggen.",
-          "tag": "labb 1"
-        },
-        {
-          "nr": 85,
-          "file": "0085-duration-och-billed-duration.html",
-          "title": "Duration och Billed Duration",
-          "goal": "Vad fälten på REPORT-raden säger om tid och minne, och att Billed Duration är den tid du betalar för, med Init Duration inräknad vid en kallstart.",
-          "tag": "labb 1"
-        },
-        {
-          "nr": 86,
-          "file": "0086-timeout.html",
-          "title": "Timeout",
-          "goal": "Att timeout är den längsta tid ett anrop får köra, 3 sekunder om du inte ändrar den, och att Lambda avbryter anropet med <code>Task timed out</code> när tiden går ut.",
-          "tag": "labb 1–2"
-        },
-        {
-          "nr": 87,
-          "file": "0087-execution-role.html",
-          "title": "Execution role",
-          "goal": "Att execution role är den roll Lambda tar på sig när funktionen körs, och att rollen som konsolen skapar bara får skriva loggar tills du ger den mer.",
-          "tag": "labb 1–2"
-        },
-        {
-          "nr": 88,
-          "file": "0088-dynamodb.html",
-          "title": "DynamoDB",
-          "goal": "Att DynamoDB är en managed databas utan server att sköta, och att koden inte håller någon anslutning öppen: varje läsning och skrivning är ett eget anrop.",
-          "tag": "labb 2"
-        },
-        {
-          "nr": 89,
-          "file": "0089-item-och-attribut.html",
-          "title": "Item och attribut",
-          "goal": "Att en rad i en DynamoDB-tabell heter item, att den består av attribut, alltså par av namn och värde, och att två items i samma tabell kan ha olika attribut.",
-          "tag": "labb 2"
-        },
-        {
-          "nr": 90,
-          "file": "0090-partitionsnyckel.html",
-          "title": "Partitionsnyckel",
-          "goal": "Att partitionsnyckeln, här <code>id</code>, är det enda du bestämmer i förväg om itemen i en DynamoDB-tabell, och att varje item måste ha den med ett eget värde.",
-          "tag": "labb 2"
-        },
-        {
-          "nr": 91,
-          "file": "0091-on-demand-lage.html",
-          "title": "On-demand-läge",
-          "goal": "Att on-demand-läge betyder att en DynamoDB-tabell betalas per läsning och skrivning, och att du inte betalar för läsningar och skrivningar när tabellen inte används.",
-          "tag": "labb 2"
-        },
-        {
-          "nr": 92,
-          "file": "0092-dynamodb-operationer.html",
-          "title": "DynamoDB-operationer",
-          "goal": "Vad <code>GetItem</code>, <code>PutItem</code>, <code>UpdateItem</code>, <code>DeleteItem</code> och <code>Scan</code> gör med en DynamoDB-tabell, och att <code>Scan</code> läser hela tabellen.",
-          "tag": "labb 2"
-        },
-        {
-          "nr": 93,
-          "file": "0093-minsta-mojliga-behorighet.html",
-          "title": "Minsta möjliga behörighet",
-          "goal": "Varför funktionens roll får fem operationer på en tabell i stället för <code>AmazonDynamoDBFullAccess</code>, och att det begränsar vad en bugg kan ställa till med.",
-          "tag": "labb 2"
-        },
-        {
           "nr": 94,
           "file": "0094-miljovariabel-i-lambda.html",
           "title": "Miljövariabel i Lambda",
@@ -728,27 +560,6 @@
           "title": "UUID",
           "goal": "Att id:t för en ny kund blir ett slumpat UUID från <code>randomUUID()</code> i stället för ett löpnummer, och varför ingen kan räkna sig fram till andras id.",
           "tag": "labb 2–3"
-        },
-        {
-          "nr": 100,
-          "file": "0100-platshallare-i-uttryck.html",
-          "title": "Platshållare i uttryck",
-          "goal": "Att <code>#n</code> står för ett attributnamn och <code>:n</code> för ett värde i <code>SET #n = :n</code>, och att <code>name</code> måste ha ett alias eftersom det är ett reserverat ord.",
-          "tag": "labb 2"
-        },
-        {
-          "nr": 101,
-          "file": "0101-conditionexpression.html",
-          "title": "ConditionExpression",
-          "goal": "Att <code>attribute_exists(id)</code> hindrar UpdateItem och DeleteItem från att gälla ett item som inte finns, och att felet då görs om till 404.",
-          "tag": "labb 2"
-        },
-        {
-          "nr": 102,
-          "file": "0102-accessdeniedexception.html",
-          "title": "AccessDeniedException",
-          "goal": "Hur du läser felet: vem som nekades, vilken handling och på vilken resurs. Du vet också att felet betyder att rollen saknar en behörighet.",
-          "tag": "labb 2"
         },
         {
           "nr": 103,
@@ -846,6 +657,223 @@
           "title": "Producent och konsument",
           "goal": "Att producenten lägger meddelanden på kön och konsumenten hämtar dem. I V43 delar de bara kön och anropar aldrig varandra.",
           "tag": "labb 1–3"
+        },
+        {
+          "nr": 115,
+          "file": "0115-standardko.html",
+          "title": "Standardkö",
+          "goal": "Att Standard är kötypen som är förvald och att den inte lovar ordning. FIFO-kön, med namn som slutar på <code>.fifo</code>, håller ordningen.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 116,
+          "file": "0116-meddelande-i-sqs.html",
+          "title": "Meddelande i SQS",
+          "goal": "Att ett meddelande är en text, ofta JSON, som ligger i fältet Message body. När det skickas ger kön det ett message ID.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 117,
+          "file": "0117-hamtat-ar-inte-borta.html",
+          "title": "Hämtat är inte borta",
+          "goal": "Att ReceiveMessage inte tar bort meddelandet. Det försvinner först när konsumenten anropar DeleteMessage.",
+          "tag": "labb 1, 3"
+        },
+        {
+          "nr": 118,
+          "file": "0118-visibility-timeout.html",
+          "title": "Visibility timeout",
+          "goal": "Att ett hämtat meddelande är osynligt för andra i 30 sekunder och blir synligt igen om ingen tagit bort det. Tiden ska vara längre än jobbet tar.",
+          "tag": "labb 1, 3"
+        },
+        {
+          "nr": 119,
+          "file": "0119-receive-count.html",
+          "title": "Receive count",
+          "goal": "Att receive count är hur många gånger ett meddelande har hämtats utan att tas bort. Varje hämtning räknas, och antalet försök är begränsat.",
+          "tag": "labb 1, 3"
+        },
+        {
+          "nr": 120,
+          "file": "0120-long-polling.html",
+          "title": "Long polling",
+          "goal": "Att ReceiveMessage med long polling väntar på ett meddelande, högst 20 sekunder, i stället för att svara tomt direkt.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 121,
+          "file": "0121-message-retention-period.html",
+          "title": "Message retention period",
+          "goal": "Att en kö tar bort meddelanden automatiskt efter retention-perioden, som är 4 dagar som standard, och varför en dödbrevskö får 14 dagar.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 122,
+          "file": "0122-dodbrevsko.html",
+          "title": "Dödbrevskö",
+          "goal": "Att en dödbrevskö (DLQ) är en vanlig kö som tar emot meddelanden som har misslyckats för många gånger, och att den skapas före huvudkön.",
+          "tag": "labb 1, 3"
+        },
+        {
+          "nr": 123,
+          "file": "0123-maxreceivecount.html",
+          "title": "maxReceiveCount",
+          "goal": "Att maxReceiveCount är gränsen för hur många gånger ett meddelande hämtas innan det flyttas till dödbrevskön. Med värdet 3 flyttas det vid den fjärde hämtningen.",
+          "tag": "labb 1, 3"
+        },
+        {
+          "nr": 124,
+          "file": "0124-dlq-redrive.html",
+          "title": "DLQ redrive",
+          "goal": "Att DLQ redrive flyttar meddelanden från dödbrevskön tillbaka till huvudkön, och att de där räknas som nya meddelanden.",
+          "tag": "labb 1, 3"
+        },
+        {
+          "nr": 125,
+          "file": "0125-kons-url-och-arn.html",
+          "title": "Köns URL och ARN",
+          "goal": "Att URL:en pekar ut kön i koden och ARN:et pekar ut samma kö i policyer.",
+          "tag": "labb 1–4"
+        },
+        {
+          "nr": 126,
+          "file": "0126-sendmessage.html",
+          "title": "SendMessage",
+          "goal": "Att <code>SendMessageCommand</code> med <code>QueueUrl</code> och <code>MessageBody</code> lägger ett meddelande på kön, och att rollen bara får <code>sqs:SendMessage</code> på den kön.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 127,
+          "file": "0127-meddelandets-innehall.html",
+          "title": "Meddelandets innehåll",
+          "goal": "Att meddelandet bara bär det konsumenten behöver (typ, id, namn, tid), inte hela objektet, och att det är en kopia som kan bli inaktuell.",
+          "tag": "labb 2–3"
+        },
+        {
+          "nr": 128,
+          "file": "0128-spara-forst-skicka-sedan.html",
+          "title": "Spara först, skicka sedan",
+          "goal": "Att API:et sparar kunden före SendMessage, och att ett fel i SendMessage ger ett 5xx-fel fast kunden redan finns: två skrivningar till två system.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 129,
+          "file": "0129-sqs-trigger.html",
+          "title": "SQS-trigger",
+          "goal": "Att triggern hämtar från kön åt funktionen och anropar handlern, att den tar bort meddelandena när handlern returnerar utan fel, och att du inte skriver någon loop.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 130,
+          "file": "0130-konsumentens-roll.html",
+          "title": "Konsumentens roll",
+          "goal": "Att konsumentens roll är en execution role med AWSLambdaSQSQueueExecutionRole, att den måste finnas innan triggern skapas, och att jobbet får en egen policy med bara UpdateItem.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 131,
+          "file": "0131-event-fran-sqs.html",
+          "title": "Event från SQS",
+          "goal": "Att eventet från SQS har listan Records med en post per meddelande, att body är en sträng som du tolkar med JSON.parse, och att attributes.ApproximateReceiveCount säger vilket försök det är.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 132,
+          "file": "0132-batch-size.html",
+          "title": "Batch size",
+          "goal": "Att batch size är det högsta antalet meddelanden i ett anrop, att batch size 1 ger ett meddelande per anrop, och att ett kast skickar tillbaka alla meddelanden i batchen.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 133,
+          "file": "0133-aterforsok.html",
+          "title": "Återförsök",
+          "goal": "Att ett kast i handlern gör att meddelandet kommer tillbaka efter visibility timeout och till slut hamnar i dödbrevskön, medan den som anropade API:et redan fått 201.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 134,
+          "file": "0134-tillfalligt-och-permanent-fel.html",
+          "title": "Tillfälligt och permanent fel",
+          "goal": "Att ett tillfälligt fel ska kastas, så att kön försöker igen, och att ett permanent fel ska loggas och hoppas över, så att meddelandet inte fastnar.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 135,
+          "file": "0135-minst-en-gang.html",
+          "title": "Minst en gång",
+          "goal": "Att samma meddelande kan komma fram mer än en gång, och att det är ett krav på koden som tar emot det, inte något kön löser.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 136,
+          "file": "0136-idempotens.html",
+          "title": "Idempotens",
+          "goal": "Att idempotent betyder att samma meddelande två gånger ger samma resultat som en gång, och att <code>if_not_exists(welcome_sent_at, :t)</code> skriver tiden bara första gången.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 137,
+          "file": "0137-handelse.html",
+          "title": "Händelse",
+          "goal": "Att en händelse berättar att något har hänt utan att källan vet vem som bryr sig, medan ett meddelande på en kö går till en bestämd kö.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 138,
+          "file": "0138-eventbridge-och-event-bus.html",
+          "title": "EventBridge och event bus",
+          "goal": "Att EventBridge tar emot händelser på en event bus, till exempel <code>default</code>, och skickar dem vidare enligt regler.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 139,
+          "file": "0139-regel-och-event-pattern.html",
+          "title": "Regel och event pattern",
+          "goal": "Att regeln matchar händelsen på <code>source</code> och <code>detail-type</code>, och att värdena måste vara exakt likadana, med samma skiftläge, i händelsen och i regeln.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 140,
+          "file": "0140-mal-i-en-regel.html",
+          "title": "Mål i en regel",
+          "goal": "Att en regel kan ha flera mål, till exempel en SQS-kö, ett SNS-ämne och en logggrupp, och att ett nytt mål läggs till på regeln utan att något hos källan ändras.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 141,
+          "file": "0141-putevents.html",
+          "title": "PutEvents",
+          "goal": "Att PutEvents skickar en lista Entries med Source, DetailType och Detail (JSON som sträng) till en event bus, att FailedEntryCount i svaret visar hur många poster som inte togs emot, och att anroparen behöver <code>events:PutEvents</code> på bussens ARN.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 142,
+          "file": "0142-eventbridge-kuvertet.html",
+          "title": "EventBridge-kuvertet",
+          "goal": "Att EventBridge lägger id, version, account, region och time runt innehållet i detail, och att konsumenten därför läser <code>body.detail ?? body</code>.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 143,
+          "file": "0143-sns-amne.html",
+          "title": "SNS-ämne",
+          "goal": "Att ett ämne trycker ut samma meddelande till alla prenumeranter direkt, medan en kö väntar på att konsumenten hämtar.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 144,
+          "file": "0144-prenumeration.html",
+          "title": "Prenumeration",
+          "goal": "Att en prenumeration med e-post måste bekräftas med länken i mejlet innan SNS skickar något till adressen.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 145,
+          "file": "0145-kons-access-policy.html",
+          "title": "Köns access policy",
+          "goal": "Att köns resource-based policy släpper in <code>events.amazonaws.com</code> med <code>sqs:SendMessage</code>, och bara från regelns ARN (<code>aws:SourceArn</code>).",
+          "tag": "labb 4"
         }
       ]
     }

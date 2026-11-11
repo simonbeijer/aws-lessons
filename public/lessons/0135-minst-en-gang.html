@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minst en gång</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 135 · V43, 24 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 135</p>
+<h1>Minst en gång</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att samma meddelande kan komma fram mer än en gång, och att det är ett krav på koden som tar emot det, inte något kön löser.
+</div>
+
+<section class="explain">
+<h2>Vad betyder minst en gång?</h2>
+
+<p>En <a href="0115-standardko.html">standardkö</a> levererar varje meddelande en gång eller flera. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html">AWS: Standard queues</a>)</span></p>
+
+<p>Det händer också när en Lambda-funktion misslyckas. Meddelandet tas inte bort, blir synligt igen efter <a href="0118-visibility-timeout.html">visibility timeout</a> och hämtas på nytt. <a href="0129-sqs-trigger.html">Triggern</a> tar bort det först när funktionen har lyckats. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda och SQS</a>)</span></p>
+</section>
+
+<section class="explain">
+<h2>Vem löser dubbletterna?</h2>
+
+<p>Koden som tar emot meddelandet. Den måste klara att köras flera gånger med samma meddelande utan oönskade följder. AWS rekommenderar starkt att funktionskoden görs så. Skickar funktionen ett mejl får kunden annars två. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda och SQS</a>)</span></p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad lovar en standardkö om leveransen?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är inte ett löfte standardkön ger; samma meddelande kan komma fler gånger.">Högst en gång, aldrig fler</button>
+    <button class="opt" data-correct data-why="Standardkön levererar varje meddelande minst en gång, så dubbletter kan förekomma.">Minst en gång, ibland fler</button>
+    <button class="opt" data-why="Standardkön lovar varken exakt en gång eller någon ordning.">Exakt en gång, och ordnat</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vem ska se till att en dubblett inte ger fel effekt?</p>
+  <div class="options">
+    <button class="opt" data-why="Standardkön filtrerar inte bort dubbletter, den kan leverera samma meddelande flera gånger.">Kön tar själv bort dubbletter</button>
+    <button class="opt" data-why="Ingen inställning i standardkön ger leverans exakt en gång.">Kön med en särskild inställning</button>
+    <button class="opt" data-correct data-why="Kön löser det inte, så koden som tar emot meddelandet måste klara dubbletter.">Koden som tar emot meddelandet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition: funktionen är inte klar när visibility timeout går ut. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Visibility timeout tar inte bort meddelandet, det gör DeleteMessage när funktionen lyckats.">Kön raderar meddelandet själv</button>
+    <button class="opt" data-correct data-why="Meddelandet blir synligt igen och kan hämtas på nytt, alltså komma fram två gånger.">Meddelandet kan hämtas igen</button>
+    <button class="opt" data-why="Dödbrevskön kräver att receive count överstiger maxReceiveCount.">Meddelandet flyttas till DLQ</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En standardkö levererar minst en gång: samma meddelande kan komma fram flera gånger.</li>
+    <li>Kön löser inte det. Koden som tar emot meddelandet måste klara att köras flera gånger.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html">AWS: Standard queues</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0134-tillfalligt-och-permanent-fel.html">Förra: Tillfälligt och permanent fel</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0136-idempotens.html">Nästa: Idempotens</a>
+</nav>
+
+</main>
+</body>
+</html>

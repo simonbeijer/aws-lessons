@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQS-trigger</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 129 · V43, 18 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 129</p>
+<h1>SQS-trigger</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att triggern hämtar från kön åt funktionen och anropar handlern, att den tar bort meddelandena när handlern returnerar utan fel, och att du inte skriver någon loop.
+</div>
+
+<section class="explain">
+<h2>Vad gör en SQS-trigger?</h2>
+
+<p>En SQS-trigger hämtar meddelanden från en <a href="0113-sqs-ko.html">SQS</a>-kö åt en Lambda-funktion. En trigger är en koppling du lägger på funktionen: när något händer i en annan tjänst körs funktionen. Triggern hämtar meddelanden med ReceiveMessage (<a href="0117-hamtat-ar-inte-borta.html">lektion 117</a>) och anropar <a href="0075-handler-och-event.html">handlern</a> med dem. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a>)</span></p>
+
+<p>Du skriver alltså ingen loop som hämtar från kön, fast funktionen är <a href="0114-producent-och-konsument.html">konsumenten</a>.</p>
+</section>
+
+<section class="explain">
+<h2>När tas meddelandena bort?</h2>
+
+<p>När handlern returnerar utan fel. Då tar triggern bort meddelandena ur kön, så funktionen behöver inte anropa DeleteMessage själv. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a>)</span></p>
+
+<p>Kastar handlern ett fel tas inget bort. Meddelandena blir synliga igen när <a href="0118-visibility-timeout.html">visibility timeout</a> har gått ut, och hämtas på nytt.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad hämtar meddelandena från kön åt funktionen?</p>
+  <div class="options">
+    <button class="opt" data-why="Du skriver ingen loop, det är triggern som hämtar.">Handlern i en while-loop</button>
+    <button class="opt" data-why="Producenten skickar bara meddelanden till kön, den hämtar inga.">Producenten i din backend</button>
+    <button class="opt" data-correct data-why="Triggern hämtar från kön och anropar handlern med meddelandena.">Triggern på din funktion</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. När tar triggern bort meddelandena ur kön?</p>
+  <div class="options">
+    <button class="opt" data-why="Hämtat är inte borta, meddelandena ligger kvar tills handlern lyckats.">Direkt när triggern hämtat dem</button>
+    <button class="opt" data-correct data-why="Returnerar handlern utan fel räknas meddelandena som klara och tas bort.">När handlern lyckats utan fel</button>
+    <button class="opt" data-why="Funktionens timeout avgör inte borttagningen, det gör om handlern lyckas.">När funktionens timeout gått ut</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Handlern kastar ett fel. Vad händer med meddelandena?</p>
+  <div class="options">
+    <button class="opt" data-why="Triggern tar bara bort meddelanden när handlern returnerat utan fel.">Borttagna av triggern direkt efteråt</button>
+    <button class="opt" data-correct data-why="Ingenting tas bort, så de blir synliga när visibility timeout gått ut.">Synliga när visibility timeout gått</button>
+    <button class="opt" data-why="Koden raderar inget, de blir synliga igen av sig själva.">Osynliga tills handlern raderar alla</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En SQS-trigger hämtar meddelanden från kön åt funktionen och anropar handlern med dem.</li>
+    <li>Du skriver ingen loop och behöver inte anropa DeleteMessage.</li>
+    <li>Returnerar handlern utan fel tas meddelandena bort. Kastar den blir de synliga igen efter visibility timeout.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Using Lambda with Amazon SQS</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0128-spara-forst-skicka-sedan.html">Förra: Spara först, skicka sedan</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0130-konsumentens-roll.html">Nästa: Konsumentens roll</a>
+</nav>
+
+</main>
+</body>
+</html>

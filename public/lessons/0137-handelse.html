@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Händelse</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main>
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 137 · V43, 26 av 36 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 137</p>
+<h1>Händelse</h1>
+
+<div class="goal">
+  <strong>Vad du ska veta efter lektionen</strong>
+  Att en händelse berättar att något har hänt utan att källan vet vem som bryr sig, medan ett meddelande på en kö går till en bestämd kö.
+</div>
+
+<section class="explain">
+<h2>Vad är en händelse?</h2>
+
+<p>En händelse (event) är en rapport om en ändring i en miljö eller ett tillstånd, till exempel att en <a href="0029-ec2-instans.html">EC2-instans</a> byter tillstånd. Den är ett <a href="0052-json.html">JSON</a>-objekt. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-events.html">AWS: Events</a>)</span></p>
+
+<p>Källan skickar händelsen till en event bus, en router som levererar den vidare. Källan anger bara vad som hände. Vilka som ska reagera avgör bussen, så källan vet inte vem som tar emot händelsen. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/ref/welcome.html">AWS: EventBridge</a>)</span></p>
+
+<p>Det är inte samma sak som Lambdas <code>event</code> i <a href="0075-handler-och-event.html">lektion 75</a>. Där är eventet indata som anroparen ger funktionen. Här är händelsen en rapport om något som har hänt.</p>
+</section>
+
+<section class="explain">
+<h2>Händelse eller meddelande?</h2>
+
+<p>En händelse går till de mottagare som bussen väljer, ett <a href="0116-meddelande-i-sqs.html">meddelande</a> till en bestämd kö. <a href="0126-sendmessage.html">SendMessage</a> skickar det, och anropet anger köns URL. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html">AWS: SendMessage</a>)</span></p>
+
+<p>En ny mottagare läggs till på bussen och källan ändras inte. Med en kö måste avsändaren känna till kön.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad är en händelse i den här lektionen?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är Lambdas event, och det är en annan sak än en händelse.">Det som funktionen får som indata</button>
+    <button class="opt" data-why="Ett meddelande på en kö är en annan sak än en händelse.">Ett meddelande som väntar hos kön</button>
+    <button class="opt" data-correct data-why="En händelse är en rapport om en ändring, till exempel att en EC2-instans byter tillstånd.">Ett besked om att något inträffat</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad avgör vilka som får en händelse?</p>
+  <div class="options">
+    <button class="opt" data-why="Källan anger bara vad som hände och vet inte vilka som tar emot.">Källan pekar ut mottagarna</button>
+    <button class="opt" data-correct data-why="Det är bussen, inte källan, som bestämmer vilka som får händelsen.">Bussen, inte själva källan</button>
+    <button class="opt" data-why="En URL pekar ut en kö, och det gäller meddelanden, inte händelser.">Köns URL inuti meddelandet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition: vad anger SendMessage för att meddelandet ska hamna rätt?</p>
+  <div class="options">
+    <button class="opt" data-why="SendMessage anger ingen regel; mottagaren är kön i anropet.">En regel för alla mottagare</button>
+    <button class="opt" data-why="Händelsens källa är inte det som styr vilken kö det blir.">Vilken tjänst som är källan</button>
+    <button class="opt" data-correct data-why="QueueUrl pekar ut kön som meddelandet skickas till.">Adressen till en bestämd kö</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En händelse är en JSON-rapport om att något har hänt. Källan vet inte vem som reagerar, och nya mottagare läggs till utan att källan ändras.</li>
+    <li>Ett meddelande på en kö går till en bestämd kö. Lambdas <code>event</code> är en annan sak: funktionens indata.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-events.html">AWS: Events</a></p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0136-idempotens.html">Förra: Idempotens</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0138-eventbridge-och-event-bus.html">Nästa: EventBridge och event bus</a>
+</nav>
+
+</main>
+</body>
+</html>
