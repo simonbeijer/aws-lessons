@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stage, anropsbehörighet och throttling</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 84 · V42, 14 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 84 · V42, 14 av 15 i veckan</p>
+<h1>Vad står mellan klienten och funktionen?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Funktionen kan nu svara, men en klient måste först hitta den, få komma in och inte skicka för många anrop. Tre saker ordnar det: en adress, en regel om vem som får anropa, och en gräns för hur många.
+</div>
+
+<section class="explain">
+<h2>Vilken adress anropar klienten?</h2>
+
+<p>Adressen kommer från en stage. En stage är en driftsatt version av <a href="0082-http-api-route-integration.html">routes och integrationer</a> i ett API (Application Programming Interface), med en egen adress, Invoke URL. URL står för Uniform Resource Locator. Ett nytt API får stagen <code>$default</code>. Den har auto-deploy: en ändrad route gäller direkt, men funktionens kod först efter Deploy i <a href="0074-serverlost-och-lambda.html">Lambda</a>.</p>
+
+<p>För <code>$default</code> står routen direkt efter <code>.amazonaws.com</code>: <code>https://ab12cd34ef.execute-api.eu-north-1.amazonaws.com/customers</code>. Andra stages, som <code>prod</code>, står före routen. Skriver du <code>/$default</code> svarar API Gateway Forbidden.</p>
+</section>
+
+<section class="explain">
+<h2>Vem får anropa funktionen?</h2>
+
+<p>Adressen räcker inte: API Gateway måste också få köra funktionen. Det styr en resource-based policy, en policy som sitter på själva funktionen, som en <a href="0015-bucket-policy.html">bucket policy</a>.</p>
+
+<p>Regeln ger tjänsten <code>apigateway.amazonaws.com</code> rätt att göra <code>lambda:InvokeFunction</code>, bara från ditt API. Konsolen lägger till den åt dig. Saknas den körs funktionen aldrig, och klienten får ett <a href="0083-event-och-svar-api-gateway.html">5xx-fel</a>.</p>
+
+<p>Rollen är något annat: <a href="0080-execution-role-och-behorighet.html">execution role</a> säger vad funktionen får göra, policyn på funktionen vem som får köra den.</p>
+</section>
+
+<section class="explain">
+<h2>Hur många anrop släpps in?</h2>
+
+<p>Throttling är en gräns för anrop per sekund, satt på stagen. Varje anrop tar en pollett ur en hink. Burst är hur många polletter hinken rymmer, alltså anrop på en gång. Rate är hur många som fylls på per sekund.</p>
+
+<p>Är hinken tom svarar API Gateway <code>429 Too Many Requests</code>, en <a href="0050-statuskod.html">4xx</a>. Funktionen körs inte, så gränsen skyddar den och DynamoDB bakom. Den gäller alla klienter tillsammans.</p>
+
+<p>Nästa lektion handlar om webbsidan som anropar adressen.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Stagen heter <code>$default</code>. Hur skrivs <code>GET /customers</code> efter <code>.amazonaws.com</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Stagen $default har inget namn i adressen. Skriver du /$default får du Forbidden.">Med /$default först och sedan /customers</button>
+    <button class="opt" data-correct data-why="Stagen $default nås direkt på adressen, så routen skrivs direkt efter.">Bara /customers, utan något före</button>
+    <button class="opt" data-why="Funktionens namn finns inte i adressen. Där står bara API:ets id och region.">Med funktionens namn först och sedan /customers</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Funktionens roll får skriva till tabellen, men policyn på funktionen saknar regeln för API Gateway. Vad ser klienten?</p>
+  <div class="options">
+    <button class="opt" data-why="Rollen styr vad funktionen får göra. Utan regeln på funktionen körs den aldrig.">Ett lyckat svar, för rollen räcker</button>
+    <button class="opt" data-correct data-why="Utan regeln får API Gateway inte köra funktionen, och klienten får ett 5xx-fel.">Internal Server Error, och funktionen körs inte</button>
+    <button class="opt" data-why="429 kommer av throttling, inte av saknad behörighet.">429 Too Many Requests, för anropet stoppas</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Rate 5 och burst 2. Sex anrop kommer på exakt samma gång. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Rate är takten i längden. På en gång får bara burst, två anrop, plats.">Alla sex går igenom, för rate är fem</button>
+    <button class="opt" data-correct data-why="Hinken rymmer två polletter, så två går igenom och fyra får 429. Funktionen körs två gånger.">Två går igenom och fyra får 429</button>
+    <button class="opt" data-why="Bara anropen utan pollett stoppas, inte alla.">Inget går igenom, för gränsen är nådd</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En stage är en driftsatt version av API:et med egen Invoke URL. <code>$default</code> har inget namn i adressen och har auto-deploy. Funktionens kod gäller först efter Deploy i Lambda.</li>
+    <li>Resource-based policy på funktionen säger vem som får anropa den: <code>apigateway.amazonaws.com</code> med <code>lambda:InvokeFunction</code>. Rollen säger vad funktionen får göra. Saknas regeln får klienten Internal Server Error.</li>
+    <li>Rate är anrop per sekund i längden, burst är anrop på en gång. Över gränsen svarar API Gateway 429 utan att köra funktionen. Gränsen gäller alla klienter tillsammans.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkällor: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-stages.html">Amazon API Gateway: Stages for HTTP APIs</a> och <a href="https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html">AWS Lambda: Working with resource-based policies in Lambda</a>.</p>
+<p>Om adressen: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-publish.html">Amazon API Gateway: Publish HTTP APIs</a>. Om regeln för API Gateway: <a href="https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#apigateway-permissions">AWS Lambda: Invoking a Lambda function using an Amazon API Gateway endpoint</a>. Om felet när regeln saknas: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-troubleshooting-lambda.html#http-api-troubleshooting-lambda-internal-server-error">HTTP API Internal Server Error</a>.</p>
+<p>Om throttling: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-throttling.html">Throttle requests to your HTTP APIs</a>, och om hinken med polletter <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html">Throttle requests to your REST APIs</a>. Per-klient-gräns: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html">Choose between REST APIs and HTTP APIs</a>. AWS kallar gränsen ett mål, så ibland släpps fler anrop igenom.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0083-event-och-svar-api-gateway.html">Förra: Event och svar genom API Gateway</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0085-cors-och-frontend.html">Nästa: CORS och frontend</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -26,19 +26,19 @@
 <section class="explain">
 <h2>Vilken skrivning kommer först?</h2>
 
-<p>API:et sparar kunden i tabellen med <code>PutItem</code> (<a href="0079-lasa-och-skriva-i-dynamodb.html">lektion 79</a>), i koden <code>PutCommand</code> (<a href="0096-documentclient.html">lektion 96</a>), och skickar sedan meddelandet med <code>SendMessage</code> (<a href="0126-sendmessage.html">lektion 126</a>). Först därefter svarar det med 201. Meddelandet säger att en kund har skapats, så kunden måste finnas när det skickas.</p>
+<p>API:et sparar kunden i tabellen med <code>PutItem</code> (<a href="0079-lasa-och-skriva-i-dynamodb.html">lektion 79</a>), i koden <code>PutCommand</code> (<a href="0081-koden-mot-dynamodb.html">lektion 81</a>), och skickar sedan meddelandet med <code>SendMessage</code> (<a href="0126-sendmessage.html">lektion 126</a>). Först därefter svarar det med 201. Meddelandet säger att en kund har skapats, så kunden måste finnas när det skickas.</p>
 
 <pre>await db.send(new PutCommand({ ... }));           // 1. spara kunden
 await sqs.send(new SendMessageCommand({ ... }));  // 2. skicka meddelandet
 return json(201, customer);                       // 3. svara</pre>
 
-<p>Det är två skrivningar till två olika system, <a href="0078-dynamodb-tabell-item-nyckel.html">DynamoDB</a> och <a href="0113-sqs-ko.html">SQS</a>. AWS kallar det <em>dual write</em>. Den andra kan misslyckas fast den första har lyckats. Ett mönster som löser det heter transactional outbox (se huvudkällan). <span class="src">(<a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS: Transactional outbox</a>)</span></p>
+<p>Det är två skrivningar till två olika system, <a href="0078-dynamodb-tabell-item-nyckel.html">DynamoDB</a> och <a href="0087-sqs-ko-och-meddelande.html">SQS</a>. AWS kallar det <em>dual write</em>. Den andra kan misslyckas fast den första har lyckats. Ett mönster som löser det heter transactional outbox (se huvudkällan). <span class="src">(<a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS: Transactional outbox</a>)</span></p>
 </section>
 
 <section class="explain">
 <h2>Vad händer om SendMessage felar?</h2>
 
-<p>Kunden finns kvar i tabellen, men inget meddelande ligger på kön. Ett fel kan vara att rollen saknar <code>sqs:SendMessage</code>, vilket ger <a href="0080-execution-role-och-behorighet.html">AccessDeniedException</a>. PutItem ångras inte. Fångar koden inte felet får klienten ett <a href="0098-svar-till-api-gateway.html">5xx-fel</a>.</p>
+<p>Kunden finns kvar i tabellen, men inget meddelande ligger på kön. Ett fel kan vara att rollen saknar <code>sqs:SendMessage</code>, vilket ger <a href="0080-execution-role-och-behorighet.html">AccessDeniedException</a>. PutItem ångras inte. Fångar koden inte felet får klienten ett <a href="0083-event-och-svar-api-gateway.html">5xx-fel</a>.</p>
 
 <p>Klienten tror då att inget sparades. Skickar den om anropet sparas kunden en gång till, så kunden finns två gånger. Ingen konsument har fått något meddelande om den första.</p>
 </section>

@@ -26,7 +26,7 @@
 <section class="explain">
 <h2>Vad släpper policyn in?</h2>
 
-<p>Köns access policy är köns <a href="0107-resource-based-policy.html">resource-based policy</a>. Utan en sats i den får en EventBridge-<a href="0139-regel-och-event-pattern.html">regel</a> inte lägga händelser i kön. En ny kö har en tom policy, så satsen måste läggas till. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#eb-sqs-permissions">AWS: Amazon SQS permissions</a>)</span></p>
+<p>Köns access policy är köns <a href="0084-stage-behorighet-throttling.html">resource-based policy</a>. Utan en sats i den får en EventBridge-<a href="0139-regel-och-event-pattern.html">regel</a> inte lägga händelser i kön. En ny kö har en tom policy, så satsen måste läggas till. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#eb-sqs-permissions">AWS: Amazon SQS permissions</a>)</span></p>
 
 <pre><code>{
   "Effect": "Allow",
@@ -40,7 +40,7 @@
   }
 }</code></pre>
 
-<p><code>events.amazonaws.com</code> är EventBridges namn som tjänst, som <code>apigateway.amazonaws.com</code> i lektion 107. <code>sqs:SendMessage</code> är samma åtgärd som <a href="0126-sendmessage.html">SendMessage</a>. Resource är köns <a href="0073-load-balancer-och-arn.html">ARN</a>. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#eb-sqs-permissions">AWS: Amazon SQS permissions</a>)</span></p>
+<p><code>events.amazonaws.com</code> är EventBridges namn som tjänst, som <code>apigateway.amazonaws.com</code> i <a href="0084-stage-behorighet-throttling.html">lektion 84</a>. <code>sqs:SendMessage</code> är samma åtgärd som <a href="0126-sendmessage.html">SendMessage</a>. Resource är köns <a href="0073-load-balancer-och-arn.html">ARN</a>. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#eb-sqs-permissions">AWS: Amazon SQS permissions</a>)</span></p>
 </section>
 
 <section class="explain">
@@ -64,7 +64,7 @@
 </div>
 
 <div class="quiz-q">
-  <p class="q">2. Repetition från lektion 107: i vilken del av satsen står att det är EventBridge som får skicka?</p>
+  <p class="q">2. Repetition från lektion 84: i vilken del av satsen står att det är EventBridge som får skicka?</p>
   <div class="options">
     <button class="opt" data-why="Action säger vad som får göras, inte vem.">I Action, som åtgärd SendMessage</button>
     <button class="opt" data-why="Resource är det som skyddas, här kön.">I Resource, som köns ARN-adress</button>

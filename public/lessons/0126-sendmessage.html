@@ -26,7 +26,7 @@
 <section class="explain">
 <h2>Vad gör SendMessage?</h2>
 
-<p>SendMessage lägger ett meddelande på den kö som <code>QueueUrl</code> pekar ut (<a href="0125-kons-url-och-arn.html">lektion 125</a>). Producenten anropar den med <a href="0095-aws-sdk.html">AWS SDK</a>. <code>MessageBody</code> är en sträng, så ett objekt görs om med <code>JSON.stringify</code> som i <a href="0098-svar-till-api-gateway.html">lektion 98</a>. Ett lyckat anrop svarar med meddelandets message ID. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html">AWS: SendMessage</a>, <a href="https://docs.aws.amazon.com/code-library/latest/ug/sqs_example_sqs_SendMessage_section.html">AWS: SendMessage med SDK for JavaScript</a>)</span></p>
+<p>SendMessage lägger ett meddelande på den kö som <code>QueueUrl</code> pekar ut (<a href="0087-sqs-ko-och-meddelande.html">lektion 87</a>). Producenten anropar den med <a href="0081-koden-mot-dynamodb.html">AWS SDK</a>. <code>MessageBody</code> är en sträng, så ett objekt görs om med <code>JSON.stringify</code> som i <a href="0083-event-och-svar-api-gateway.html">lektion 83</a>. Ett lyckat anrop svarar med meddelandets message ID. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html">AWS: SendMessage</a>, <a href="https://docs.aws.amazon.com/code-library/latest/ug/sqs_example_sqs_SendMessage_section.html">AWS: SendMessage med SDK for JavaScript</a>)</span></p>
 
 <pre><code>import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
@@ -38,13 +38,13 @@ await client.send(new SendMessageCommand({
   MessageBody: JSON.stringify({ id: 7 })
 }));</code></pre>
 
-<p><code>queueUrl</code> läses från miljövariabeln <code>QUEUE_URL</code>, precis som <code>TABLE_NAME</code> i <a href="0094-miljovariabel-i-lambda.html">lektion 94</a>. Då kan samma kod skicka till en annan kö i en annan miljö.</p>
+<p><code>queueUrl</code> läses från miljövariabeln <code>QUEUE_URL</code>, precis som <code>TABLE_NAME</code> i <a href="0081-koden-mot-dynamodb.html">lektion 81</a>. Då kan samma kod skicka till en annan kö i en annan miljö.</p>
 </section>
 
 <section class="explain">
 <h2>Vad får rollen göra?</h2>
 
-<p>Funktionens <a href="0080-execution-role-och-behorighet.html">execution role</a> får bara <code>sqs:SendMessage</code> på en enda kö, med köns ARN som resurs (<a href="0125-kons-url-och-arn.html">lektion 125</a>). Det är <a href="0080-execution-role-och-behorighet.html">minsta möjliga behörighet</a>: en handling på en resurs. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-api-permissions-reference.html">AWS: SQS API permissions</a>)</span></p>
+<p>Funktionens <a href="0080-execution-role-och-behorighet.html">execution role</a> får bara <code>sqs:SendMessage</code> på en enda kö, med köns ARN som resurs (<a href="0087-sqs-ko-och-meddelande.html">lektion 87</a>). Det är <a href="0080-execution-role-och-behorighet.html">minsta möjliga behörighet</a>: en handling på en resurs. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-api-permissions-reference.html">AWS: SQS API permissions</a>)</span></p>
 
 <pre>{
   "Effect": "Allow",
@@ -102,7 +102,7 @@ await client.send(new SendMessageCommand({
 <p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
 
 <nav class="bottomnav">
-  <a href="0125-kons-url-och-arn.html">Förra: Köns URL och ARN</a>
+  <a href="0124-dlq-redrive.html">Förra: DLQ redrive</a>
   <a href="../index.html">Alla lektioner</a>
   <a href="0127-meddelandets-innehall.html">Nästa: Meddelandets innehåll</a>
 </nav>

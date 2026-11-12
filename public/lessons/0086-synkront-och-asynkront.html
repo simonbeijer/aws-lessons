@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Synkront och asynkront</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 86 · V43, 1 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 86 · V43, 1 av 16 i veckan</p>
+<h1>Vad betyder asynkront?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  API:et (Application Programming Interface) ska lämna jobbet vidare i stället för att göra allt själv. Asynkront betyder att anroparen bara väntar på att jobbet är lämnat, inte på att det är gjort. Här ser du skillnaden mot synkront, och vilka två delar som lämnar och hämtar jobbet.
+</div>
+
+<section class="explain">
+<h2>Väntar anroparen eller inte?</h2>
+
+<p>Synkront betyder att anroparen väntar tills jobbet är klart, och svaret innehåller resultatet. Så fungerade API:et i v42: webbsidan fick svar först när allt var gjort. Det betyder att svaret aldrig blir snabbare än det långsammaste steget, och att ett fel i vilket steg som helst blir ett fel för webbsidan.</p>
+
+<p>Asynkront betyder att jobbet lämnas vidare och svaret kommer direkt, innan jobbet är gjort. Någon annan gör det senare.</p>
+</section>
+
+<section class="explain">
+<h2>Hur gör API:et?</h2>
+
+<p>API:et sparar kunden, lägger ett meddelande i en SQS-kö (Simple Queue Service), en lista där meddelanden väntar på att någon ska hämta dem, och svarar <a href="0050-statuskod.html">201</a> (skapad). Välkomstjobbet, att markera kunden som välkomnad i tabellen, görs senare av en annan funktion.</p>
+
+<p>Själva lämnandet är ändå synkront: API:et väntar tills kön har bekräftat att meddelandet är sparat. Bara välkomstjobbet är asynkront. Därför betyder 201 att kunden är sparad och att jobbet ligger säkert i kön, inte att jobbet är gjort.</p>
+</section>
+
+<section class="explain">
+<h2>Vem gör jobbet?</h2>
+
+<p>Den som lägger meddelandet i kön är producenten, här API:et. Den som hämtar det och tar bort det när jobbet är gjort är konsumenten, här funktionen som gör välkomstjobbet. Lambda hämtar meddelandena åt den, så den behöver inte fråga kön själv.</p>
+
+<p>De delar bara meddelandet och anropar aldrig varandra. Därför kan konsumenten vara avstängd när producenten skickar: meddelandet ligger kvar i kön, högst fyra dagar som standard. En ny konsument går också att lägga till utan att producenten ändras. Vad kön är och hur ett meddelande ser ut kommer härnäst.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Webbsidan får svar först när API:et har sparat kunden och skickat ett mejl. Vad kallas det?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Webbsidan väntar tills hela jobbet är gjort, och det är synkront.">Synkront, webbsidan väntar på jobbet</button>
+    <button class="opt" data-why="Asynkront hade svaret kommit innan mejlet skickats.">Asynkront, mejlet lämnas vidare</button>
+    <button class="opt" data-why="Antalet steg avgör inte. Det som avgör är om webbsidan väntar på dem.">Asynkront, eftersom två steg görs</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Varför kan API:et svara 201 innan välkomstjobbet är gjort?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Kön har bekräftat meddelandet. Själva jobbet görs senare av en annan funktion.">Meddelandet ligger sparat i kön</button>
+    <button class="opt" data-why="API:et väntar bara på att kön sparat meddelandet, inte på något mejl.">Mejlet har redan skickats iväg</button>
+    <button class="opt" data-why="API:et lägger meddelandet i kön först, och det är därför svaret kan komma före jobbet.">API:et hoppar över kön för snabbhet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Konsumenten är avstängd när producenten skickar ett meddelande. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Producenten anropar inte konsumenten, den lämnar bara meddelandet i kön.">Skickandet ger direkt ett fel</button>
+    <button class="opt" data-correct data-why="Kön sparar meddelandet tills någon hämtar det, högst fyra dagar som standard.">Meddelandet väntar kvar i kön</button>
+    <button class="opt" data-why="Producenten gör inte konsumentens jobb. De delar bara kön.">Producenten gör jobbet själv</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Synkront: anroparen väntar tills jobbet är gjort och får resultatet. Asynkront: jobbet lämnas vidare och svaret kommer direkt, utan resultat.</li>
+    <li>API:et väntar på att kön sparat meddelandet, svarar 201, och jobbet görs senare.</li>
+    <li>Producenten lägger meddelandet i kön, konsumenten hämtar och tar bort det. De anropar aldrig varandra, och meddelandet väntar i kön, högst fyra dagar som standard.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkällor: <a href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html">AWS Lambda: Invoking a Lambda function asynchronously</a> och <a href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-sync.html">synkront anrop</a>. Om kön: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html">Amazon SQS: What is Amazon SQS?</a>, <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html">Standard queues</a> och <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">Lambda med SQS</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="V43-start.html">Förra: Veckan i överblick, asynkrona flöden</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0087-sqs-ko-och-meddelande.html">Nästa: SQS-kö och meddelande</a>
+</nav>
+
+</main>
+</body>
+</html>

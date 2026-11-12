@@ -39,7 +39,7 @@
   "detail": { "customerId": "42" }
 }</code></pre>
 
-<p><code>id</code> är ett <a href="0099-uuid.html">UUID</a> som skapas för varje händelse, och med det kan du följa händelsen genom reglerna till målen. Det kan också vara en nyckel för <a href="0136-idempotens.html">idempotens</a>. <code>time</code> säger när händelsen hände, inte när den kom fram. Kursen säger att EventBridge lägger till <code>detail-type</code> och <code>source</code>. AWS säger att avsändaren anger dem för egna händelser, och det gäller. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEventsRequestEntry.html">AWS: PutEventsRequestEntry</a>)</span> Ditt eget innehåll ligger kvar oförändrat i <code>detail</code>.</p>
+<p><code>id</code> är ett <a href="0081-koden-mot-dynamodb.html">UUID</a> som skapas för varje händelse, och med det kan du följa händelsen genom reglerna till målen. Det kan också vara en nyckel för <a href="0136-idempotens.html">idempotens</a>. <code>time</code> säger när händelsen hände, inte när den kom fram. Kursen säger att EventBridge lägger till <code>detail-type</code> och <code>source</code>. AWS säger att avsändaren anger dem för egna händelser, och det gäller. <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEventsRequestEntry.html">AWS: PutEventsRequestEntry</a>)</span> Ditt eget innehåll ligger kvar oförändrat i <code>detail</code>.</p>
 </section>
 
 <section class="explain">

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTTP API, route och integration</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 82 · V42, 12 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 82 · V42, 12 av 15 i veckan</p>
+<h1>Hur når ett anrop funktionen?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Funktionen kan spara en kund, men ingen utanför AWS kan anropa den. Ett HTTP API (Hypertext Transfer Protocol, Application Programming Interface) i API Gateway tar emot anropet, väljer vad det gäller och skickar det till funktionen. Svaret går tillbaka samma väg.
+</div>
+
+<section class="explain">
+<h2>Vad gör API Gateway?</h2>
+
+<p>Funktionen har ingen egen webbadress, så API Gateway står framför den. I <a href="0070-mixed-content.html">lektion 70</a> gav den ett API en HTTPS-adress (HTTP med kryptering).</p>
+
+<p>Här används ett <strong>HTTP API</strong>, en av API-typerna i API Gateway. REST API (Representational State Transfer) har fler funktioner och kostar mer per anrop, men de behövs inte här.</p>
+
+<p>Ett anrop, till exempel <code>PUT /customers/abc-123</code>, går så här:</p>
+<ol>
+  <li>API Gateway matchar det mot en <strong>route</strong>.</li>
+  <li>Det skickas till routens <strong>integration</strong>, här funktionen, som ett <a href="0075-handler-och-event.html">event</a> som handlern får.</li>
+  <li>Det handlern returnerar görs om till ett HTTP-svar.</li>
+</ol>
+</section>
+
+<section class="explain">
+<h2>Vad är en route?</h2>
+
+<p>En route är metod plus sökväg. Den ligger i API Gateway, inte i koden som i <a href="0057-express.html">Express</a>. API:et får fem routes:</p>
+
+<pre><code>GET    /customers
+POST   /customers
+GET    /customers/{id}
+PUT    /customers/{id}
+DELETE /customers/{id}</code></pre>
+
+<p>Klammerparenteserna gör <code>id</code> till en sökvägsparameter. Anropet <code>GET /customers/abc-123</code> matchar den tredje routen, och koden får <code>abc-123</code> i <code>pathParameters.id</code>.</p>
+
+<p>Matchar ingen route svarar API Gateway själv med 404 och <code>{"message":"Not Found"}</code>. Funktionen körs inte, så anropet syns inte i dess logg. Koden kan också svara 404 när kunden saknas, och kroppen visar vem som svarade.</p>
+</section>
+
+<section class="explain">
+<h2>Vad är en integration?</h2>
+
+<p>Integrationen är det som står bakom routen. Här är det funktionen, för alla fem routes. Det kan i stället vara en server, som API:et på EC2 (Elastic Compute Cloud) i lektion 70.</p>
+
+<p>Adressen hör till API:et. Byter du integration anropar klienten samma adress.</p>
+
+<p>Eventets innehåll och svarets form kommer i nästa lektion.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. <code>GET /products</code> får 404 med <code>{"message":"Not Found"}</code>. Vad har hänt?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Ingen route matchar, så API Gateway svarar själv och funktionen körs inte.">Ingen route matchar och funktionen körs inte</button>
+    <button class="opt" data-why="Då hade kroppen kommit från koden, inte från API Gateway.">Funktionen kördes och svarade själv med 404</button>
+    <button class="opt" data-why="Routerna finns i API Gateway, inte i koden.">Koden saknar en route för sökvägen /products</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Routen är <code>GET /customers/{id}</code>. Var hamnar <code>abc-123</code> i anropet <code>GET /customers/abc-123</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Kroppen är anropets innehåll, inte sökvägen.">Som text i event.body</button>
+    <button class="opt" data-why="req.params.id är Express. Här finns inget req-objekt.">Som id i req.params.id</button>
+    <button class="opt" data-correct data-why="Det som står där {id} står i routen hamnar i event.pathParameters.id.">Som id i pathParameters</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 57: vad svarar Express om ingen route matchar?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Express svarar 404, som API Gateway gör när ingen route matchar.">404 med texten Cannot GET</button>
+    <button class="opt" data-why="Ingen route är inget krasch, bara ett anrop utan svar att ge.">500 för att servern har kraschat</button>
+    <button class="opt" data-why="Express svarar inte 200 när inget matchar.">200 med tom kropp utan felmeddelande</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>API Gateway matchar anropet mot en route, skickar det till integrationen (funktionen) och gör om svaret till HTTP.</li>
+    <li>En route är metod plus sökväg. <code>{id}</code> blir <code>event.pathParameters.id</code>.</li>
+    <li>Ingen matchande route ger 404 med <code>{"message":"Not Found"}</code> från API Gateway. Funktionen körs inte.</li>
+    <li>Adressen hör till API:et. Byter du integration ändras den inte.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-routes.html">Amazon API Gateway: Create routes for HTTP APIs</a>.</p>
+<p>Om integrationer: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations.html">Create integrations for HTTP APIs</a> och <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html">Lambda proxy integrations</a>. Om valet mellan API-typer: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html">Choose between REST APIs and HTTP APIs</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0081-koden-mot-dynamodb.html">Förra: Koden mot DynamoDB</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0083-event-och-svar-api-gateway.html">Nästa: Event och svar genom API Gateway</a>
+</nav>
+
+</main>
+</body>
+</html>

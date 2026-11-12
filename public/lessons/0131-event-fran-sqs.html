@@ -28,7 +28,7 @@
 
 <p>Eventet är ett objekt med nyckeln <code>Records</code>, en lista med en post per meddelande. <a href="0129-sqs-trigger.html">Triggern</a> hämtar meddelandena och lägger dem i listan, så listan kan ha flera poster. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#example-standard-queue-message-event">AWS: Lambda med SQS</a>)</span></p>
 
-<p>I <a href="0097-handelse-fran-api-gateway.html">lektion 97</a> gjorde API Gateway om anropet till ett <a href="0075-handler-och-event.html">event</a>. Här bygger Lambda strukturen. Av innehållet är bara <code>body</code> skrivet av producenten.</p>
+<p>I <a href="0083-event-och-svar-api-gateway.html">lektion 83</a> gjorde API Gateway om anropet till ett <a href="0075-handler-och-event.html">event</a>. Här bygger Lambda strukturen. Av innehållet är bara <code>body</code> skrivet av producenten.</p>
 </section>
 
 <section class="explain">
@@ -45,7 +45,7 @@
   ]
 }</code></pre>
 
-<p><code>body</code> är <a href="0127-meddelandets-innehall.html">meddelandets innehåll</a> som text, även när texten är JSON, precis som <code>event.body</code> i lektion 97. Därför tolkas den med <code>JSON.parse</code>. <a href="0119-receive-count.html">Receive count</a> heter <code>ApproximateReceiveCount</code> i eventet och är texten <code>"1"</code>, inte talet 1.</p>
+<p><code>body</code> är <a href="0127-meddelandets-innehall.html">meddelandets innehåll</a> som text, även när texten är JSON, precis som <code>event.body</code> i <a href="0083-event-och-svar-api-gateway.html">lektion 83</a>. Därför tolkas den med <code>JSON.parse</code>. <a href="0089-dodbrevsko.html">Receive count</a> heter <code>ApproximateReceiveCount</code> i eventet och är texten <code>"1"</code>, inte talet 1.</p>
 
 <p>Koden går igenom listan post för post. Per post tolkar den <code>JSON.parse(record.body)</code> och läser <code>record.attributes.ApproximateReceiveCount</code>. Fältet <code>attributes</code> är det SQS själv lägger till om meddelandet.</p>
 </section>
@@ -75,9 +75,9 @@
 <div class="quiz-q">
   <p class="q">3. Repetition: vad räknar ApproximateReceiveCount?</p>
   <div class="options">
-    <button class="opt" data-correct data-why="Receive count räknar hämtningar utan borttagning, per meddelande (lektion 119).">Hämtningar utan att raderas</button>
-    <button class="opt" data-why="Receive count gäller ett meddelande, inte hur många som ligger i kön (lektion 119).">Väntande meddelanden i kön</button>
-    <button class="opt" data-why="Det räknar hämtningar, inte lyckade anrop (lektion 119).">Lyckade anrop till handlern</button>
+    <button class="opt" data-correct data-why="Receive count räknar hämtningar utan borttagning, per meddelande (lektion 89).">Hämtningar utan att raderas</button>
+    <button class="opt" data-why="Receive count gäller ett meddelande, inte hur många som ligger i kön (lektion 89).">Väntande meddelanden i kön</button>
+    <button class="opt" data-why="Det räknar hämtningar, inte lyckade anrop (lektion 89).">Lyckade anrop till handlern</button>
   </div>
   <p class="feedback" aria-live="polite"></p>
 </div>

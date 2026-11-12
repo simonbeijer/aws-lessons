@@ -26,9 +26,9 @@
 <section class="explain">
 <h2>Vad gör en SQS-trigger?</h2>
 
-<p>En SQS-trigger hämtar meddelanden från en <a href="0113-sqs-ko.html">SQS</a>-kö åt en Lambda-funktion. En trigger är en koppling du lägger på funktionen: när något händer i en annan tjänst körs funktionen. Triggern hämtar meddelanden med ReceiveMessage (<a href="0117-hamtat-ar-inte-borta.html">lektion 117</a>) och anropar <a href="0075-handler-och-event.html">handlern</a> med dem. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a>)</span></p>
+<p>En SQS-trigger hämtar meddelanden från en <a href="0087-sqs-ko-och-meddelande.html">SQS</a>-kö åt en Lambda-funktion. En trigger är en koppling du lägger på funktionen: när något händer i en annan tjänst körs funktionen. Triggern hämtar meddelanden med ReceiveMessage (<a href="0088-hamta-och-ta-bort.html">lektion 88</a>) och anropar <a href="0075-handler-och-event.html">handlern</a> med dem. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a>)</span></p>
 
-<p>Du skriver alltså ingen loop som hämtar från kön, fast funktionen är <a href="0114-producent-och-konsument.html">konsumenten</a>.</p>
+<p>Du skriver alltså ingen loop som hämtar från kön, fast funktionen är <a href="0086-synkront-och-asynkront.html">konsumenten</a>.</p>
 </section>
 
 <section class="explain">
@@ -36,7 +36,7 @@
 
 <p>När handlern returnerar utan fel. Då tar triggern bort meddelandena ur kön, så funktionen behöver inte anropa DeleteMessage själv. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a>)</span></p>
 
-<p>Kastar handlern ett fel tas inget bort. Meddelandena blir synliga igen när <a href="0118-visibility-timeout.html">visibility timeout</a> har gått ut, och hämtas på nytt.</p>
+<p>Kastar handlern ett fel tas inget bort. Meddelandena blir synliga igen när <a href="0088-hamta-och-ta-bort.html">visibility timeout</a> har gått ut, och hämtas på nytt.</p>
 </section>
 
 <h2>Quiz</h2>

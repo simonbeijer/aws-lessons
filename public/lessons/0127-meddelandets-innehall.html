@@ -26,7 +26,7 @@
 <section class="explain">
 <h2>Vad står i meddelandet?</h2>
 
-<p>Meddelandet om en ny kund bär fyra fält: typ, id, namn och tid. Typen är <code>CustomerCreated</code>, så <a href="0114-producent-och-konsument.html">konsumenten</a> ser vad som har hänt. Id är kundens id i tabellen och <code>created_at</code> är tiden. Allt ligger i <code>MessageBody</code>, som är en sträng (<a href="0126-sendmessage.html">lektion 126</a>). <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html">AWS: SendMessage</a>)</span></p>
+<p>Meddelandet om en ny kund bär fyra fält: typ, id, namn och tid. Typen är <code>CustomerCreated</code>, så <a href="0086-synkront-och-asynkront.html">konsumenten</a> ser vad som har hänt. Id är kundens id i tabellen och <code>created_at</code> är tiden. Allt ligger i <code>MessageBody</code>, som är en sträng (<a href="0126-sendmessage.html">lektion 126</a>). <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html">AWS: SendMessage</a>)</span></p>
 
 <pre>{
   "type": "CustomerCreated",
@@ -41,7 +41,7 @@
 <section class="explain">
 <h2>Varför kan det bli inaktuellt?</h2>
 
-<p>Meddelandet är en kopia av kundens data från när det skickades. Ändras namnet i tabellen från <code>FEL Testsson</code> till <code>Test Testsson</code> medan meddelandet väntar, står det fortfarande <code>FEL Testsson</code> i meddelandet. Det kan vänta länge: kön behåller det 4 dagar som standard (<a href="0121-message-retention-period.html">lektion 121</a>). <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html">AWS: SetQueueAttributes</a>)</span> Därför hämtar konsumenten färska uppgifter ur tabellen med id:t om de kan ha ändrats.</p>
+<p>Meddelandet är en kopia av kundens data från när det skickades. Ändras namnet i tabellen från <code>FEL Testsson</code> till <code>Test Testsson</code> medan meddelandet väntar, står det fortfarande <code>FEL Testsson</code> i meddelandet. Det kan vänta länge: kön behåller det 4 dagar som standard (<a href="0089-dodbrevsko.html">lektion 89</a>). <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html">AWS: SetQueueAttributes</a>)</span> Därför hämtar konsumenten färska uppgifter ur tabellen med id:t om de kan ha ändrats.</p>
 
 <p>Att hålla meddelandet smalt är ett designval, inte en AWS-regel. AWS visar både händelser med data och händelser med bara en identifierare. <span class="src">(<a href="https://aws.amazon.com/event-driven-architecture/">AWS: Event-driven architecture</a>)</span></p>
 </section>

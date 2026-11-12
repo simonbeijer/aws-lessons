@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hämta och ta bort</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 88 · V43, 3 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 88 · V43, 3 av 16 i veckan</p>
+<h1>Hur hämtas ett meddelande?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Förra lektionen låg meddelandet i kön. Nu hämtar konsumenten det. Att hämta räcker inte för att ta bort det: meddelandet försvinner först när konsumenten säger till, och annars kommer det tillbaka. Konsumenten kan också vänta på nya meddelanden i stället för att fråga hela tiden.
+</div>
+
+<section class="explain">
+<h2>Tas det bort vid hämtning?</h2>
+
+<p>Nej. Konsumenten hämtar upp till 10 meddelanden åt gången med <code>ReceiveMessage</code>, men de ligger kvar i SQS-kön (Simple Queue Service). De tas bort först när konsumenten anropar <code>DeleteMessage</code>.</p>
+
+<p>För varje hämtat meddelande ger kön ett receipt handle, en kod för just den hämtningen. <code>DeleteMessage</code> använder den koden, inte message ID (identifier), för att peka ut meddelandet. Hämtas meddelandet igen får det ett nytt.</p>
+</section>
+
+<section class="explain">
+<h2>Vad händer medan det ligger kvar?</h2>
+
+<p>Direkt efter hämtningen blir meddelandet osynligt för andra konsumenter, så ingen annan tar samma jobb. Hur länge styr visibility timeout: 30 sekunder som standard, räknat från hämtningen.</p>
+
+<p>Anropas inte <code>DeleteMessage</code> inom tiden blir meddelandet synligt igen och kan hämtas på nytt.</p>
+
+<p>Tiden bör vara längre än jobbet tar. Är den kortare blir meddelandet synligt medan konsumenten ännu jobbar, och en annan tar det.</p>
+</section>
+
+<section class="explain">
+<h2>Hur väntar konsumenten?</h2>
+
+<p>Utan väntan, short polling, svarar kön genast, även när den är tom. Det är förvalt, och konsumenten måste fråga om och om igen. Varje tomt svar är ett onödigt anrop.</p>
+
+<p>Med long polling väntar <code>ReceiveMessage</code> på ett meddelande, högst 20 sekunder. Kommer ett meddelande svarar kön direkt, annars blir svaret tomt när tiden gått ut. Väntetiden sätts med <code>WaitTimeSeconds</code> i anropet, eller som inställning på kön (Receive message wait time, 0 till 20 sekunder).</p>
+
+<p>Vad som ska hända med ett meddelande som aldrig blir klart och hela tiden kommer tillbaka tar nästa lektion.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Konsumenten har hämtat ett meddelande med ReceiveMessage. Vad har hänt med det?</p>
+  <div class="options">
+    <button class="opt" data-why="Hämtningen tar inte bort något, det görs med DeleteMessage.">Det är borttaget ur kön</button>
+    <button class="opt" data-correct data-why="Det ligger kvar men är osynligt för andra, tills det tas bort eller tiden går ut.">Det ligger kvar men är osynligt</button>
+    <button class="opt" data-why="Det blir osynligt direkt, så ingen annan konsument tar samma jobb.">Det ligger kvar och syns för alla</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Jobbet tar längre tid än visibility timeout. Vad kan hända?</p>
+  <div class="options">
+    <button class="opt" data-why="Kön väntar inte på jobbet, den räknar bara tiden från hämtningen.">Kön väntar tills jobbet är klart</button>
+    <button class="opt" data-why="Kön tar aldrig bort något åt konsumenten, det görs med DeleteMessage.">Kön tar bort det åt konsumenten</button>
+    <button class="opt" data-correct data-why="Meddelandet blir synligt igen medan jobbet pågår, så en annan konsument kan hämta det.">En annan konsument kan hämta det</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Kön är tom och long polling är på. Vad gör ReceiveMessage?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är short polling, som svarar genast.">Svarar genast med tomt svar</button>
+    <button class="opt" data-correct data-why="Den väntar högst 20 sekunder på ett meddelande och svarar tomt om inget kommer.">Väntar högst 20 sekunder, sedan tomt</button>
+    <button class="opt" data-why="Väntetiden har ett tak på 20 sekunder.">Väntar tills ett meddelande kommer</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>ReceiveMessage</code> hämtar meddelanden och ger ett receipt handle, men tar inte bort dem.</li>
+    <li><code>DeleteMessage</code> tar bort meddelandet och pekar ut det med receipt handle, inte message ID.</li>
+    <li>Ett hämtat meddelande är osynligt under visibility timeout (30 sekunder som standard) och kommer tillbaka om ingen tagit bort det.</li>
+    <li>Long polling väntar högst 20 sekunder på ett meddelande. Short polling svarar genast.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html">AWS: Visibility timeout</a>. Dessutom <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html">ReceiveMessage</a>, <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_DeleteMessage.html">DeleteMessage</a>, <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html">Short and long polling</a> och <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html">SetQueueAttributes</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0087-sqs-ko-och-meddelande.html">Förra: SQS-kö och meddelande</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0089-dodbrevsko.html">Nästa: Dödbrevskö</a>
+</nav>
+
+</main>
+</body>
+</html>

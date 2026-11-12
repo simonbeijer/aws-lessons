@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dödbrevskö</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="fördjupning">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 89 · V43, 4 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 89 · V43, 4 av 16 i veckan</p>
+<h1>Vart tar trasiga meddelanden vägen?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Ett meddelande som aldrig blir klart kommer tillbaka till kön om och om igen. En dödbrevskö (DLQ, dead-letter queue) är kön där kön själv lägger det efter några misslyckade försök, så att det inte stoppar resten.
+</div>
+
+<section class="explain">
+<h2>Vad är en dödbrevskö?</h2>
+
+<p>Är ett meddelande trasigt hämtas det igen och igen, och konsumenten fastnar på samma jobb varje gång. En dödbrevskö löser det. Den är en vanlig SQS-kö (Simple Queue Service) som bara har fått rollen som uppsamlingsplats: meddelanden som misslyckats för många gånger flyttas dit, och där kan man titta på dem och se vad som var fel.</p>
+
+<p>Huvudkön, den som meddelandena först skickas till, pekar ut dödbrevskön. Därför skapas dödbrevskön först. Båda köerna ska ligga i samma AWS-konto och region.</p>
+</section>
+
+<section class="explain">
+<h2>När flyttas meddelandet?</h2>
+
+<p>Kön räknar hämtningarna. Receive count är antalet gånger just det meddelandet har hämtats utan att tas bort: 1 vid första hämtningen, 2 om det kom tillbaka och hämtades igen, och så vidare. Varje hämtning räknas, också en man gör själv i konsolen.</p>
+
+<p>Hur många försök kön ger sätts på huvudkön, med maxReceiveCount. Konsolen kallar den Maximum receives. När receive count blir större än värdet flyttas meddelandet i stället för att hämtas. Med 3 hämtas det tre gånger, och vid den fjärde hamnar det i dödbrevskön.</p>
+</section>
+
+<section class="explain">
+<h2>Varför längre retention?</h2>
+
+<p>Message retention period är hur länge ett meddelande får ligga i en kö innan SQS tar bort det själv. Huvudkön har 4 dagar, som lektion 86 nämnde. Inställningen går att sätta från 60 sekunder till 14 dagar.</p>
+
+<p>Dödbrevskön får 14 dagar, för det som hamnar där ska ligga kvar tills någon hunnit titta. Men tiden räknas från att meddelandet först skickades, inte från att det flyttades. Har det legat en dag i huvudkön och dödbrevskön har 4 dagar, återstår tre. Därför ska dödbrevskön ha längre retention än huvudkön. Vad som görs med ett meddelande där tar nästa lektion.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Varför skapas dödbrevskön före huvudkön?</p>
+  <div class="options">
+    <button class="opt" data-why="Ordningen har inget med meddelandena att göra, utan med vad huvudkön pekar på.">Meddelandena skickas först dit från början</button>
+    <button class="opt" data-correct data-why="Huvudkön pekar ut den, och kan bara peka på en kö som redan finns.">Huvudkön pekar på den, så den måste finnas</button>
+    <button class="opt" data-why="Båda köerna är vanliga SQS-köer, de skapas på samma sätt.">Den kräver en särskild sorts kö att skapa</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Maximum receives är 3. Vad händer vid den fjärde hämtningen?</p>
+  <div class="options">
+    <button class="opt" data-why="Den hämtar inte meddelandet en fjärde gång, gränsen är nådd.">Konsumenten får meddelandet en gång till</button>
+    <button class="opt" data-correct data-why="Receive count skulle bli 4, större än 3, så kön flyttar meddelandet.">Kön flyttar det till dödbrevskön</button>
+    <button class="opt" data-why="Kön tar aldrig bort ett meddelande åt konsumenten, det flyttas.">Kön tar bort det för gott</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Ett meddelande låg 3 dagar i huvudkön innan det flyttades. Dödbrevskön har 4 dagar. Hur länge ligger det kvar där?</p>
+  <div class="options">
+    <button class="opt" data-why="Tiden räknas från att meddelandet skickades, inte från flytten.">4 dagar till</button>
+    <button class="opt" data-correct data-why="Klockan startade vid första sändningen, så 4 minus 3 ger en dag kvar.">Ungefär en dag</button>
+    <button class="opt" data-why="Retention är en köinställning, den ger inte meddelandet 14 dagar av sig själv.">14 dagar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">4. Konsumentens jobb tar längre tid än visibility timeout. Hur kan det leda till dödbrevskön?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är inte köns timeout som flyttar, utan antalet hämtningar.">Timeouten flyttar meddelandet direkt</button>
+    <button class="opt" data-why="Dödbrevskön har ingen egen konsument som tar över.">Dödbrevskön tar över jobbet</button>
+    <button class="opt" data-correct data-why="Meddelandet blir synligt igen och hämtas på nytt, receive count växer tills gränsen nås.">Det hämtas om och om igen tills gränsen nås</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En dödbrevskö (DLQ) är en vanlig SQS-kö som tar emot meddelanden som misslyckats för många gånger. Den skapas före huvudkön, i samma konto och region.</li>
+    <li>Receive count räknar hämtningarna. Med Maximum receives (maxReceiveCount) 3 flyttas meddelandet vid den fjärde.</li>
+    <li>Huvudkön har 4 dagars retention, dödbrevskön 14. Tiden räknas från första sändningen.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html">AWS: Dead-letter queues</a>. Dessutom <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-dead-letter-queue.html">Configure a dead-letter queue</a>, <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html">ReceiveMessage</a>, <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html">SetQueueAttributes</a> och <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html">What is Amazon SQS?</a>. Att den fjärde hämtningen flyttar är en tolkning av AWS formulering, och kursens första labb beskriver det likadant.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0088-hamta-och-ta-bort.html">Förra: Hämta och ta bort</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0090-dlq-redrive.html">Nästa: DLQ redrive</a>
+</nav>
+
+</main>
+</body>
+</html>

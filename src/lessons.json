@@ -520,109 +520,116 @@
       "title": "V42 – Serverlösa lösningar",
       "lessons": [
         {
-          "nr": 94,
-          "file": "0094-miljovariabel-i-lambda.html",
-          "title": "Miljövariabel i Lambda",
-          "goal": "Att <code>TABLE_NAME</code> sätts i funktionens konfiguration och läses med <code>process.env</code>, och att värdet läses när en ny exekveringsmiljö startar.",
+          "nr": null,
+          "file": "V42-start.html",
+          "title": "Veckan i överblick: serverlösa lösningar",
+          "goal": "Vad veckan handlar om, varför servern från v41 byts mot Lambda, DynamoDB och API Gateway, och vad som blir bättre.",
+          "tag": ""
+        },
+        {
+          "nr": 71,
+          "file": "0071-cloudshell-och-aws-cli.html",
+          "title": "CloudShell och AWS CLI",
+          "goal": "Att CloudShell är en terminal i konsolen som redan är inloggad som din IAM-användare, och hur ett <code>aws</code>-kommando är byggt: tjänst, åtgärd, flaggor, och vad <code>--query</code> och <code>--output text</code> gör med svaret.",
+          "tag": "labb 0"
+        },
+        {
+          "nr": 72,
+          "file": "0072-variabler-i-skalet.html",
+          "title": "Variabler i skalet",
+          "goal": "Att <code>API=https://...</code> sparar ett värde som <code>$API</code> läser, att <code>NAMN=$(aws ...)</code> sparar ett kommandos utdata, och att variabeln bara finns i det skalet.",
+          "tag": "labb 0, 3"
+        },
+        {
+          "nr": 73,
+          "file": "0073-load-balancer-och-arn.html",
+          "title": "Application Load Balancer och ARN",
+          "goal": "Att en lastbalanserare tar emot trafik och fördelar den till servrar bakom, att den kräver subnät i två zoner, varför nya konton kan vara spärrade, och hur ett ARN är byggt (tjänst, region, konto, resurs).",
+          "tag": "labb 0, 2"
+        },
+        {
+          "nr": 74,
+          "file": "0074-serverlost-och-lambda.html",
+          "title": "Serverlöst och Lambda-funktion",
+          "goal": "Att serverlöst betyder ingen server att sköta och betalning per anrop, att en Lambda-funktion är kod plus konfiguration som körs när en händelse kommer, vad runtime är (Node.js 22.x), och att ny kod gäller först efter Deploy.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 75,
+          "file": "0075-handler-och-event.html",
+          "title": "Handler och event",
+          "goal": "Att handlern är funktionen Lambda anropar (<code>index.handler</code>), att <code>event</code> är det anroparen skickar med, att returvärdet blir svaret, och att en testhändelse är ett event du skriver själv i JSON.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 76,
+          "file": "0076-loggar-och-report-raden.html",
+          "title": "Loggar och REPORT-raden",
+          "goal": "Att <code>console.log</code> hamnar i logggruppen <code>/aws/lambda/&lt;namn&gt;</code> i CloudWatch Logs, uppdelat i loggströmmar, och vad REPORT-raden säger: Duration, Billed Duration (det du betalar för) och minne.",
+          "tag": "labb 1–4"
+        },
+        {
+          "nr": 77,
+          "file": "0077-miljo-kallstart-timeout.html",
+          "title": "Exekveringsmiljö, kallstart och timeout",
+          "goal": "Att Lambda startar en miljö och sparar den mellan anrop, att en kallstart är när en ny miljö måste startas (<code>Init Duration</code>), och att timeout (standard 3 sekunder) avbryter med <code>Task timed out</code>.",
+          "tag": "labb 1–2"
+        },
+        {
+          "nr": 78,
+          "file": "0078-dynamodb-tabell-item-nyckel.html",
+          "title": "DynamoDB: tabell, item och nyckel",
+          "goal": "Att DynamoDB är en managed databas där varje läsning och skrivning är ett eget anrop, att en rad heter item och består av attribut, att partitionsnyckeln (<code>id</code>) är det enda som bestäms i förväg, och att on-demand betyder betalning per anrop.",
           "tag": "labb 2"
         },
         {
-          "nr": 95,
-          "file": "0095-aws-sdk.html",
-          "title": "AWS SDK",
-          "goal": "Att AWS SDK är biblioteket din kod använder för att anropa AWS-tjänster, att det redan finns i Lambda, och varför klienten skapas utanför handlern.",
+          "nr": 79,
+          "file": "0079-lasa-och-skriva-i-dynamodb.html",
+          "title": "Hur läser och skriver man i DynamoDB?",
+          "goal": "Vad <code>GetItem</code>, <code>PutItem</code>, <code>UpdateItem</code>, <code>DeleteItem</code> och <code>Scan</code> gör, hur <code>#n</code> och <code>:n</code> fungerar i <code>SET #n = :n</code> (och varför <code>name</code> behöver alias), och att <code>attribute_exists(id)</code> gör att ett item som inte finns ger 404.",
           "tag": "labb 2"
         },
         {
-          "nr": 96,
-          "file": "0096-documentclient.html",
-          "title": "DocumentClient",
-          "goal": "Att <code>DynamoDBDocumentClient</code> låter dig skicka vanliga JavaScript-objekt till DynamoDB i stället för att skriva varje värde som <code>{ \"S\": \"Alice\" }</code>.",
-          "tag": "labb 2"
+          "nr": 80,
+          "file": "0080-execution-role-och-behorighet.html",
+          "title": "Vad får funktionen göra i AWS?",
+          "goal": "Att funktionens roll bara får skriva loggar tills du ger den mer, varför den får fem operationer på en tabell i stället för full åtkomst, och hur du läser <code>AccessDeniedException</code>: vem, vad och på vad.",
+          "tag": "labb 1–2"
         },
         {
-          "nr": 97,
-          "file": "0097-handelse-fran-api-gateway.html",
-          "title": "Händelse från API Gateway",
-          "goal": "Var metoden, sökvägen, id:t och kroppen står i eventet från API Gateway, och att <code>body</code> är en sträng där citattecknen inuti måste escapas.",
+          "nr": 81,
+          "file": "0081-koden-mot-dynamodb.html",
+          "title": "Hur sparar koden en kund?",
+          "goal": "Att AWS SDK redan finns i Lambda, varför klienten skapas utanför handlern, att <code>DynamoDBDocumentClient</code> låter dig skicka vanliga objekt, att <code>TABLE_NAME</code> läses ur en miljövariabel, och att id:t blir ett slumpat UUID.",
           "tag": "labb 2–3"
         },
         {
-          "nr": 98,
-          "file": "0098-svar-till-api-gateway.html",
-          "title": "Svar till API Gateway",
-          "goal": "Att svaret är ett objekt med <code>statusCode</code>, <code>headers</code> och <code>body</code> som sträng, och att ett fel som inte fångas ger klienten ett 5xx-fel med bara ett kort meddelande.",
+          "nr": 82,
+          "file": "0082-http-api-route-integration.html",
+          "title": "Hur når ett anrop funktionen?",
+          "goal": "Att API Gateway matchar anropet mot en route (metod plus sökväg, <code>{id}</code> blir <code>pathParameters.id</code>), skickar det till integrationen (funktionen) och gör om svaret till HTTP, och att ett anrop utan route får 404 utan att funktionen körs.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 83,
+          "file": "0083-event-och-svar-api-gateway.html",
+          "title": "Vad får handlern in och vad ska den svara?",
+          "goal": "Var metoden, sökvägen, id:t och kroppen står i eventet, att <code>body</code> är en sträng, att svaret är ett objekt med <code>statusCode</code>, <code>headers</code> och <code>body</code> som sträng, och att ett fel som inte fångas blir ett 5xx-fel.",
           "tag": "labb 2–3"
         },
         {
-          "nr": 99,
-          "file": "0099-uuid.html",
-          "title": "UUID",
-          "goal": "Att id:t för en ny kund blir ett slumpat UUID från <code>randomUUID()</code> i stället för ett löpnummer, och varför ingen kan räkna sig fram till andras id.",
-          "tag": "labb 2–3"
-        },
-        {
-          "nr": 103,
-          "file": "0103-http-api.html",
-          "title": "HTTP API",
-          "goal": "Vilka fyra saker API Gateway gör med ett anrop på väg till din funktion, och varför du bygger ett HTTP API och inte ett REST API.",
+          "nr": 84,
+          "file": "0084-stage-behorighet-throttling.html",
+          "title": "Vad står mellan klienten och funktionen?",
+          "goal": "Att en stage är en driftsatt version med egen Invoke URL (<code>$default</code> med auto-deploy), att funktionens resource-based policy säger vem som får anropa den medan rollen säger vad den får göra, och att rate och burst ger 429 över gränsen.",
           "tag": "labb 3"
         },
         {
-          "nr": 104,
-          "file": "0104-route-i-api-gateway.html",
-          "title": "Route i API Gateway",
-          "goal": "Att en route är metod plus sökväg, att <code>{id}</code> blir <code>pathParameters.id</code>, och att ett anrop utan matchande route får 404 utan att funktionen körs.",
-          "tag": "labb 3"
-        },
-        {
-          "nr": 105,
-          "file": "0105-integration.html",
-          "title": "Integration",
-          "goal": "Att integrationen är det som står bakom en route, här funktionen <code>v42-api</code>, och att den kan bytas utan att adressen ändras.",
-          "tag": "labb 3"
-        },
-        {
-          "nr": 106,
-          "file": "0106-stage-och-invoke-url.html",
-          "title": "Stage och Invoke URL",
-          "goal": "Att en stage är en driftsatt version av API:et med egen adress, och att <code>$default</code> med auto-deploy gör ändringar aktiva direkt.",
-          "tag": "labb 3"
-        },
-        {
-          "nr": 107,
-          "file": "0107-resource-based-policy.html",
-          "title": "Resource-based policy",
-          "goal": "Att policyn på funktionen säger vem som får anropa den, och att rollen säger vad funktionen själv får göra.",
-          "tag": "labb 3"
-        },
-        {
-          "nr": 108,
-          "file": "0108-preflight.html",
-          "title": "Preflight",
-          "goal": "Att webbläsaren skickar ett <code>OPTIONS</code>-anrop före en POST med JSON, och att POST:en skickas först om svaret tillåter den.",
+          "nr": 85,
+          "file": "0085-cors-och-frontend.html",
+          "title": "Hur anropar webbsidan API:et?",
+          "goal": "Att webbläsaren skickar ett <code>OPTIONS</code>-anrop (preflight) före en POST med JSON, att API Gateway svarar på CORS själv utan att funktionen körs, och att <code>VITE_API_URL</code> byggs in i sidans JavaScript så att adressen syns för alla.",
           "tag": "labb 3–4"
-        },
-        {
-          "nr": 109,
-          "file": "0109-cors-i-api-gateway.html",
-          "title": "CORS i API Gateway",
-          "goal": "Att API Gateway svarar på CORS själv, med tillåtna ursprung, headers och metoder, utan att funktionen körs. Inställningen ligger i API Gateway, inte i koden.",
-          "tag": "labb 3–4"
-        },
-        {
-          "nr": 110,
-          "file": "0110-throttling.html",
-          "title": "Throttling",
-          "goal": "Att rate och burst sätter en gräns för hur många anrop per sekund API:et tar emot, och att anrop över gränsen får 429 utan att funktionen körs.",
-          "tag": "labb 3"
-        },
-        {
-          "nr": 111,
-          "file": "0111-miljovariabel-i-vite.html",
-          "title": "Miljövariabel i Vite",
-          "goal": "Att <code>VITE_API_URL</code> i <code>.env.local</code> och i Amplify byggs in i sidans JavaScript, så att adressen syns för alla som öppnar sidan.",
-          "tag": "labb 4"
         }
       ]
     },
@@ -634,91 +641,35 @@
           "nr": null,
           "file": "V43-start.html",
           "title": "Veckan i överblick: asynkrona flöden och integration",
-          "goal": "Vad veckans lösning blir och var varje begrepp passar in.",
+          "goal": "Vad veckan handlar om, varför API:et från v42 lämnar jobb vidare till en kö i stället för att göra allt själv, och vad som blir bättre.",
           "tag": ""
         },
         {
-          "nr": 112,
-          "file": "0112-synkront-och-asynkront.html",
-          "title": "Synkront och asynkront",
-          "goal": "Att synkront betyder att anroparen väntar på jobbet, och asynkront att jobbet görs senare. API:et i V43 svarar 201 innan välkomnandet är gjort.",
-          "tag": "labb 1–2"
-        },
-        {
-          "nr": 113,
-          "file": "0113-sqs-ko.html",
-          "title": "SQS-kö",
-          "goal": "Att en SQS-kö sparar meddelanden tills någon tagit bort dem, och att hämta inte är att ta bort. Därför tappar en kraschad mottagare inget.",
-          "tag": "labb 1"
-        },
-        {
-          "nr": 114,
-          "file": "0114-producent-och-konsument.html",
-          "title": "Producent och konsument",
-          "goal": "Att producenten lägger meddelanden på kön och konsumenten hämtar dem. I V43 delar de bara kön och anropar aldrig varandra.",
+          "nr": 86,
+          "file": "0086-synkront-och-asynkront.html",
+          "title": "Vad betyder asynkront?",
+          "goal": "Att synkront betyder att anroparen väntar på jobbet och asynkront att jobbet lämnas vidare och svaret kommer direkt (201 före välkomstjobbet), och att producent och konsument aldrig anropar varandra.",
           "tag": "labb 1–3"
         },
         {
-          "nr": 115,
-          "file": "0115-standardko.html",
-          "title": "Standardkö",
-          "goal": "Att Standard är kötypen som är förvald och att den inte lovar ordning. FIFO-kön, med namn som slutar på <code>.fifo</code>, håller ordningen.",
+          "nr": 87,
+          "file": "0087-sqs-ko-och-meddelande.html",
+          "title": "Vad är en SQS-kö?",
+          "goal": "Att en kö sparar meddelanden tills någon hämtat och tagit bort dem, att ett meddelande är en text (JSON) med ett message ID, att Standard inte lovar ordning men FIFO gör det, och att kön pekas ut med URL i koden och ARN i policyer.",
           "tag": "labb 1"
         },
         {
-          "nr": 116,
-          "file": "0116-meddelande-i-sqs.html",
-          "title": "Meddelande i SQS",
-          "goal": "Att ett meddelande är en text, ofta JSON, som ligger i fältet Message body. När det skickas ger kön det ett message ID.",
-          "tag": "labb 1"
-        },
-        {
-          "nr": 117,
-          "file": "0117-hamtat-ar-inte-borta.html",
-          "title": "Hämtat är inte borta",
-          "goal": "Att ReceiveMessage inte tar bort meddelandet. Det försvinner först när konsumenten anropar DeleteMessage.",
+          "nr": 88,
+          "file": "0088-hamta-och-ta-bort.html",
+          "title": "Hur hämtas ett meddelande?",
+          "goal": "Att ReceiveMessage inte tar bort meddelandet, att det är osynligt under visibility timeout (30 sekunder) och kommer tillbaka om ingen kör DeleteMessage, och att long polling (20 sekunder) väntar på meddelanden i stället för att fråga hela tiden.",
           "tag": "labb 1, 3"
         },
         {
-          "nr": 118,
-          "file": "0118-visibility-timeout.html",
-          "title": "Visibility timeout",
-          "goal": "Att ett hämtat meddelande är osynligt för andra i 30 sekunder och blir synligt igen om ingen tagit bort det. Tiden ska vara längre än jobbet tar.",
-          "tag": "labb 1, 3"
-        },
-        {
-          "nr": 119,
-          "file": "0119-receive-count.html",
-          "title": "Receive count",
-          "goal": "Att receive count är hur många gånger ett meddelande har hämtats utan att tas bort. Varje hämtning räknas, och antalet försök är begränsat.",
-          "tag": "labb 1, 3"
-        },
-        {
-          "nr": 120,
-          "file": "0120-long-polling.html",
-          "title": "Long polling",
-          "goal": "Att ReceiveMessage med long polling väntar på ett meddelande, högst 20 sekunder, i stället för att svara tomt direkt.",
-          "tag": "labb 1"
-        },
-        {
-          "nr": 121,
-          "file": "0121-message-retention-period.html",
-          "title": "Message retention period",
-          "goal": "Att en kö tar bort meddelanden automatiskt efter retention-perioden, som är 4 dagar som standard, och varför en dödbrevskö får 14 dagar.",
-          "tag": "labb 1"
-        },
-        {
-          "nr": 122,
-          "file": "0122-dodbrevsko.html",
-          "title": "Dödbrevskö",
-          "goal": "Att en dödbrevskö (DLQ) är en vanlig kö som tar emot meddelanden som har misslyckats för många gånger, och att den skapas före huvudkön.",
-          "tag": "labb 1, 3"
-        },
-        {
-          "nr": 123,
-          "file": "0123-maxreceivecount.html",
-          "title": "maxReceiveCount",
-          "goal": "Att maxReceiveCount är gränsen för hur många gånger ett meddelande hämtas innan det flyttas till dödbrevskön. Med värdet 3 flyttas det vid den fjärde hämtningen.",
+          "nr": 89,
+          "file": "0089-dodbrevsko.html",
+          "title": "Vart tar trasiga meddelanden vägen?",
+          "goal": "Att en dödbrevskö (DLQ) är en vanlig kö för meddelanden som misslyckats för många gånger, att receive count räknar hämtningarna och Maximum receives 3 flyttar meddelandet vid den fjärde, och varför dödbrevskön får 14 dagars retention mot huvudköns 4.",
           "tag": "labb 1, 3"
         },
         {
@@ -727,13 +678,6 @@
           "title": "DLQ redrive",
           "goal": "Att DLQ redrive flyttar meddelanden från dödbrevskön tillbaka till huvudkön, och att de där räknas som nya meddelanden.",
           "tag": "labb 1, 3"
-        },
-        {
-          "nr": 125,
-          "file": "0125-kons-url-och-arn.html",
-          "title": "Köns URL och ARN",
-          "goal": "Att URL:en pekar ut kön i koden och ARN:et pekar ut samma kö i policyer.",
-          "tag": "labb 1–4"
         },
         {
           "nr": 126,

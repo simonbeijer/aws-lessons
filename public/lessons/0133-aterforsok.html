@@ -26,15 +26,15 @@
 <section class="explain">
 <h2>Hur blir det ett nytt försök?</h2>
 
-<p>Kastar funktionen ett fel tar <a href="0129-sqs-trigger.html">triggern</a> inte bort meddelandena. De blir synliga i kön igen efter <a href="0118-visibility-timeout.html">visibility timeout</a>, och då hämtas de på nytt. Det nya försöket är bara en ny hämtning. Tiden mellan försöken är inte en fast siffra, eftersom Lambda kan vänta allt längre när felen upprepas. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html">AWS: felhantering för SQS</a>)</span></p>
+<p>Kastar funktionen ett fel tar <a href="0129-sqs-trigger.html">triggern</a> inte bort meddelandena. De blir synliga i kön igen efter <a href="0088-hamta-och-ta-bort.html">visibility timeout</a>, och då hämtas de på nytt. Det nya försöket är bara en ny hämtning. Tiden mellan försöken är inte en fast siffra, eftersom Lambda kan vänta allt längre när felen upprepas. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html">AWS: felhantering för SQS</a>)</span></p>
 
-<p>Varje hämtning ökar <a href="0119-receive-count.html">receive count</a>. Blir den större än <a href="0123-maxreceivecount.html">maxReceiveCount</a> flyttar kön meddelandet till <a href="0122-dodbrevsko.html">dödbrevskön</a>. Med värdet 3 sker det efter tre misslyckade körningar. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html">AWS: SetQueueAttributes</a>)</span></p>
+<p>Varje hämtning ökar <a href="0089-dodbrevsko.html">receive count</a>. Blir den större än <a href="0089-dodbrevsko.html">maxReceiveCount</a> flyttar kön meddelandet till <a href="0089-dodbrevsko.html">dödbrevskön</a>. Med värdet 3 sker det efter tre misslyckade körningar. <span class="src">(<a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html">AWS: SetQueueAttributes</a>)</span></p>
 </section>
 
 <section class="explain">
 <h2>Vad får anroparen?</h2>
 
-<p>Anroparen har redan fått sitt svar. API:et svarade <a href="0050-statuskod.html">201</a> när <a href="0126-sendmessage.html">SendMessage</a> lagt meddelandet på kön, och då hade ingen funktion körts. Ett kast i handlern ändrar inte det svaret. Det skiljer sig från <a href="0098-svar-till-api-gateway.html">ett kast i en funktion bakom API:et</a>, där felet går tillbaka till den som anropade. Här syns felet bara i dödbrevskön.</p>
+<p>Anroparen har redan fått sitt svar. API:et svarade <a href="0050-statuskod.html">201</a> när <a href="0126-sendmessage.html">SendMessage</a> lagt meddelandet på kön, och då hade ingen funktion körts. Ett kast i handlern ändrar inte det svaret. Det skiljer sig från <a href="0083-event-och-svar-api-gateway.html">ett kast i en funktion bakom API:et</a>, där felet går tillbaka till den som anropade. Här syns felet bara i dödbrevskön.</p>
 </section>
 
 <h2>Quiz</h2>
@@ -54,7 +54,7 @@
   <div class="options">
     <button class="opt" data-correct data-why="Efter tre misslyckade körningar flyttar kön meddelandet till dödbrevskön.">I dödbrevskön efter tre kast</button>
     <button class="opt" data-why="Kön flyttar meddelandet när gränsen passerats, det ligger inte kvar för alltid.">Kvar i huvudkön utan gräns</button>
-    <button class="opt" data-why="Kön raderar det inte, utan flyttar det till dödbrevskön (lektion 122).">Raderat efter de tre kasten</button>
+    <button class="opt" data-why="Kön raderar det inte, utan flyttar det till dödbrevskön (lektion 89).">Raderat efter de tre kasten</button>
   </div>
   <p class="feedback" aria-live="polite"></p>
 </div>

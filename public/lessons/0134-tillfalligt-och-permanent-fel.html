@@ -26,17 +26,17 @@
 <section class="explain">
 <h2>Vilka fel går över?</h2>
 
-<p>Ett tillfälligt fel kan gå över av sig själv, så ett nytt försök kan lyckas. Exempel i DynamoDB är <a href="0110-throttling.html">throttling</a> (för många anrop) och <a href="0050-statuskod.html">5xx-fel</a> från tjänsten. Ett permanent fel ger samma svar varje gång. <a href="0079-lasa-och-skriva-i-dynamodb.html">ConditionalCheckFailedException</a> är ett sådant: villkoret <code>attribute_exists(id)</code> är falskt, alltså finns kunden inte. DynamoDB anger att felet inte ska försökas igen, och inget antal försök får kunden att dyka upp. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html">AWS: Error handling with DynamoDB</a>)</span></p>
+<p>Ett tillfälligt fel kan gå över av sig själv, så ett nytt försök kan lyckas. Exempel i DynamoDB är <a href="0084-stage-behorighet-throttling.html">throttling</a> (för många anrop) och <a href="0050-statuskod.html">5xx-fel</a> från tjänsten. Ett permanent fel ger samma svar varje gång. <a href="0079-lasa-och-skriva-i-dynamodb.html">ConditionalCheckFailedException</a> är ett sådant: villkoret <code>attribute_exists(id)</code> är falskt, alltså finns kunden inte. DynamoDB anger att felet inte ska försökas igen, och inget antal försök får kunden att dyka upp. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html">AWS: Error handling with DynamoDB</a>)</span></p>
 
-<p><a href="0095-aws-sdk.html">SDK:n</a> gör själv några försök med väntetid innan ett tillfälligt fel når din kod. Det som kommer fram till handlern har alltså redan misslyckats flera gånger. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html#Programming.Errors.RetryAndBackoff">AWS: Error retries and exponential backoff</a>)</span></p>
+<p><a href="0081-koden-mot-dynamodb.html">SDK:n</a> gör själv några försök med väntetid innan ett tillfälligt fel når din kod. Det som kommer fram till handlern har alltså redan misslyckats flera gånger. <span class="src">(<a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html#Programming.Errors.RetryAndBackoff">AWS: Error retries and exponential backoff</a>)</span></p>
 </section>
 
 <section class="explain">
 <h2>Kasta eller logga?</h2>
 
-<p>Vid ett tillfälligt fel kastar <a href="0075-handler-och-event.html">handlern</a> felet. Då tas inte meddelandet bort, och kön ger ett <a href="0133-aterforsok.html">nytt försök</a>. Vid ett permanent fel fångar den det med <a href="0098-svar-till-api-gateway.html">try/catch</a>, loggar det och returnerar utan fel. Då tar <a href="0129-sqs-trigger.html">triggern</a> bort meddelandet. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html">AWS: felhantering för SQS</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a>)</span></p>
+<p>Vid ett tillfälligt fel kastar <a href="0075-handler-och-event.html">handlern</a> felet. Då tas inte meddelandet bort, och kön ger ett <a href="0133-aterforsok.html">nytt försök</a>. Vid ett permanent fel fångar den det med <a href="0083-event-och-svar-api-gateway.html">try/catch</a>, loggar det och returnerar utan fel. Då tar <a href="0129-sqs-trigger.html">triggern</a> bort meddelandet. <span class="src">(<a href="https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html">AWS: felhantering för SQS</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a>)</span></p>
 
-<p>Kastar du ett permanent fel också, försöks meddelandet i onödan tills <a href="0123-maxreceivecount.html">maxReceiveCount</a> passerats, och hamnar i <a href="0122-dodbrevsko.html">dödbrevskön</a>.</p>
+<p>Kastar du ett permanent fel också, försöks meddelandet i onödan tills <a href="0089-dodbrevsko.html">maxReceiveCount</a> passerats, och hamnar i <a href="0089-dodbrevsko.html">dödbrevskön</a>.</p>
 </section>
 
 <h2>Quiz</h2>

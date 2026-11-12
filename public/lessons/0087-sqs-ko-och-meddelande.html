@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQS-kö och meddelande</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="fördjupning">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 87 · V43, 2 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 87 · V43, 2 av 16 i veckan</p>
+<h1>Vad är en SQS-kö?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Förra lektionen lämnade API:et (Application Programming Interface) jobbet i en kö. Nu om kön själv: en SQS-kö (Simple Queue Service) håller meddelanden åt konsumenten tills den hinner. Här står också vad ett meddelande är, om det kommer i ordning och hur kön pekas ut.
+</div>
+
+<section class="explain">
+<h2>Vad gör kön?</h2>
+
+<p>En SQS-kö sparar meddelanden tills någon har hämtat dem och tagit bort dem. Ett meddelande är en text som producenten skickar in. Kön sparar det på flera servrar, så det försvinner inte om en av dem går ner.</p>
+</section>
+
+<section class="explain">
+<h2>Vad är ett meddelande?</h2>
+
+<p>Texten ligger i fältet Message body och måste ha minst ett tecken. Oftast är den <a href="0052-json.html">JSON</a> (JavaScript Object Notation), men vanlig text och XML (Extensible Markup Language, text med taggar) går också. Producenten skriver den och konsumenten läser den. I veckan är det en kort JSON om kunden som skapats:</p>
+
+<pre><code>{ "type": "CustomerCreated", "id": "demo-1", "name": "Alice", "created_at": "2026-10-22T15:10:00Z" }</code></pre>
+
+<p>När meddelandet skickats ger SQS det ett message ID (identifier). Du väljer det inte. Svaret på skickandet innehåller det, och det visar att kön tog emot meddelandet.</p>
+</section>
+
+<section class="explain">
+<h2>Kommer meddelandena i ordning?</h2>
+
+<p>Det beror på kötypen. Standard är förvald och lovar ingen ordning: skickar du A, B, C kan du få B, A, C. FIFO (First-In-First-Out) håller ordningen, så det som skickas först hämtas först. Namnet på en FIFO-kö måste sluta på <code>.fifo</code>. Kötypen väljs när kön skapas och går inte att ändra efteråt.</p>
+</section>
+
+<section class="explain">
+<h2>Hur pekas kön ut?</h2>
+
+<p>Samma kö har två adresser, beroende på vem som frågar. Koden använder köns URL (Uniform Resource Locator, webbadress) som <code>QueueUrl</code>. Den innehåller region, kontonummer och köns namn, och stora och små bokstäver i namnet spelar roll.</p>
+
+<p>En policy använder köns ARN (Amazon Resource Name, förklarat i <a href="0073-load-balancer-och-arn.html">lektion 73</a>) i <code>Resource</code>. Pekar ARN:et på fel kö ger policyn ingen rätt till den kö koden anropar.</p>
+
+<p>Nu finns kön, meddelandet i den och adressen till den. Hur konsumenten hämtar meddelandet och tar bort det kommer härnäst.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Meddelandena måste hämtas i samma ordning som de skickades. Vilken kö väljer du?</p>
+  <div class="options">
+    <button class="opt" data-why="Standard är förvald, men lovar ingen ordning.">Standard, den är förvald</button>
+    <button class="opt" data-correct data-why="FIFO håller ordningen, och namnet slutar på .fifo.">FIFO, namnet slutar på .fifo</button>
+    <button class="opt" data-why="Bara FIFO håller ordningen, kötyperna är inte lika.">Båda, ordningen blir ändå lika</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad visar message ID i svaret på ett skickat meddelande?</p>
+  <div class="options">
+    <button class="opt" data-why="Jobbet görs senare av konsumenten, och message ID säger inget om det.">Att jobbet är gjort</button>
+    <button class="opt" data-correct data-why="SQS sätter ID:t när meddelandet skickats, så det visar att kön tog emot det.">Att kön tog emot meddelandet</button>
+    <button class="opt" data-why="ID:t sätts av SQS, du väljer det inte och det ger ingen ordning.">Att meddelandet hamnar först</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Vad skriver du i <code>Resource</code> i en policy för kön?</p>
+  <div class="options">
+    <button class="opt" data-why="URL:en används i koden, inte i policyn.">Köns URL</button>
+    <button class="opt" data-correct data-why="Resource tar ett ARN, som pekar ut kön bland alla konton och regioner.">Köns ARN</button>
+    <button class="opt" data-why="Ett namn ensamt pekar inte ut kön, Resource kräver ett ARN.">Bara köns namn</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">4. Repetition från lektion 86: vem lägger meddelandet i kön?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Producenten, här API:et, lägger meddelandet i kön.">Producenten</button>
+    <button class="opt" data-why="Konsumenten hämtar meddelandet, den lägger inte dit det.">Konsumenten</button>
+    <button class="opt" data-why="Kön sparar meddelanden, men någon annan lägger dit dem.">Kön själv</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En SQS-kö sparar meddelanden tills någon hämtat dem och tagit bort dem.</li>
+    <li>Ett meddelande är en text (oftast JSON) i Message body, med ett message ID som SQS sätter vid skickandet.</li>
+    <li>Standard lovar ingen ordning. FIFO gör det, har namn som slutar på <code>.fifo</code> och väljs när kön skapas.</li>
+    <li>Koden pekar ut kön med URL (<code>QueueUrl</code>), policyer med ARN (<code>Resource</code>).</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html">AWS: What is Amazon SQS?</a>. Dessutom <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html">Standard queues</a>, <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/creating-sqs-fifo-queues.html">Creating FIFO queues</a>, <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html">SendMessage</a>, <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-queue-message-identifiers.html">Queue and message identifiers</a> och <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-overview-of-managing-access.html">Managing access</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0086-synkront-och-asynkront.html">Förra: Synkront och asynkront</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0088-hamta-och-ta-bort.html">Nästa: Hämta och ta bort</a>
+</nav>
+
+</main>
+</body>
+</html>

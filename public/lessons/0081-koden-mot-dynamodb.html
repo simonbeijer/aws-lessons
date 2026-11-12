@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Koden mot DynamoDB</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 81 · V42, 11 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 81 · V42, 11 av 15 i veckan</p>
+<h1>Hur sparar koden en kund?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Funktionen har nu rätt att skriva i tabellen, men ännu ingen kod som gör det. Koden pratar med DynamoDB genom ett färdigt bibliotek från AWS, och ett par rader före handlern förbereder anropen.
+</div>
+
+<section class="explain">
+<h2>Vad består koden av?</h2>
+
+<pre><code>import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { randomUUID } from "node:crypto";
+
+const db = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+const TABLE = process.env.TABLE_NAME;
+
+export const handler = async (event) =&gt; {
+  const kund = { id: randomUUID(), name: "Carol" };
+  await db.send(new PutCommand({ TableName: TABLE, Item: kund }));
+};</code></pre>
+
+<p>Biblioteket heter AWS SDK (software development kit) och finns redan i Lambda, så ingen <code>npm install</code> behövs. En <strong>klient</strong> skickar anropen till DynamoDB, och ett <strong>kommando</strong> säger vad som ska göras. <code>PutCommand</code> är PutItem från <a href="0079-lasa-och-skriva-i-dynamodb.html">lektion 79</a>.</p>
+
+<p>DynamoDB vill ha en typ runt varje värde, som <code>{ "S": "Carol" }</code> för text. <code>DynamoDBDocumentClient</code> lägger på typerna, så du skickar ett vanligt objekt.</p>
+</section>
+
+<section class="explain">
+<h2>Varför ligger två rader utanför handlern?</h2>
+
+<p>Klienten och <code>TABLE</code> skapas utanför <a href="0075-handler-och-event.html">handlern</a>. Den delen körs bara när en ny exekveringsmiljö startar, och miljön sparas mellan anrop (<a href="0077-miljo-kallstart-timeout.html">lektion 77</a>). I handlern skapas den om vid varje anrop, och varje anrop blir långsammare.</p>
+
+<p><code>TABLE_NAME</code> är en <a href="0044-miljovariabel.html">miljövariabel</a>. Du sätter den i funktionens konfiguration, och <code>process.env</code> läser den. Då kan samma kod köra mot en annan tabell.</p>
+</section>
+
+<section class="explain">
+<h2>Vilket id får kunden?</h2>
+
+<p>DynamoDB delar inte ut löpnummer, så koden skapar id:t själv med <code>randomUUID()</code>. UUID (Universally Unique Identifier) är ett slumpat id som <code>9b801085-b120-4eba-b9ed-5b7841385dd4</code>. Ett löpnummer går att gissa, ett UUID inte. <a href="0068-agarkontroll.html">Ägarkontrollen</a> behövs ändå, för ett id kan läcka.</p>
+
+<p>Än så länge körs koden bara inifrån AWS. Nästa lektion ger den en väg in utifrån.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du flyttar <code>new DynamoDBClient({})</code> in i handlern. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Det gäller när klienten ligger utanför handlern.">Klienten skapas en gång per miljö</button>
+    <button class="opt" data-correct data-why="Allt i handlern körs vid varje anrop, så klienten skapas om varje gång.">Klienten skapas på nytt vid varje anrop</button>
+    <button class="opt" data-why="Klienten fungerar också inne i handlern, men skapas om varje gång.">Klienten kan inte nå tabellen alls</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du vill köra samma kod mot en annan tabell. Vad ändrar du?</p>
+  <div class="options">
+    <button class="opt" data-why="Koden ska slippa ändras, därför ligger namnet i en variabel.">Tabellnamnet i koden, och sparar med Deploy</button>
+    <button class="opt" data-correct data-why="TABLE_NAME läses ur konfigurationen, så koden är densamma.">Värdet på TABLE_NAME i funktionens konfiguration</button>
+    <button class="opt" data-why="Typerna har inget med vilken tabell som används att göra.">Typerna som DocumentClient lägger till</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 80: <code>db.send(new PutCommand(...))</code> nekas. Vilken handling saknar rollen?</p>
+  <div class="options">
+    <button class="opt" data-why="GetItem hämtar, men PutCommand sparar.">dynamodb:GetItem</button>
+    <button class="opt" data-correct data-why="PutCommand är PutItem, så rollen behöver dynamodb:PutItem.">dynamodb:PutItem</button>
+    <button class="opt" data-why="Scan läser hela tabellen, det är inte vad PutCommand gör.">dynamodb:Scan</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>AWS SDK finns redan i Lambda. Koden skapar en klient, skickar kommandon med <code>send</code> och använder <code>DynamoDBDocumentClient</code> för vanliga objekt.</li>
+    <li>Klienten och <code>process.env.TABLE_NAME</code> läses utanför handlern: en gång per miljö.</li>
+    <li>Id:t är <code>randomUUID()</code> ur <code>node:crypto</code>, skapat av koden.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html#nodejs-example-sdk-usage">AWS Lambda: Using the SDK for JavaScript v3 in your handler</a>.</p>
+<p>Om klienten: <a href="https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/migrate-dynamodb-doc-client.html">DynamoDB document client</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html#nodejs-handler-state">Using global state</a> och <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html">Lambda environment variables</a>. Om id:t: <a href="https://nodejs.org/api/crypto.html#cryptorandomuuidoptions">crypto.randomUUID()</a> och <a href="https://www.rfc-editor.org/rfc/rfc9562.html">RFC 9562</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0080-execution-role-och-behorighet.html">Förra: Execution role och minsta möjliga behörighet</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0082-http-api-route-integration.html">Nästa: HTTP API, route och integration</a>
+</nav>
+
+</main>
+</body>
+</html>

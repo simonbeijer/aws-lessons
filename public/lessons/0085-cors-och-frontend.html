@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CORS och frontend</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 85 · V42, 15 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 85 · V42, 15 av 15 i veckan</p>
+<h1>Hur anropar webbsidan API:et?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Webbsidan på Amplify ska anropa API:et (Application Programming Interface) på adressen från förra lektionen. Det kräver två saker: sidan måste få adressen, och webbläsaren måste få ett ja från API:et innan den skickar något.
+</div>
+
+<section class="explain">
+<h2>Hur får sidan adressen?</h2>
+
+<p>Adressen är API:ets Invoke URL (Uniform Resource Locator) från <a href="0084-stage-behorighet-throttling.html">förra lektionen</a>. Sidan får den som en <a href="0044-miljovariabel.html">miljövariabel</a>. I Vite (verktyget som bygger sidan) heter den <code>VITE_API_URL</code>. Koden läser den med <code>import.meta.env.VITE_API_URL</code>.</p>
+
+<p>Lokalt står värdet i <code>.env.local</code>, som inte checkas in, så Amplify får ett eget. Vid <a href="0016-bygge.html">bygget</a> byter Vite ut uttrycket mot adressen i JavaScript-koden, så ett nytt värde gäller först efter nästa bygge.</p>
+
+<div class="box bad">
+  <span class="box-title">Varning</span>
+  <p>Adressen står i koden som varje besökare hämtar. Lägg aldrig ett lösenord eller en nyckel i en <code>VITE_</code>-variabel.</p>
+</div>
+</section>
+
+<section class="explain">
+<h2>Varför frågar webbläsaren först?</h2>
+
+<p>Sidan på Amplify och API:et har olika ursprung, så <a href="0069-cors.html">CORS</a> (Cross-Origin Resource Sharing) gäller.</p>
+
+<p>En POST med JSON (JavaScript Object Notation) skickas inte direkt, för <code>application/json</code> är inget av de <a href="0051-header.html">Content-Type</a>-värden som slipper kontroll. Webbläsaren skickar först ett preflight, ett <code>OPTIONS</code>-anrop (<a href="0049-http-metod.html">HTTP-metod</a>). Det anger sidans ursprung (<code>Origin</code>), metoden och headers som POST:en använder, och frågar om det är tillåtet. Tillåter svaret det, skickas POST:en. Annars skickas den aldrig.</p>
+
+<p>I Network-fliken syns två rader: <code>OPTIONS</code> med status 204, sedan <code>POST</code> med 201.</p>
+</section>
+
+<section class="explain">
+<h2>Vem svarar på frågan?</h2>
+
+<p>API Gateway, inte funktionen. Det gäller även utan route för <code>OPTIONS</code>. API:ets CORS-inställning har tre listor: <code>Access-Control-Allow-Origin</code>, <code>Access-Control-Allow-Headers</code> (<code>content-type</code>) och <code>Access-Control-Allow-Methods</code> (till exempel GET, POST).</p>
+
+<p>Ursprunget stavas exakt, utan <code>/</code> sist. Sidan har två ursprung: <code>http://localhost:5173</code> lokalt och sin Amplify-adress. Båda ska stå med.</p>
+
+<p>Nästa vecka lämnar API:et jobbet vidare till en kö.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du byter värdet på <code>VITE_API_URL</code> i Amplify. Sidan anropar fortfarande den gamla adressen. Varför?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Adressen byttes in i JavaScript-filerna vid bygget. Ett nytt värde kommer med först i nästa bygge.">Den gamla adressen ligger kvar i filerna från förra bygget</button>
+    <button class="opt" data-why="Variabeln läses inte från funktionen. Den byts in i sidans kod när sidan byggs.">Funktionen har sparat den gamla adressen i minnet</button>
+    <button class="opt" data-why="En omladdning hämtar samma byggda filer. Det nya värdet kommer med först i nästa bygge.">Webbläsaren behöver laddas om för att ta emot värdet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Network-fliken visar en <code>OPTIONS</code>-rad och ingen <code>POST</code>-rad. Vad har hänt?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Webbläsaren fick inget ja, så POST:en skickades aldrig.">Svaret tillät inte POST:en, så den skickades aldrig</button>
+    <button class="opt" data-why="Då hade det funnits en POST-rad. Här skickades den aldrig.">POST:en kom fram, men funktionen svarade med ett fel</button>
+    <button class="opt" data-why="Preflight skickas av webbläsaren på egen hand. Den beror inte på att koden saknar något.">Sidans kod glömde att skicka POST:en</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. CORS-listan har <code>http://localhost:5173/</code> med snedstreck sist. Sidan på localhost kör <code>POST</code> med JSON. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Ursprung stavas exakt. Utan snedstrecket i listan hade det stämt, med det stämmer det inte.">Det fungerar, för sökvägen räknas inte</button>
+    <button class="opt" data-correct data-why="Ursprunget matchar inte exakt, så svaret saknar Access-Control-Allow-Origin och webbläsaren skickar aldrig POST:en.">Preflight får inget ja, och POST:en skickas aldrig</button>
+    <button class="opt" data-why="API Gateway svarar på preflight själv, och funktionen körs inte. Den får aldrig se anropet.">Funktionen körs och måste svara med rätt header</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>VITE_API_URL</code> står i <code>.env.local</code> lokalt och i Amplify. Vite byter in värdet i JavaScript vid bygget, så adressen syns för alla. Inga hemligheter i <code>VITE_</code>-variabler.</li>
+    <li>En POST med <code>application/json</code> får först ett <code>OPTIONS</code>-anrop (preflight). Tillåts den, skickas POST:en, annars aldrig.</li>
+    <li>API Gateway svarar på preflight utan att funktionen körs. CORS-listorna: Allow-Origin, Allow-Headers, Allow-Methods. Ursprung stavas exakt.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkällor: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html">Amazon API Gateway: Configure CORS for HTTP APIs</a> och <a href="https://vite.dev/guide/env-and-mode">Vite: Env Variables and Modes</a>.</p>
+<p>Om preflight: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS#preflighted_requests">MDN: CORS, Preflighted requests</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS#simple_requests">Simple requests</a> och <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/OPTIONS">OPTIONS</a>. Om variabler i Amplify: <a href="https://docs.aws.amazon.com/amplify/latest/userguide/setting-env-vars.html">Setting environment variables</a> och <a href="https://docs.aws.amazon.com/amplify/latest/userguide/environment-variables.html">Amplify environment variables</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0084-stage-behorighet-throttling.html">Förra: Stage, anropsbehörighet och throttling</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="V43-start.html">Nästa: Veckan i överblick, asynkrona flöden</a>
+</nav>
+
+</main>
+</body>
+</html>

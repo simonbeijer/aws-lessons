@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event och svar genom API Gateway</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 83 · V42, 13 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 83 · V42, 13 av 15 i veckan</p>
+<h1>Vad får handlern in och vad ska den svara?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Nu når anropet funktionen, men handlern från lektion 81 returnerar ingenting som en klient kan använda. API Gateway skickar anropet som ett event med fasta platser, och väntar sig ett svar i en bestämd form.
+</div>
+
+<section class="explain">
+<h2>Var står uppgifterna?</h2>
+
+<p>API Gateway packar hela HTTP-anropet (Hypertext Transfer Protocol) i ett <a href="0075-handler-och-event.html">event</a>. Fyra delar behövs, här för <code>PUT /customers/abc-123</code>:</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Del</th><th>I koden</th><th>Värde</th></tr>
+  <tr><td>Metoden</td><td><code>event.requestContext.http.method</code></td><td><code>"PUT"</code></td></tr>
+  <tr><td>Sökvägen</td><td><code>event.rawPath</code></td><td><code>"/customers/abc-123"</code></td></tr>
+  <tr><td>Id:t</td><td><code>event.pathParameters.id</code></td><td><code>"abc-123"</code></td></tr>
+  <tr><td>Kroppen</td><td><code>event.body</code></td><td><code>"{\"name\":\"Carol\"}"</code></td></tr>
+</table>
+</div>
+
+<p>Som testhändelse räcker:</p>
+
+<pre><code>{
+  "rawPath": "/customers/abc-123",
+  "requestContext": { "http": { "method": "PUT" } },
+  "pathParameters": { "id": "abc-123" },
+  "body": "{\"name\":\"Carol\"}"
+}</code></pre>
+
+<p><code>body</code> är en sträng, inte ett objekt. Kroppen inuti är <a href="0052-json.html">JSON</a> (JavaScript Object Notation) med egna citattecken, så ett vanligt <code>"</code> avslutar strängen för tidigt. Därför skrivs de <code>\"</code>. Koden gör om strängen till ett objekt med <code>JSON.parse(event.body)</code>.</p>
+</section>
+
+<section class="explain">
+<h2>Hur ser svaret ut?</h2>
+
+<p>Handlern returnerar ett objekt med tre delar, och API Gateway gör HTTP-svaret av det. <code>statusCode</code> blir <a href="0050-statuskod.html">statuskoden</a>, <code>headers</code> blir <a href="0051-header.html">headers</a> och <code>body</code> kroppen.</p>
+
+<pre><code>return {
+  statusCode: 404,
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ error: "customer 999 not found" })
+};</code></pre>
+
+<p>Också <code>body</code> är en sträng. <code>JSON.stringify</code> gör om ett objekt till text, motsatsen till <code>JSON.parse</code>. I <a href="0057-express.html">Express</a> skrev <code>res.status(404).json(...)</code> svaret. Här returnerar handlern det.</p>
+</section>
+
+<section class="explain">
+<h2>Vad händer vid fel?</h2>
+
+<p>Kastar koden ett fel som inget <code>try</code>/<code>catch</code> fångar, finns inget svar att lämna. Klienten får då ett 5xx-fel och bara <code>{"message":"Internal Server Error"}</code>. Detaljerna står i <a href="0076-loggar-och-report-raden.html">CloudWatch Logs</a>. Fångar du felet kan du returnera ett eget svar, till exempel 404.</p>
+
+<p>Till skillnad från 404:an i <a href="0082-http-api-route-integration.html">förra lektionen</a> körs funktionen här, men kraschar.</p>
+
+<p>Nästa lektion handlar om adressen klienten anropar och om vem som får anropa funktionen.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Anropet är <code>PUT /customers/abc-123</code>. Var står PUT i eventet?</p>
+  <div class="options">
+    <button class="opt" data-why="rawPath har bara sökvägen. Metoden står i requestContext.http.method.">I rawPath, före sökvägen</button>
+    <button class="opt" data-correct data-why="Metoden står i event.requestContext.http.method.">I requestContext, under http</button>
+    <button class="opt" data-why="pathParameters har bara delar av sökvägen, som id:t.">I pathParameters, bredvid id:t</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Handlern ska svara 201 med kunden som JSON. Vad blir <code>body</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="body ska vara en sträng. Ett objekt måste göras om först.">Kunden som objekt</button>
+    <button class="opt" data-correct data-why="JSON.stringify gör om objektet till en sträng, och body är alltid en sträng.">Kunden som JSON-text</button>
+    <button class="opt" data-why="Statuskoden står i statusCode, inte i body.">Koden 201 som text</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Repetition från lektion 82: vilket anrop kör funktionen?</p>
+  <div class="options">
+    <button class="opt" data-why="Ingen route matchar, så API Gateway svarar själv med 404 och funktionen körs inte.">Ett anrop utan matchande route</button>
+    <button class="opt" data-correct data-why="Funktionen körs och kraschar. Klienten får 5xx och Internal Server Error.">Ett anrop där koden kraschar</button>
+    <button class="opt" data-why="Fel metod matchar ingen route, och då svarar API Gateway själv med 404.">Ett anrop med fel metod</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Metoden står i <code>event.requestContext.http.method</code>, sökvägen i <code>event.rawPath</code>, id:t i <code>event.pathParameters.id</code> och kroppen i <code>event.body</code>.</li>
+    <li><code>body</code> är en sträng. Citattecknen inuti skrivs <code>\"</code>, och <code>JSON.parse</code> gör om den till ett objekt.</li>
+    <li>Svaret är ett objekt med <code>statusCode</code>, <code>headers</code> och <code>body</code>. <code>body</code> är en sträng, gjord med <code>JSON.stringify</code>.</li>
+    <li>Ett fel som inte fångas ger klienten ett 5xx-fel och bara Internal Server Error. Detaljerna står i CloudWatch Logs.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html">Amazon API Gateway: Lambda proxy integrations for HTTP APIs</a>.</p>
+<p>Om fel: <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-troubleshooting-lambda.html#http-api-troubleshooting-lambda-internal-server-error">HTTP API Internal Server Error</a> och <a href="https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway-errors.html">Handling Lambda errors with an API Gateway API</a>. Kursen säger 500 för ett ofångat fel. AWS felsida för Lambda säger 502 och API Gateways egen sida anger ingen kod, så exakt kod är obekräftad. Därför står det 5xx här.</p>
+<p>Om escapade citattecken: <a href="https://www.rfc-editor.org/rfc/rfc8259.html#section-7">RFC 8259: Strings</a>. Om <code>JSON.parse</code> och <code>JSON.stringify</code>: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse">MDN: JSON.parse()</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">MDN: JSON.stringify()</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0082-http-api-route-integration.html">Förra: HTTP API, route och integration</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0084-stage-behorighet-throttling.html">Nästa: Stage, anropsbehörighet och throttling</a>
+</nav>
+
+</main>
+</body>
+</html>

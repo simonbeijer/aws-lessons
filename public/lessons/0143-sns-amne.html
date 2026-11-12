@@ -28,7 +28,7 @@
 
 <p>Ett ämne (topic, <a href="0011-sns.html">lektion 11</a>) skickar varje meddelande vidare till alla prenumeranter direkt när det publicerats. En prenumerant är mottagaren som prenumerationen pekar på: en e-postadress, en kö, en Lambda-funktion och fler. <span class="src">(<a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html">AWS: What is Amazon SNS?</a>)</span></p>
 
-<p>Det kallas tryck (push). Mottagaren frågar aldrig efter nya meddelanden. <span class="src">(<a href="https://aws.amazon.com/sns/faqs/">AWS: SNS FAQ</a>)</span> I en <a href="0113-sqs-ko.html">kö</a> ligger meddelandet kvar tills konsumenten hämtar det (pull).</p>
+<p>Det kallas tryck (push). Mottagaren frågar aldrig efter nya meddelanden. <span class="src">(<a href="https://aws.amazon.com/sns/faqs/">AWS: SNS FAQ</a>)</span> I en <a href="0087-sqs-ko-och-meddelande.html">kö</a> ligger meddelandet kvar tills konsumenten hämtar det (pull).</p>
 
 <p>När ämnet är mål i en regel (<a href="0140-mal-i-en-regel.html">lektion 140</a>) får det hela händelsen som JSON, så ett mejl till en prenumerant visar kuvertet (<a href="0142-eventbridge-kuvertet.html">lektion 142</a>). <span class="src">(<a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutTargets.html">AWS: PutTargets</a>)</span></p>
 </section>
@@ -40,7 +40,7 @@
 
 <p>Kursen säger att ett ämne inte sparar något. AWS säger att SNS lagrar alla meddelanden det tar emot hållbart, med kopior på disk i flera <a href="0022-availability-zone.html">Availability Zones</a>. <span class="src">(<a href="https://aws.amazon.com/sns/faqs/">AWS: SNS FAQ</a>)</span> För lagringen gäller AWS.</p>
 
-<p>Går leveransen inte fram, gör SNS omförsök. När försöken är slut kasseras meddelandet, om ingen <a href="0122-dodbrevsko.html">dödbrevskö</a> är kopplad. <span class="src">(<a href="https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html">AWS: Delivery retries</a>)</span></p>
+<p>Går leveransen inte fram, gör SNS omförsök. När försöken är slut kasseras meddelandet, om ingen <a href="0089-dodbrevsko.html">dödbrevskö</a> är kopplad. <span class="src">(<a href="https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html">AWS: Delivery retries</a>)</span></p>
 
 <p>Vill du kunna hämta senare, låt en kö prenumerera. Då hamnar meddelandet också i kön. <span class="src">(<a href="https://aws.amazon.com/sns/faqs/">AWS: SNS FAQ</a>)</span></p>
 </section>
