@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start V44: containerisera en applikation</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="start">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Start · V44</span>
+</nav>
+
+<p class="lesson-no">Start · V44</p>
+<h1>Veckan i överblick: containerisera en applikation</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Den här veckan packas API:et (Application Programming Interface) från v41 med allt det behöver i en container, som körs likadant var den än startas. Verktyget heter Docker. Paketet kallas image, och databasen får en egen container bredvid. Imagen skickas sedan till ett register, ett bibliotek för images, i AWS.
+</div>
+
+<section class="explain">
+<h2>Varför nu?</h2>
+
+<p>I v41 installerades API:et för hand på en server som du själv skötte, med databasen som en egen tjänst i AWS. Det som fungerade där hängde på hur just den servern var inställd. I v42–v43 byggdes det om som funktioner, som passar små jobb.</p>
+
+<p>Nu får det vara ett vanligt API igen, men packat så att inget hänger på servern. Samma image kör på din dator och i AWS, och bara inställningarna utifrån skiljer. Lokalt står databasen i en egen container i stället för som tjänst i AWS. Nästa vecka låter ECS (Elastic Container Service) AWS köra imagen åt dig.</p>
+</section>
+
+<section class="explain">
+<h2>Hur hänger det ihop?</h2>
+
+<svg viewBox="0 0 640 130" role="img" aria-label="API:et körs i en container på din dator och anropar databasen, som körs i en egen container bredvid. Imagen med API:et skickas till ett register i AWS." style="width:100%;height:auto;margin:16px 0;font-size:14px">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+  <g fill="#fff" stroke="#2563eb" stroke-width="2">
+    <rect x="5" y="30" width="175" height="60" rx="8"/>
+    <rect x="232" y="30" width="175" height="60" rx="8"/>
+    <rect x="460" y="30" width="175" height="60" rx="8"/>
+  </g>
+  <g fill="#111827" text-anchor="middle">
+    <text x="92" y="56" font-weight="700">Databas</text><text x="92" y="76">i en container</text>
+    <text x="320" y="56" font-weight="700">API</text><text x="320" y="76">i en container</text>
+    <text x="547" y="56" font-weight="700">Register i AWS</text><text x="547" y="76">tar emot imagen</text>
+  </g>
+  <g stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#ah)">
+    <path d="M232,60 H182"/><path d="M407,60 H458"/>
+  </g>
+</svg>
+</section>
+
+<section class="explain">
+<h2>Veckans väg</h2>
+
+<ol>
+  <li><a href="0102-container-image-och-docker.html">Container och Docker</a> (102–105): vad en container är och hur du startar, läser och tar bort en.</li>
+  <li><a href="0106-konfiguration-ur-miljon.html">API:et blir redo</a> (106–110): inställningar utifrån, en adress som visar att API:et lever, och Dockerfilen, receptet för imagen.</li>
+  <li><a href="0111-compose-och-tjanstens-namn.html">Databasen bredvid</a> (111–113): Docker Compose startar API:et och databasen med en fil.</li>
+  <li><a href="0114-ecr-namn-och-inloggning.html">Imagen till ECR</a> (114–115): ECR (Elastic Container Registry) är registret som tar emot imagen.</li>
+  <li><a href="0116-mindre-och-sakrare-image.html">Bonus: mindre och säkrare</a> (116): en image med mindre i sig.</li>
+</ol>
+</section>
+
+<section class="explain">
+<h2>Efter veckan</h2>
+
+<p>Du kan säga skillnaden på en image och en container, läsa en Dockerfile, och förklara hur API:et och databasen hittar varandra. Du vet också varför imagen byggs för rätt processortyp innan den skickas till ECR.</p>
+</section>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.docker.com/get-started/docker-overview/">Docker: What is Docker?</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0101-scheduler-cron-och-rate.html">Förra: Scheduler, cron och rate</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0102-container-image-och-docker.html">Nästa: Container, image och Docker</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQS-trigger och konsumentens roll</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 93 · V43, 8 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 93 · V43, 8 av 16 i veckan</p>
+<h1>Vem hämtar meddelandet åt funktionen?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Meddelandet ligger på kön, och funktionen ska få det. En trigger, en koppling på funktionen, hämtar det åt den. Triggern använder funktionens roll, så rollen måste få hämta från kön innan triggern skapas.
+</div>
+
+<section class="explain">
+<h2>Vad gör triggern?</h2>
+
+<p>I <a href="0088-hamta-och-ta-bort.html">lektion 88</a> hämtade konsumenten själv med <code>ReceiveMessage</code> och tog bort med <code>DeleteMessage</code>. Med en SQS-trigger (Simple Queue Service) gör Lambda det åt funktionen. Den hämtar meddelanden från kön och anropar <a href="0075-handler-och-event.html">handlern</a> med dem. Du skriver ingen loop och inget <code>DeleteMessage</code>. AWS kallar triggern event source mapping.</p>
+
+<p>Triggern tar bort meddelandena när handlern returnerar utan fel. Kastar handlern ett fel tas inget bort, och meddelandena blir synliga igen när visibility timeout har gått ut (lektion 88).</p>
+</section>
+
+<section class="explain">
+<h2>Vilken roll behövs?</h2>
+
+<p>Triggern hämtar med funktionens egen roll (<a href="0080-execution-role-och-behorighet.html">execution role</a>), och den fick i lektion 80 bara skriva loggar. Rollen får därför en AWS managed policy (färdig policy från AWS) som heter <code>AWSLambdaSQSQueueExecutionRole</code>. Den tillåter <code>sqs:ReceiveMessage</code>, <code>sqs:DeleteMessage</code> och <code>sqs:GetQueueAttributes</code> (läsa köns inställningar), plus loggarna. Policyn har <code>"Resource": "*"</code>, så den gäller alla köer i kontot, vilket är bredare än nödvändigt.</p>
+
+<p>Triggern börjar hämta så fort den finns, så policyn ska ligga på rollen innan triggern skapas.</p>
+
+<div class="box note">
+  <span class="box-title">Så ser det ut om policyn saknas</span>
+  <p>Enligt kursen vägrar konsolen skapa triggern och svarar "The provided execution role does not have permissions to call ReceiveMessage on SQS". AWS dokumentation nämner inte felet.</p>
+</div>
+
+<p>Det funktionen sedan gör med meddelandet, till exempel uppdatera en rad i tabellen, kräver sin egen policy, med bara <code>dynamodb:UpdateItem</code> på tabellens ARN (Amazon Resource Name). Nästa steg är att se vad handlern faktiskt får in när triggern anropar den.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vem tar bort ett lyckat meddelande ur kön när funktionen har en SQS-trigger?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Triggern tar bort meddelandena när handlern returnerat utan fel.">Triggern, när handlern lyckats</button>
+    <button class="opt" data-why="Funktionen anropar inte DeleteMessage själv när en trigger hämtar åt den.">Funktionen, med DeleteMessage</button>
+    <button class="opt" data-why="Kön tar aldrig bort något av sig själv, det gör bara ett anrop.">Kön, när visibility timeout gått</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Handlern kastar ett fel. Vad händer med meddelandena?</p>
+  <div class="options">
+    <button class="opt" data-why="Triggern tar bara bort meddelanden efter ett lyckat anrop.">De tas bort av triggern</button>
+    <button class="opt" data-correct data-why="Inget tas bort, så de blir synliga igen när visibility timeout gått ut (lektion 88).">De blir synliga igen efter en stund</button>
+    <button class="opt" data-why="Det är inget som raderas, och inget som väntar på att funktionen ska göra det.">De ligger osynliga tills någon raderar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Vad ska rollen ha gjort innan triggern skapas?</p>
+  <div class="options">
+    <button class="opt" data-why="Triggern anropar funktionen, men rättigheterna måste finnas innan den skapas.">Rollen ska redan ha körts i en test</button>
+    <button class="opt" data-why="Rollen får inte skicka åt triggern, den ska hämta och ta bort.">Rollen ska få rätt att skicka till kön</button>
+    <button class="opt" data-correct data-why="Triggern hämtar med rollen, så AWSLambdaSQSQueueExecutionRole måste redan ligga på den.">Rollen ska ha fått SQS-policyn</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Triggern hämtar från kön åt funktionen och anropar handlern. Ingen loop, inget eget DeleteMessage.</li>
+    <li>Returnerar handlern utan fel tas meddelandena bort. Kastar den blir de synliga igen efter visibility timeout.</li>
+    <li>Rollen måste ha <code>AWSLambdaSQSQueueExecutionRole</code> (ReceiveMessage, DeleteMessage, GetQueueAttributes, loggar, på alla köer) innan triggern skapas.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Using Lambda with Amazon SQS</a>. Dessutom <a href="https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSLambdaSQSQueueExecutionRole.html">AWSLambdaSQSQueueExecutionRole</a> och <a href="https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-configure.html">Configuring queue permissions</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0092-spara-forst-skicka-sedan.html">Förra: Spara först, skicka sedan</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0094-event-fran-sqs-och-batch.html">Nästa: Event från SQS och batch size</a>
+</nav>
+
+</main>
+</body>
+</html>

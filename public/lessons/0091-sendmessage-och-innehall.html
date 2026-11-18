@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SendMessage och meddelandets innehåll</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 91 · V43, 6 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 91 · V43, 6 av 16 i veckan</p>
+<h1>Hur lägger API:et ett meddelande i kön?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Hittills har lektionerna handlat om kön och vad som händer med ett meddelande där. Nu är det producentens tur: API:et (Application Programming Interface) lägger själv meddelandet i kön när en kund skapas, med anropet SendMessage. Koden är kort, men rollen måste få skicka och meddelandet bära rätt uppgifter.
+</div>
+
+<section class="explain">
+<h2>Hur skickar koden?</h2>
+
+<p>Koden lägger ett meddelande på SQS-kön (Simple Queue Service) med AWS SDK (Software Development Kit, som i <a href="0081-koden-mot-dynamodb.html">lektion 81</a>) och kommandot <code>SendMessageCommand</code>. Det behöver två saker: <code>QueueUrl</code>, köns adress, och <code>MessageBody</code>, meddelandet. Kroppen är en sträng, så ett objekt görs först om till JSON (JavaScript Object Notation) med <code>JSON.stringify</code> (<a href="0083-event-och-svar-api-gateway.html">lektion 83</a>). Adressen läses från miljövariabeln <code>QUEUE_URL</code>, så koden kan byta kö utan att ändras.</p>
+
+<pre><code>import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+
+const client = new SQSClient({});
+
+await client.send(new SendMessageCommand({
+  QueueUrl: process.env.QUEUE_URL,
+  MessageBody: JSON.stringify({ id: "c-1042" })
+}));</code></pre>
+
+<p>Rollen som funktionen kör med (<a href="0080-execution-role-och-behorighet.html">execution role</a>) måste också få skicka. Den får <code>sqs:SendMessage</code> på just den här kön, med köns ARN (Amazon Resource Name) som <code>Resource</code>. Det är minsta möjliga behörighet: en bugg kan skicka meddelanden, men inte hämta eller radera dem.</p>
+</section>
+
+<section class="explain">
+<h2>Vad ska meddelandet bära?</h2>
+
+<p>Bara det konsumenten behöver: vad som hänt, kundens id, namnet och tiden, som i JSON-exemplet i <a href="0087-sqs-ko-och-meddelande.html">lektion 87</a>. Hela kunden skickas inte, för där kan det finnas sådant konsumenten inte ska se, till exempel ett lösenord. Med id:t kan konsumenten hämta resten ur tabellen.</p>
+
+<p>Meddelandet är också en kopia av uppgifterna från när det skickades. Ändras namnet i tabellen medan meddelandet väntar, står det gamla kvar i meddelandet. Det gäller också efter en <a href="0090-dlq-redrive.html">redrive</a>: rättas namnet i tabellen, kommer meddelandet tillbaka med det gamla och kan misslyckas igen. Därför hämtar konsumenten färska uppgifter ur tabellen när de kan ha ändrats.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Kunden är ett objekt i koden. Hur blir det MessageBody?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="MessageBody är en sträng, så objektet görs om med JSON.stringify.">Det görs om till JSON-text</button>
+    <button class="opt" data-why="Ett objekt är ingen sträng, så det går inte att skicka som det är.">Det skickas som det är</button>
+    <button class="opt" data-why="MessageBody är ett enda fält, det delas inte upp i flera.">Varje fält skickas för sig</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad ger du rollen för att API:et ska få skicka?</p>
+  <div class="options">
+    <button class="opt" data-why="Det ger rätt att göra allt i SQS, långt mer än att skicka.">Alla SQS-åtgärder på alla köer</button>
+    <button class="opt" data-correct data-why="Minsta möjliga behörighet: en åtgärd på en kö, utpekad med köns ARN.">sqs:SendMessage på en kö</button>
+    <button class="opt" data-why="Rollen ska skicka, och hämta hör till konsumenten.">sqs:ReceiveMessage på en kö</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Namnet ändras i tabellen medan meddelandet väntar i kön. Vad gäller?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Meddelandet är en kopia från när det skickades, och konsumenten kan läsa färskt ur tabellen med id:t.">Meddelandet har det gamla namnet kvar</button>
+    <button class="opt" data-why="Kopian följer inte med när tabellen ändras.">Meddelandet får det nya namnet</button>
+    <button class="opt" data-why="Namnet står kvar i kopian, det tas inte bort.">Meddelandet förlorar namnet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>SendMessageCommand</code> med <code>QueueUrl</code> och <code>MessageBody</code> (en sträng) lägger ett meddelande på kön.</li>
+    <li>Rollen får bara <code>sqs:SendMessage</code> på en kö, med köns ARN som <code>Resource</code>.</li>
+    <li>Meddelandet bär bara det konsumenten behöver, och är en kopia som kan bli inaktuell.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html">AWS: SendMessage</a>. Dessutom <a href="https://docs.aws.amazon.com/code-library/latest/ug/sqs_example_sqs_SendMessage_section.html">SendMessage med SDK for JavaScript</a> och <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-api-permissions-reference.html">SQS API permissions</a>. Att meddelandet ska vara smalt och kan bli inaktuellt är kursens designval, inte en AWS-regel: AWS visar både händelser med data och händelser med bara ett id (<a href="https://aws.amazon.com/event-driven-architecture/">Event-driven architecture</a>).</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0090-dlq-redrive.html">Förra: DLQ redrive</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0092-spara-forst-skicka-sedan.html">Nästa: Spara först, skicka sedan</a>
+</nav>
+
+</main>
+</body>
+</html>

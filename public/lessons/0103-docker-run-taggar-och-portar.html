@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>docker run, taggar och portar</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 103 · V44, 2 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 103 · V44, 2 av 15 i veckan</p>
+<h1>Hur startar man en container?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Med ett kommando startar du en container från en image, och Docker hämtar imagen åt dig om den saknas. En container är stängd från omvärlden, så du måste själv öppna en port in till den. Allt annat i veckan börjar med en container som startats så här.
+</div>
+
+<section class="explain">
+<h2>Vad gör docker run?</h2>
+
+<p><code>docker run -d -p 8080:80 --name web nginx:alpine</code></p>
+
+<p>Docker letar först efter imagen på datorn. Saknas den hämtas den från ett register, en central plats som lagrar och delar images. Standardregistret är Docker Hub. Sedan skapas en container från imagen och startas.</p>
+
+<p>Första gången syns hämtningen. Sedan skrivs containerns långa id ut och prompten kommer tillbaka.</p>
+</section>
+
+<section class="explain">
+<h2>Namn och flaggor</h2>
+
+<p><code>nginx:alpine</code> är imagens namn och tagg. nginx är en webbserver, och taggen <code>alpine</code> väljer en variant byggd på Alpine Linux. Anger du ingen tagg används <code>latest</code>.</p>
+
+<p><code>-d</code> (detached) kör containern i bakgrunden. Utan det hänger terminalen kvar i containerns logg. <code>--name web</code> ger containern ett namn som senare kommandon kan använda, annars slumpar Docker ett. Finns redan en container med namnet, även en stoppad, svarar Docker att namnet "is already in use".</p>
+</section>
+
+<section class="explain">
+<h2>Hur når trafiken in?</h2>
+
+<p>Containern är isolerad, så ingen trafik når den av sig själv. <code>-p 8080:80</code> kopplar värdens port 8080 till containerns port 80, <a href="0033-port.html">porten</a> som nginx lyssnar på. Värdens port står först. <a href="0058-localhost.html">localhost</a>:8080 i webbläsaren når alltså nginx.</p>
+
+<p>nginx vet inget om 8080. Docker flyttar trafiken, nginx lyssnar på 80 som vanligt. Därför kan flera containrar använda port 80 inuti, med olika portar på värden.</p>
+
+<p><code>docker ps</code> listar körande containrar. Kolumnen PORTS visar kopplingen som <code>0.0.0.0:8080->80/tcp</code>, där 0.0.0.0 betyder alla värdens adresser och tcp är protokollet TCP (Transmission Control Protocol). Är 8080 upptagen svarar Docker "port is already allocated". Välj då en annan värdport, som <code>-p 8081:80</code>.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du kör <code>docker run</code> med en image som inte finns på datorn. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Docker avbryter inte. Den hämtar saknade images från registret.">Docker avbryter, och du måste hämta imagen först</button>
+    <button class="opt" data-correct data-why="Docker hämtar imagen från registret, Docker Hub som standard, och startar sedan containern.">Docker hämtar imagen från Docker Hub och startar containern</button>
+    <button class="opt" data-why="En container skapas från en image. Docker startar ingen tom container i stället.">Docker startar en tom container utan program i</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du kör <code>docker run -d -p 9090:80 nginx:alpine</code>. Vilken adress öppnar du i webbläsaren?</p>
+  <div class="options">
+    <button class="opt" data-why="80 är containerns port. Värden har ingenting på 80 i det här läget.">localhost:80, porten nginx lyssnar på</button>
+    <button class="opt" data-correct data-why="Värdens port står först i -p, så trafik till 9090 på värden flyttas till port 80 i containern.">localhost:9090, värdens port</button>
+    <button class="opt" data-why="Det är bara en port i adressen. Värdens port är den du anger först i -p.">localhost:9090:80, hela kopplingen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Två containrar kör nginx, som lyssnar på port 80 i båda. Hur kan de köra samtidigt på samma dator?</p>
+  <div class="options">
+    <button class="opt" data-why="nginx behöver inte ändras. Porten i containern är skild från porten på värden.">nginx måste ställas in på olika portar i imagerna</button>
+    <button class="opt" data-why="Port 80 inne i en container krockar inte med en annan container. Det är värdens port som är delad.">Det går inte, bara en container får ha port 80</button>
+    <button class="opt" data-correct data-why="Varje container har sin egen port 80. Det är värdens portar som måste skilja sig åt, till exempel 8080 och 8081.">De kopplas till olika värdportar, som 8080 och 8081</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>docker run</code> använder imagen på datorn, hämtar den annars från registret (Docker Hub som standard), och skapar och startar en container.</li>
+    <li><code>nginx:alpine</code> är namn och tagg. Utan tagg används <code>latest</code>.</li>
+    <li><code>-d</code> kör i bakgrunden. <code>--name web</code> ger containern ett namn.</li>
+    <li><code>-p 8080:80</code> kopplar värdens port till containerns, värden först. Programmet i containern vet inget om 8080.</li>
+    <li>PORTS i <code>docker ps</code> visar <code>0.0.0.0:8080->80/tcp</code>. "port is already allocated" betyder att värdporten är upptagen, "name is already in use" att namnet är det.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.docker.com/reference/cli/docker/container/run/">Docker: docker container run</a>. Register och Docker Hub: <a href="https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-registry/">Docker: What is a registry?</a>. Taggen och <code>latest</code>: <a href="https://docs.docker.com/reference/cli/docker/image/tag/">Docker: docker image tag</a>. Portkopplingen: <a href="https://docs.docker.com/engine/network/port-publishing/">Docker: Port publishing</a>. Att värden står först visar Docker bara i exemplet <code>-p 8080:80</code>. Att nginx inte vet om 8080 kommer från kursen och följer av hur Docker kopplar portarna. Kolumnen PORTS och de två felmeddelandena kommer också från kursen.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0102-container-image-och-docker.html">Förra: Container, image och Docker</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0104-logs-och-exec.html">Nästa: Loggen och in i containern</a>
+</nav>
+
+</main>
+</body>
+</html>

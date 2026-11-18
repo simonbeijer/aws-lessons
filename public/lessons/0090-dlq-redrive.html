@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DLQ redrive</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="notis">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 90 · V43, 5 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 90 · V43, 5 av 16 i veckan</p>
+<h1>Hur får man tillbaka ett trasigt meddelande?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Meddelandena i dödbrevskön väntar där på att någon ska rätta felet. DLQ redrive (dead-letter queue redrive) skickar tillbaka dem till huvudkön så att de får nya försök.
+</div>
+
+<section class="explain">
+<h2>Vad gör redrive?</h2>
+
+<p>När felet är rättat flyttar DLQ redrive meddelandena från dödbrevskön tillbaka till källkön, huvudkön de kom från. Konsolens knapp Start DLQ redrive finns på dödbrevskön, inte på huvudkön. Låg ett meddelande i dödbrevskön står det efteråt 1 i huvudkön och 0 i dödbrevskön.</p>
+
+<p>SQS (Simple Queue Service) ändrar inte innehållet, men det som läggs i huvudkön är en ny kopia. Den får ett nytt message ID, och retention-tiden börjar om, till skillnad från flytten till dödbrevskön som behöll klockan. Receive count börjar också om från 0, så med Maximum receives 3 får meddelandet tre nya försök.</p>
+
+<div class="box note">
+  <span class="box-title">Inte bekräftat av AWS</span>
+  Att receive count börjar om från 0 står i kursen, inte i AWS dokumentation.
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad är ett meddelande efter redrive, jämfört med innan?</p>
+  <div class="options">
+    <button class="opt" data-why="Meddelandet räknas som nytt, så message ID:t byts ut.">Samma meddelande med samma message ID</button>
+    <button class="opt" data-correct data-why="Redrive lägger en ny kopia i huvudkön, med nytt message ID.">En ny kopia med nytt message ID</button>
+    <button class="opt" data-why="Redrive flyttar meddelandet, det raderas inte och blir inte kvar i dödbrevskön.">En kopia, och originalet ligger kvar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Ett meddelande låg 3 dagar i huvudkön och flyttades till dödbrevskön. Sedan görs redrive. Hur räknas retention i huvudkön?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Redrive ger en ny kopia, och dess retention-tid börjar om.">Den börjar om från början</button>
+    <button class="opt" data-why="Det var flytten till dödbrevskön som behöll klockan, inte redrive.">Den fortsätter från de 3 dagarna</button>
+    <button class="opt" data-why="Meddelandet kommer tillbaka med full retention, inte med en gräns på dagen.">Den slutar efter en dag</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Start DLQ redrive finns på dödbrevskön och flyttar meddelandena tillbaka till källkön, utan att ändra dem.</li>
+    <li>De kommer som en ny kopia: nytt message ID, retention börjar om, receive count från 0 (receive count enligt kursen).</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-dead-letter-queue-redrive.html">AWS: DLQ redrive</a>. Dessutom <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_StartMessageMoveTask.html">StartMessageMoveTask</a>. Ett blogginlägg från AWS säger att message ID behålls, men Developer Guide säger nytt, och den följs här.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0089-dodbrevsko.html">Förra: Dödbrevskö</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0091-sendmessage-och-innehall.html">Nästa: SendMessage och meddelandets innehåll</a>
+</nav>
+
+</main>
+</body>
+</html>

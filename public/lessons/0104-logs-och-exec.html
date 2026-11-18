@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loggen och in i containern</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 104 · V44, 3 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 104 · V44, 3 av 15 i veckan</p>
+<h1>Hur ser man vad som händer i en container?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  En container som kör i bakgrunden visar ingenting av sig själv. Du läser vad programmet skrivit, eller kör ett kommando inne i containern. Så ser du om containern du nyss startade gör det den ska.
+</div>
+
+<section class="explain">
+<h2>Hur läser man loggen?</h2>
+
+<p>Programmet i en container skriver ut text, som en webbserver gör för varje anrop. Texten går till stdout (standard output, vanliga utskrifter) och stderr (standard error, felmeddelanden). Docker samlar upp båda. Det är loggen.</p>
+
+<p><code>docker logs web</code> visar loggen för containern som fick namnet <a href="0103-docker-run-taggar-och-portar.html"><code>--name web</code></a>. Du får det som finns just då: för nginx en rad per anrop, och en 404 när sidan saknas. Med <code>-f</code> (follow) fortsätter kommandot visa nya rader när de kommer, tills du avbryter med Ctrl+C.</p>
+
+<p>Skriver programmet sin logg till en fil inne i containern syns den inte i <code>docker logs</code>.</p>
+</section>
+
+<section class="explain">
+<h2>Hur kör man något inne i den?</h2>
+
+<p><code>docker exec</code> kör ett nytt kommando i en container som redan kör, utan att starta en ny:</p>
+
+<p><code>docker exec web cat /usr/share/nginx/html/index.html</code></p>
+
+<p>Det fungerar bara medan containerns huvudprocess kör, programmet containern startades med, här nginx. När den avslutas stoppar containern.</p>
+</section>
+
+<section class="explain">
+<h2>När behövs -it?</h2>
+
+<p>Vill du inte köra ett enstaka kommando utan arbeta i containern får du ett skal, ett program där du skriver kommandon och ser svaren: <code>docker exec -it web sh</code>. Det kräver två flaggor. <code>-i</code> (interactive) håller STDIN (standard input, det du skriver) öppet. <code>-t</code> (tty) ger skalet en terminal, så att det visar prompt och rader som i en vanlig terminal. Prompten byter utseende: du är inne i containern, som root (administratören), och <code>exit</code> tar dig ut igen.</p>
+
+<p>Ett enstaka kommando som <code>cat</code> ovan behöver ingetdera, det skriver sitt svar och är klart.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Programmet i en container skriver sin logg till en fil inne i containern. Vad visar <code>docker logs</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="docker logs läser inte filer i containern. Den visar bara det programmet skrivit till stdout och stderr.">Innehållet i loggfilen, eftersom den ligger i containern</button>
+    <button class="opt" data-correct data-why="Docker samlar bara upp stdout och stderr. Skriver programmet till en fil syns det inte i docker logs.">Inte filens innehåll, bara det som går till stdout och stderr</button>
+    <button class="opt" data-why="Det är stdout och stderr som samlas in, inte tidigare körningar. Filen är inte med.">Loggen från containerns förra körning, inte filen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du vill se nya loggrader dyka upp medan du själv laddar om en sida. Vad gör du?</p>
+  <div class="options">
+    <button class="opt" data-why="Utan -f visar kommandot bara det som finns just då och är sedan klart. Nya rader syns först när du kör det igen.">Kör docker logs web och kör om det efter varje laddning</button>
+    <button class="opt" data-why="exec kör ett kommando i containern. Det är inte det som visar loggen löpande.">Kör docker exec web, som följer loggen av sig själv</button>
+    <button class="opt" data-correct data-why="-f (follow) fortsätter visa nya rader tills du avbryter med Ctrl+C.">Kör docker logs -f web och avbryt med Ctrl+C</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Du vill bara skriva ut en fil som ligger i den körande containern <code>web</code>. Vad behöver du?</p>
+  <div class="options">
+    <button class="opt" data-why="-it behövs bara när du vill ha ett skal att arbeta i. Ett enstaka kommando skriver sitt svar och är klart.">docker exec -it web sh, eftersom exec alltid kräver -it</button>
+    <button class="opt" data-correct data-why="Ett enstaka kommando går utan -it. Du får ett skal bara om du själv ber om det med sh.">docker exec web cat följt av filens sökväg, utan -it</button>
+    <button class="opt" data-why="docker run skapar en ny container. exec kör kommandot i den som redan kör.">docker run web cat följt av filens sökväg</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Programmet skriver loggen till stdout och stderr, Docker samlar upp den och <code>docker logs web</code> läser den. <code>-f</code> följer den löpande, avbryt med Ctrl+C. En loggfil i containern syns inte.</li>
+    <li><code>docker exec web &lt;kommando&gt;</code> kör ett kommando i en container som redan kör, så länge dess huvudprocess kör.</li>
+    <li><code>-it</code> behövs bara för ett skal: <code>docker exec -it web sh</code>. <code>-i</code> håller STDIN öppet, <code>-t</code> ger en terminal.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.docker.com/reference/cli/docker/container/logs/">Docker: docker container logs</a>. Insamlingen av stdout och stderr: <a href="https://docs.docker.com/engine/logging/">Docker: Logs and metrics</a>. <code>exec</code>, <code>-i</code>, <code>-t</code> och huvudprocessen: <a href="https://docs.docker.com/reference/cli/docker/container/exec/">Docker: docker container exec</a>. Att en loggfil i containern inte syns i <code>docker logs</code> och att ett enstaka kommando går utan <code>-it</code> följer av Docker-dokumentationens beskrivningar, men står där inte uttryckligen. Det kommer från kursen, liksom loggraderna för nginx och att prompten byter utseende.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0103-docker-run-taggar-och-portar.html">Förra: docker run, taggar och portar</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0105-stoppad-borttagen-och-skrivlagret.html">Nästa: Stoppad, borttagen och skrivlagret</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spara först, skicka sedan</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="notis">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 92 · V43, 7 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 92 · V43, 7 av 16 i veckan</p>
+<h1>Vad händer om skickandet felar?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Förra lektionen lät API:et (Application Programming Interface) skicka ett meddelande när kunden sparats. Då skriver det till två ställen, tabellen och kön. Den andra skrivningen kan misslyckas fast den första lyckades, och då finns kunden utan meddelande.
+</div>
+
+<section class="explain">
+<h2>Två skrivningar, två system</h2>
+
+<p>Meddelandet säger att kunden finns, så API:et sparar kunden först, skickar sedan och svarar sist. Skickas först och sparningen felar, får en konsument veta om en kund som inte finns.</p>
+
+<pre><code>await db.send(new PutCommand({ ... }));           // 1. spara kunden
+await sqs.send(new SendMessageCommand({ ... }));  // 2. skicka meddelandet
+return json(201, customer);                       // 3. svara</code></pre>
+
+<p>Det är två skrivningar till två system, och ingen kan ångra den andra. Felar steg 2, till exempel för att rollen saknar <code>sqs:SendMessage</code>, ligger kunden kvar utan meddelande. Klienten får då 500 Internal Server Error, och loggen visar AccessDeniedException. Skickar klienten om finns kunden två gånger. Felet är ovanligt och syns i loggen, så API:et lever med det.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. SendMessage felar efter att kunden sparats. Vad gäller?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Sparningen ångras inte, och inget meddelande har lagts på kön.">Kunden finns kvar, men inget meddelande</button>
+    <button class="opt" data-why="Sparningen var redan klar och tas inte bort av ett fel i kön.">Kunden tas bort ur tabellen igen</button>
+    <button class="opt" data-why="Meddelandet skickas inte av sig självt om anropet felade.">Meddelandet läggs på kön ändå</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Klienten får ett 5xx-fel och skickar om anropet. Vad blir resultatet?</p>
+  <div class="options">
+    <button class="opt" data-why="Tabellen känner inte till felet i kön och nekar inte.">Tabellen nekar den nya kunden</button>
+    <button class="opt" data-correct data-why="Den första kunden finns redan, och omskicket sparar en till.">Samma kund finns två gånger</button>
+    <button class="opt" data-why="Den första sparningen ångras inte av omskicket.">Den första kunden ersätts</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>API:et sparar kunden före SendMessage och svarar sist.</li>
+    <li>Det är två skrivningar till två system. Felar den andra finns kunden kvar utan meddelande, och klienten får ett 5xx-fel.</li>
+    <li>Skickar klienten om finns kunden två gånger.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS: Transactional outbox pattern</a>, som kallar det här dual write.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0091-sendmessage-och-innehall.html">Förra: SendMessage och meddelandets innehåll</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0093-sqs-trigger-och-roll.html">Nästa: SQS-trigger och konsumentens roll</a>
+</nav>
+
+</main>
+</body>
+</html>

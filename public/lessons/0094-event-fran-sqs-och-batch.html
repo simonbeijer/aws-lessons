@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event från SQS och batch size</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 94 · V43, 9 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 94 · V43, 9 av 16 i veckan</p>
+<h1>Vad får handlern in från kön?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Triggern ger handlern meddelandena som ett event med en lista. Listan kan ha flera meddelanden, och en inställning, batch size, avgör hur många. Det styr hur mycket som körs om när något går fel.
+</div>
+
+<section class="explain">
+<h2>Hur ser eventet ut?</h2>
+
+<p>Triggern från <a href="0093-sqs-trigger-och-roll.html">förra lektionen</a> packar meddelandena i ett event, och Lambda bestämmer formen, inte producenten. Eventet har listan <code>Records</code> med en post per meddelande. Tre fält behövs i varje post, och alla är strängar:</p>
+
+<pre><code>{
+  "Records": [
+    {
+      "messageId": "a1b2-…",
+      "body": "{\"id\":\"c-1042\"}",
+      "attributes": { "ApproximateReceiveCount": "1" }
+    }
+  ]
+}</code></pre>
+
+<p><code>body</code> är det producenten skickade, och ett meddelande är en sträng (<a href="0091-sendmessage-och-innehall.html">lektion 91</a>). <code>ApproximateReceiveCount</code> är <a href="0089-dodbrevsko.html">receive count</a>, antal hämtningar utan borttagning, som SQS (Simple Queue Service) själv lägger i <code>attributes</code>. Det är texten <code>"1"</code>, inte talet 1. <code>messageId</code> är meddelandets id, bra att skriva i loggen.</p>
+
+<p>Handlern går igenom listan och tolkar varje body med JSON (JavaScript Object Notation):</p>
+
+<pre><code>for (const record of event.Records) {
+  const body = JSON.parse(record.body);
+  const attempt = record.attributes.ApproximateReceiveCount;
+}</code></pre>
+</section>
+
+<section class="explain">
+<h2>Hur många meddelanden åt gången?</h2>
+
+<p>Meddelandena i ett anrop kallas en batch, och listan kan ha flera poster. Batch size är det högsta antalet. Utan inställning är det upp till 10. Med batch size 1 får handlern ett meddelande per anrop, men koden går ändå igenom en lista med en post.</p>
+
+<p>Det spelar roll när något kastar. Triggern tar bara bort meddelanden efter ett lyckat anrop, så ett kast skickar tillbaka hela batchen, också de som lyckades. Med batch size 10, där nio går bra och ett kastar, kommer alla tio tillbaka och de nio körs om. Med batch size 1 drabbar ett kast bara det meddelandet. Vad som sedan händer med dem tar nästa lektion.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad är <code>record.body</code> när producenten skickade JSON?</p>
+  <div class="options">
+    <button class="opt" data-why="Lambda tolkar inte JSON åt handlern, body är kvar som text.">Ett objekt som går att läsa direkt</button>
+    <button class="opt" data-correct data-why="Body är en sträng, så handlern gör JSON.parse på den.">En sträng som tolkas med JSON.parse</button>
+    <button class="opt" data-why="Listan är Records, och varje body är en enda sträng.">En lista med en JSON-post per fält</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Batch size är 10, nio meddelanden lyckas och ett kastar. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Triggern tar inte bort något efter ett kast, inte heller de som gick bra.">De nio tas bort och ett kommer tillbaka</button>
+    <button class="opt" data-correct data-why="Ett kast skickar tillbaka hela batchen, även de nio som lyckades.">Alla tio kommer tillbaka till kön</button>
+    <button class="opt" data-why="Kön vet inte vilket som kastade, hela batchen går tillbaka.">Bara det som kastade kommer tillbaka</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Vad är ApproximateReceiveCount för ett meddelande som kommit tillbaka en gång?</p>
+  <div class="options">
+    <button class="opt" data-why="Fältet är en sträng, och värdet är antalet hämtningar, inte antalet kast.">Talet 1, eftersom det kastade en gång</button>
+    <button class="opt" data-correct data-why="Det har hämtats två gånger utan att tas bort, och värdet är en sträng (lektion 89).">Texten "2", andra hämtningen</button>
+    <button class="opt" data-why="Receive count gäller ett enda meddelande, inte kön (lektion 89).">Antalet meddelanden som väntar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Eventet har listan <code>Records</code>, en post per meddelande. <code>body</code> är en sträng som tolkas med <code>JSON.parse</code>, <code>attributes.ApproximateReceiveCount</code> en sträng med antal hämtningar och <code>messageId</code> meddelandets id.</li>
+    <li>Batch size är högsta antalet meddelanden per anrop, upp till 10 som standard. Batch size 1 ger ett meddelande per anrop.</li>
+    <li>Ett kast skickar tillbaka hela batchen, också de som lyckades.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#example-standard-queue-message-event">AWS: Lambda med SQS, exempel på event</a>. Dessutom <a href="https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-configure.html">AWS: konfigurera SQS-trigger för Lambda</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0093-sqs-trigger-och-roll.html">Förra: SQS-trigger och konsumentens roll</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0095-aterforsok-och-fel.html">Nästa: Återförsök och två sorters fel</a>
+</nav>
+
+</main>
+</body>
+</html>

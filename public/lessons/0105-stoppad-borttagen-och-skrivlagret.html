@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stoppad, borttagen och skrivlagret</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 105 · V44, 4 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 105 · V44, 4 av 15 i veckan</p>
+<h1>Vad händer när containern stoppas eller tas bort?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  En stoppad container finns kvar, en borttagen gör det inte. Det du ändrat inne i den försvinner med den, men imagen den kom från ändras aldrig. Det avgör var data som ska sparas måste ligga när API:et och databasen körs i containrar.
+</div>
+
+<section class="explain">
+<h2>Stoppad eller borttagen?</h2>
+
+<p><code>docker stop web</code> stoppar programmet i containern, men containern finns kvar. <code>docker ps</code> visar bara körande containrar, så den syns inte där. <code>docker ps -a</code> (all) visar även stoppade, med status Exited. <code>docker start web</code> startar den igen.</p>
+
+<p><code>docker rm web</code> tar bort containern helt. Vill du ta bort en som fortfarande kör behövs <code>-f</code> (force), som tvingar bort den.</p>
+</section>
+
+<section class="explain">
+<h2>Var hamnar ändringarna?</h2>
+
+<p>Imagen är en <a href="0102-container-image-och-docker.html">skrivskyddad mall</a>. Containern får därför ett eget skrivbart lager ovanpå, skrivlagret. Allt som ändras i containern skrivs dit, nya filer såväl som ändrade, till exempel med <a href="0104-logs-och-exec.html"><code>docker exec</code></a>. Lagret hör till just den containern.</p>
+
+<p>Efter <code>stop</code> ligger lagret kvar, så efter <code>start</code> finns ändringen där. <code>rm</code> tar bort lagret med containern. Imagen är orörd, så en ny container från samma image börjar utan ändringen.</p>
+</section>
+
+<section class="explain">
+<h2>Vad överlever?</h2>
+
+<p>Eftersom skrivlagret försvinner med containern ska en container gå att slänga och ersätta med en ny från samma image. Det som ska överleva måste därför ligga utanför den: i en databas, i S3 (Simple Storage Service) eller i en volym, som förklaras senare i veckan.</p>
+
+<p>Ska containern ändå slängas kan Docker göra det åt dig. <code>docker run --rm</code> tar bort containern automatiskt när den avslutas, så ingen Exited-container blir kvar efter en körning du bara ville göra en gång.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du har kört <code>docker stop web</code>. Var finns containern?</p>
+  <div class="options">
+    <button class="opt" data-why="docker ps visar bara körande containrar. Den stoppade finns kvar men syns inte där.">I docker ps, eftersom stop bara pausar den</button>
+    <button class="opt" data-correct data-why="Stoppad är inte borttagen. docker ps -a visar även stoppade containrar, med status Exited.">Den finns kvar och syns i docker ps -a som Exited</button>
+    <button class="opt" data-why="Det är rm som tar bort en container. stop stoppar bara programmet i den.">Den är borta, och en ny skapas med docker start</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du ändrar en fil i <code>web</code>, tar bort containern med <code>docker rm</code> och startar en ny från samma image. Vad ser du?</p>
+  <div class="options">
+    <button class="opt" data-why="Ändringen skrevs till containerns eget lager, inte till imagen. Imagen ändras aldrig.">Ändringen, eftersom den sparades i imagen</button>
+    <button class="opt" data-correct data-why="Skrivlagret hörde till den gamla containern och togs bort med den. Imagen är orörd, så den nya börjar rent.">Originalfilen, eftersom lagret togs bort med containern</button>
+    <button class="opt" data-why="Lagret hör till en enda container och delas inte, så inget förs över till en ny.">Ändringen, eftersom nya containrar ärver föregående lager</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Du kör en container med <code>--rm</code> och den avslutas. Vad visar <code>docker ps -a</code> om den?</p>
+  <div class="options">
+    <button class="opt" data-why="Utan --rm blir en avslutad container kvar som Exited. Med --rm tas den bort automatiskt.">Den finns kvar med status Exited, som vanligt</button>
+    <button class="opt" data-why="--rm tar inte bort bara skrivlagret. Hela containern tas bort.">Containern, men med ett tomt skrivlager</button>
+    <button class="opt" data-correct data-why="--rm tar automatiskt bort containern när den avslutas, så det finns inget att visa.">Ingenting, för den togs bort när den avslutades</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>docker stop</code> behåller containern: den syns i <code>docker ps -a</code> som Exited, inte i <code>docker ps</code>. <code>docker start</code> startar den igen. <code>docker rm</code> tar bort den, <code>rm -f</code> även en som kör.</li>
+    <li>Ändringar i containern ligger i dess skrivlager. Det försvinner med <code>rm</code>, och imagen ändras aldrig.</li>
+    <li><code>--rm</code> tar bort containern när den avslutas. Det som ska överleva måste ligga utanför containern.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.docker.com/engine/storage/drivers/">Docker: Storage drivers</a>. Att data i containerlagret inte finns kvar när containern förstörs: <a href="https://docs.docker.com/engine/storage/">Docker: Storage</a>. <code>docker ps -a</code>: <a href="https://docs.docker.com/reference/cli/docker/container/ls/">Docker: docker container ls</a>. <code>rm</code> och <code>-f</code>: <a href="https://docs.docker.com/reference/cli/docker/container/rm/">Docker: docker container rm</a>. <code>--rm</code>: <a href="https://docs.docker.com/reference/cli/docker/container/run/">Docker: docker container run</a>. Att <code>docker ps</code> bara visar körande containrar, att en stoppad får status Exited och att <code>-f</code> tvingar bort en körande container står i referenserna ovan. Att skrivlagret ligger kvar efter <code>stop</code> och att ändringen finns kvar efter <code>start</code> står inte uttryckligen i Docker-dokumentationen, som bara beskriver att lagret tas bort med containern. Det kommer från kursen.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0104-logs-och-exec.html">Förra: Loggen och in i containern</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0106-konfiguration-ur-miljon.html">Nästa: Konfiguration ur miljön</a>
+</nav>
+
+</main>
+</body>
+</html>

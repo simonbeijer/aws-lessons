@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dockerfilen rad för rad</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="fördjupning">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 108 · V44, 7 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 108 · V44, 7 av 15 i veckan</p>
+<h1>Vad står i en Dockerfile?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  En Dockerfile är receptet som gör API:et till en image, åtta rader som går att läsa en i taget. Med den kan vem som helst bygga exakt samma image, och den avgör både vad som finns i imagen och vad som körs när containern startar.
+</div>
+
+<section class="explain">
+<h2>Vad är en Dockerfile?</h2>
+
+<p>En Dockerfile är en textfil, utan filändelse, som Docker läser uppifrån och ned för att bygga en <a href="0102-container-image-och-docker.html">image</a>. API:ets recept ser ut så här:</p>
+
+<pre><code>FROM node:22-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY . .
+USER node
+EXPOSE 3000
+CMD ["node", "server.js"]</code></pre>
+
+<p>Raderna följer en berättelse: först utgångspunkten, sedan att få in appen, till sist hur den körs.</p>
+</section>
+
+<section class="explain">
+<h2>Hur kommer appen in?</h2>
+
+<p><code>FROM node:22-alpine</code> väljer basimagen, en färdig image som resten bygger på. Här har den Linux (<a href="0103-docker-run-taggar-och-portar.html">Alpine</a>) och Node 22, så ingen behöver installera Node själv.</p>
+
+<p><code>WORKDIR /app</code> väljer mappen som raderna efter arbetar i. Saknas den skapas den.</p>
+
+<p><code>COPY</code> kopierar filer från projektmappen in i imagen. Först paketfilerna (<code>package*.json</code> är både <code>package.json</code> och <code>package-lock.json</code>), sedan med <code>COPY . .</code> resten av projektet. Att ordningen har ett skäl kommer i en senare lektion.</p>
+
+<p><code>RUN npm ci --omit=dev</code> kör ett kommando under bygget. <code>npm ci</code> installerar paketen utifrån <code>package-lock.json</code>, som listar vilka versioner som gäller, och ändrar varken den eller <code>package.json</code>. Saknas lock-filen, eller stämmer den inte med <code>package.json</code>, avslutas kommandot med fel. <code>--omit=dev</code> hoppar över paket som bara behövs under utveckling.</p>
+</section>
+
+<section class="explain">
+<h2>Hur körs den?</h2>
+
+<p>Raderna hittills har byggt innehållet. De tre sista lägger bara till uppgifter om imagen, så kallad metadata, och ändrar inga filer.</p>
+
+<p><code>USER node</code> byter användare. Utan raden kör containern som root, den användare i Linux som får göra allt. Basimagen har redan användaren <code>node</code>, och i containern visar <code>whoami</code> node.</p>
+
+<p><code>EXPOSE 3000</code> dokumenterar bara att API:et lyssnar på 3000. Porten öppnas inte av den: det gör <a href="0103-docker-run-taggar-och-portar.html"><code>-p</code></a> vid <code>docker run</code>.</p>
+
+<p><code>CMD ["node", "server.js"]</code> säger vad som körs när containern startar.</p>
+</section>
+
+<section class="explain">
+<h2>RUN eller CMD?</h2>
+
+<p><code>RUN</code> körs en gång, under bygget, och resultatet, de installerade paketen, följer med imagen. <code>CMD</code> körs inte under bygget. Det körs varje gång en container startar.</p>
+
+<p>Hakparenteserna i <code>CMD</code> spelar roll. Med dem startar Docker Node direkt, så <code>docker stop</code> skickar <a href="0107-health-och-sigterm.html">SIGTERM</a> till Node. Skriver man <code>CMD node server.js</code> körs kommandot via skalet <code>/bin/sh -c</code>. Det tar emot signalen i stället, SIGTERM-koden i API:et körs inte och Docker dödar processen efter 10 sekunder.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. När körs <code>RUN npm ci --omit=dev</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="RUN hör till bygget. Det som startar vid containerns start är CMD.">Varje gång någon startar en container av imagen</button>
+    <button class="opt" data-correct data-why="RUN körs under bygget, och paketen följer med i imagen. CMD är det som körs när containern startar.">En gång under bygget, och paketen följer med imagen</button>
+    <button class="opt" data-why="RUN körs under bygget, inte vid första containerstarten. Då är paketen redan med i imagen.">Första gången någon startar en container av imagen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Dockerfilen har <code>EXPOSE 3000</code>, och containern startas med <code>docker run</code> utan <code>-p</code>. Går API:et att nå på värdens port 3000?</p>
+  <div class="options">
+    <button class="opt" data-why="EXPOSE öppnar ingen port. Den dokumenterar bara vilken port programmet lyssnar på.">Ja, EXPOSE öppnar porten mot värddatorn direkt</button>
+    <button class="opt" data-correct data-why="EXPOSE dokumenterar bara porten. Det är -p vid docker run som kopplar värdens port till containerns.">Nej, EXPOSE dokumenterar bara, det är -p som öppnar</button>
+    <button class="opt" data-why="CMD startar programmet men kopplar ingen port. Portkopplingen görs med -p vid docker run.">Ja, men först när CMD har startat programmet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Varför är <code>CMD ["node", "server.js"]</code> bättre än <code>CMD node server.js</code> för API:et?</p>
+  <div class="options">
+    <button class="opt" data-why="Hakparenteserna ändrar inte hur snabbt programmet startar. De avgör vem som tar emot signalen vid docker stop.">Programmet startar märkbart snabbare med hakparenteser</button>
+    <button class="opt" data-why="Båda formerna startar samma program. Skillnaden är vem som får signalen vid docker stop.">Ingen skillnad, de är två sätt att skriva samma sak</button>
+    <button class="opt" data-correct data-why="Med hakparenteser startar Node direkt och får SIGTERM. Utan dem tar skalet signalen, hanteraren körs inte och Docker väntar 10 sekunder.">Node får SIGTERM direkt, så hanteraren körs vid docker stop</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Dockerfilen läses uppifrån. <code>FROM</code> väljer basimagen, <code>WORKDIR</code> mappen, <code>COPY</code> kopierar in filer och <code>RUN</code> kör ett kommando under bygget.</li>
+    <li><code>npm ci --omit=dev</code> installerar utifrån <code>package-lock.json</code>, avslutas med fel om den inte stämmer med <code>package.json</code>, ändrar ingen av dem och hoppar över utvecklingspaket.</li>
+    <li><code>USER node</code> byter från root. <code>EXPOSE 3000</code> dokumenterar bara porten, <code>-p</code> öppnar den.</li>
+    <li><code>CMD</code> körs när containern startar, inte under bygget. I exec-form (<code>["node", "server.js"]</code>) får Node SIGTERM, i skalform tar skalet den.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.docker.com/reference/dockerfile/">Docker: Dockerfile reference</a> (FROM, WORKDIR, COPY, RUN, USER, EXPOSE, CMD, exec- och skalform). <code>npm ci</code> och <code>--omit=dev</code>: <a href="https://docs.npmjs.com/cli/v10/commands/npm-ci">npm: npm-ci</a>. Att basimagen har användaren <code>node</code>: <a href="https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md">docker-node: Best practices</a> (inte bekräftat på docs.docker.com). Alpine: <a href="https://www.alpinelinux.org/about/">Alpine Linux: About</a>. Dockerfilen, att <code>whoami</code> visar node och att Docker väntar 10 sekunder kommer från kursen.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0107-health-och-sigterm.html">Förra: /health och SIGTERM</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0109-docker-build-och-dockerignore.html">Nästa: docker build och .dockerignore</a>
+</nav>
+
+</main>
+</body>
+</html>

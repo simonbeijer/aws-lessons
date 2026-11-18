@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/health och SIGTERM</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 107 · V44, 6 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 107 · V44, 6 av 15 i veckan</p>
+<h1>Hur vet omvärlden att API:et lever, och hur stoppas det?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Två små tillägg gör att API:et går att övervaka och stoppa i en container: en adress som svarar på om programmet lever, och kod som tar emot beskedet att stoppa och avslutar i ordning. Utan dem kan ett friskt API se sjukt ut, och ett stopp avbryter anrop mitt i. Båda ska finnas innan API:et packas.
+</div>
+
+<section class="explain">
+<h2>Vad är /health?</h2>
+
+<p><code>/health</code> är en adress i API:et som bara svarar på om processen lever. Den frågar inte databasen. Svaret är <a href="0050-statuskod.html">statuskod</a> 200 med <code>{"status":"ok","version":"1.0.0"}</code>.</p>
+
+<p>Skälet är att en <a href="0073-load-balancer-och-arn.html">lastbalanserare</a> i v45 ska fråga adressen för att veta om API:et fungerar. Skulle <code>/health</code> också fråga databasen, räknades API:et som dött varje gång databasen har problem, fast programmet är helt friskt.</p>
+
+<p>Därför kan <code>/health</code> ge 200 samtidigt som <code>/customers</code> ger 500: når API:et inte databasen misslyckas <code>/customers</code>, men <code>/health</code> svarar ändå. Det syns första gången imagen startas, i <a href="0109-docker-build-och-dockerignore.html">lektion 109</a>.</p>
+</section>
+
+<section class="explain">
+<h2>Vad händer vid docker stop?</h2>
+
+<p><a href="0105-stoppad-borttagen-och-skrivlagret.html"><code>docker stop</code></a> skickar SIGTERM (Signal Terminate) till containerns huvudprocess, alltså API:et. En <a href="0060-process-i-bakgrunden.html">signal</a> är ett kort besked till en process, och SIGTERM betyder "avsluta dig".</p>
+
+<p>En huvudprocess i en container avslutas inte av SIGTERM om den inte har kod för det. Då händer inget, Docker väntar 10 sekunder och skickar SIGKILL (Signal Kill). Det kan programmet inte fånga, det dör direkt, också mitt i ett anrop.</p>
+</section>
+
+<section class="explain">
+<h2>Hur avslutar API:et i ordning?</h2>
+
+<p>API:et lyssnar på signalen med <code>process.on("SIGTERM", ...)</code>. När den kommer sker tre saker i tur och ordning:</p>
+
+<ul>
+  <li><code>server.close()</code> slutar ta emot nya anslutningar, men låter pågående anrop bli klara.</li>
+  <li>När alla är klara stängs anslutningarna till databasen med <code>pool.end()</code>.</li>
+  <li><code>process.exit(0)</code> avslutar programmet.</li>
+</ul>
+
+<p>I loggen syns <code>SIGTERM: stänger</code>, och <code>docker stop</code> är klart på en bråkdels sekund i stället för tio.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. <code>/health</code> ger 200 och <code>/customers</code> ger 500. Vad säger det?</p>
+  <div class="options">
+    <button class="opt" data-why="Adressen frågar inte databasen, så ett 200 säger inget om den. Bara att processen lever.">Databasen fungerar men API:et är trasigt</button>
+    <button class="opt" data-correct data-why="/health frågar inte databasen. 200 betyder att processen lever, och 500 på /customers att något annat, som databasen, inte når fram.">Programmet lever, men något i /customers fungerar inte</button>
+    <button class="opt" data-why="Har processen dött svarar /health inte alls. Ett 200 betyder att den lever.">Programmet har dött, och 500 är det sista svaret</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Ett API utan SIGTERM-kod stoppas med <code>docker stop</code>. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Utan kod för SIGTERM avslutar sig processen inte själv. Docker avslutar den efter väntetiden.">Det avslutas direkt, för SIGTERM betyder avsluta</button>
+    <button class="opt" data-correct data-why="Processen reagerar inte på SIGTERM. Efter 10 sekunder skickar Docker SIGKILL, som inte går att fånga.">Docker väntar 10 sekunder och dödar det sedan med SIGKILL</button>
+    <button class="opt" data-why="Docker väntar bara en gång, 10 sekunder, och dödar sedan processen. Det finns ingen andra omgång.">Docker skickar SIGTERM om och om igen tills det avslutas</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. API:et har SIGTERM-kod och är mitt i ett anrop när <code>docker stop</code> körs. Vad händer med anropet?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="server.close() tar inte emot nya anslutningar men låter pågående bli klara. Sedan avslutas programmet.">Det blir klart, sedan avslutas API:et</button>
+    <button class="opt" data-why="Det är SIGKILL som avbryter direkt. Med SIGTERM-kod väntar API:et in pågående anrop.">Det avbryts direkt, så att API:et kan avsluta fort</button>
+    <button class="opt" data-why="Docker flyttar inget mellan containrar. API:et väntar in det pågående anropet och avslutar sedan.">Det flyttas till en ny container</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>/health</code> svarar på om processen lever, utan att fråga databasen. Därför ger den 200 fast <code>/customers</code> ger 500.</li>
+    <li><code>docker stop</code> skickar SIGTERM till huvudprocessen. Utan kod för den väntar Docker 10 sekunder och skickar SIGKILL, som inte går att fånga.</li>
+    <li>Med <code>process.on("SIGTERM", ...)</code> slutar API:et ta emot nya anrop (<code>server.close()</code>), låter pågående bli klara, stänger databasanslutningarna och avslutar.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.docker.com/reference/cli/docker/container/stop/">Docker: docker container stop</a> (SIGTERM, 10 sekunder, SIGKILL). Att en huvudprocess inte avslutas av SIGTERM utan kod för det: <a href="https://docs.docker.com/reference/cli/docker/container/run/">Docker: docker container run</a>. Att SIGKILL inte kan fångas och <code>process.on</code>: <a href="https://nodejs.org/api/process.html#signal-events">Node.js: Signal events</a>. <code>server.close()</code>: <a href="https://nodejs.org/api/http.html#serverclosecallback">Node.js: server.close</a>. Koden i <code>/health</code> och SIGTERM-hanteraren, svaret med <code>version</code> och att <code>/health</code> inte ska fråga databasen kommer från kursen. Att 0 är lyckat avslut (Node.js kallar 0 &quot;the success code&quot;): <a href="https://nodejs.org/api/process.html#processexitcode">Node.js: process.exit</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0106-konfiguration-ur-miljon.html">Förra: Konfiguration ur miljön</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0108-dockerfilen-rad-for-rad.html">Nästa: Dockerfilen rad för rad</a>
+</nav>
+
+</main>
+</body>
+</html>

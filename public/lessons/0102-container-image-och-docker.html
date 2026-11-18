@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Container, image och Docker</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 102 · V44, 1 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 102 · V44, 1 av 15 i veckan</p>
+<h1>Vad är en container?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  En container kör ett program tillsammans med det det behöver, utan att vara en hel server. Det är därför samma program kan köra likadant på olika datorer. Det här behöver du förstå innan API:et (Application Programming Interface) från v41 packas in.
+</div>
+
+<section class="explain">
+<h2>Container eller server?</h2>
+
+<p>I v41 kördes API:et på en <a href="0029-ec2-instans.html">EC2-instans</a> (Elastic Compute Cloud), en hel virtuell server med eget operativsystem. En container är mycket mindre: några processer som får en egen vy av filsystemet, avskärmad från resten av datorn.</p>
+
+<p>Containrarna på en dator delar dess Linux-kärna, den del av operativsystemet som styr hårdvaran. Därför är de lätta: ingen av dem bär på ett eget operativsystem. Kör du <code>ps</code> (listar processer) inne i en webbservercontainer ser du bara webbservern och dess arbetare, inget mer.</p>
+</section>
+
+<section class="explain">
+<h2>Image och container</h2>
+
+<p>Containern startas från en image, en skrivskyddad mall med programmet och det det behöver. Den fyller samma roll som en <a href="0030-ami.html">AMI</a> (Amazon Machine Image), fast för ett program och inte för en hel server. Eftersom imagen har med det programmet behöver, kör den likadant var den startas. Containern är en körande kopia av imagen, och flera containrar kan startas från samma image.</p>
+
+<p>Imagen ändras aldrig. Behövs något annat blir det en ny image. Vart ändringar i en körande container tar vägen kommer i <a href="0105-stoppad-borttagen-och-skrivlagret.html">lektion 105</a>.</p>
+</section>
+
+<section class="explain">
+<h2>Vad är docker?</h2>
+
+<p>Kommandot <code>docker</code> är en klient. Den pratar med Docker Engine, en process i bakgrunden som bygger images och kör containrar.</p>
+
+<p>På Mac och Windows finns ingen Linux-kärna att dela. Därför kör Docker Desktop, programmet man installerar där, Engine i en liten virtuell Linux-maskin, och containrarna delar den maskinens kärna. Det är därför <code>uname -r</code> (skriver ut kärnans version) visar en Linux-kärna inne i en container, även på en Mac.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad är det som gör en container lättare än en EC2-instans?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Containern delar värdens kärna. Det är inte en server som bär med sig ett eget operativsystem.">Den delar kärnan med värden, utan eget operativsystem</button>
+    <button class="opt" data-why="Containern har en egen vy av filsystemet. Det är inte det som gör den lätt.">Den saknar filsystem och använder värdens rakt av</button>
+    <button class="opt" data-why="Det är tvärtom: en container är några processer, inte en hel server.">Den är en hel server men med mindre minne</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. En AMI är mallen en EC2-instans startas från. Vad är motsvarigheten för en container?</p>
+  <div class="options">
+    <button class="opt" data-why="Containern är den körande kopian, inte mallen.">Containern, som kör programmet</button>
+    <button class="opt" data-correct data-why="Imagen är den skrivskyddade mallen, och containern en körande kopia av den.">Imagen, med programmet i</button>
+    <button class="opt" data-why="Docker Engine är processen som bygger images och kör containrar, inte mallen.">Docker Engine, som kör den</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. På en Mac visar <code>uname -r</code> inne i en container en Linux-kärna. Varför?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Docker Desktop kör Engine i en virtuell Linux-maskin, och det är den maskinens kärna som delas.">Containrarna delar kärnan i Docker Desktops Linux-maskin</button>
+    <button class="opt" data-why="Containern har ingen egen kärna. Den delar kärnan med värden, här Linux-maskinen.">Varje container bär med sig en egen Linux-kärna</button>
+    <button class="opt" data-why="macOS kärna delas inte med containrar. Engine kör i en Linux-maskin.">Docker byter ut macOS-kärnan mot Linux-kärnan</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En container är några processer med en egen vy av filsystemet. De delar värdens Linux-kärna, så en container är inte en hel server.</li>
+    <li>En image är den skrivskyddade mallen. En container är en körande kopia, och flera kan startas från samma image.</li>
+    <li><code>docker</code> är en klient mot Docker Engine. På Mac och Windows kör Docker Desktop Engine i en liten virtuell Linux-maskin.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/">Docker: What is a container?</a>. Image och skrivskyddad mall: <a href="https://docs.docker.com/get-started/docker-overview/">Docker: What is Docker?</a>. Engine i Linux-maskinen: <a href="https://docs.docker.com/desktop/features/networking/">Docker Desktop: Networking</a>, som säger att Docker Desktop kör Engine i en lätt virtuell Linux-maskin. Sidan nämner inte Mac och Windows uttryckligen, den uppgiften kommer från kursen. Att <code>ps</code> bara visar webbservern kommer också från kursen.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="V44-start.html">Förra: Start V44</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0103-docker-run-taggar-och-portar.html">Nästa: docker run, taggar och portar</a>
+</nav>
+
+</main>
+</body>
+</html>

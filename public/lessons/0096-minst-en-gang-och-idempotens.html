@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minst en gång och idempotens</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 96 · V43, 11 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 96 · V43, 11 av 16 i veckan</p>
+<h1>Kan ett meddelande komma två gånger?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Ja, och kön gör inget åt det. Förra lektionen gav ett skäl: meddelanden försöks igen. Därför måste koden ge samma resultat andra gången som första, och det kallas idempotent.
+</div>
+
+<section class="explain">
+<h2>Varför kommer dubbletter?</h2>
+
+<p>En standardkö lovar leverans minst en gång (at-least-once): varje meddelande kommer fram en gång eller flera. Ett kast ger ett nytt försök (<a href="0095-aterforsok-och-fel.html">lektion 95</a>), men dubbletter kan också komma utan att något gått fel. Kön filtrerar inte bort dem, så skyddet ligger i koden som tar emot meddelandet. Skickade funktionen ett mejl skulle kunden få två.</p>
+</section>
+
+<section class="explain">
+<h2>Hur tål koden det?</h2>
+
+<p>Koden ska vara idempotent: två likadana körningar lämnar databasen i samma läge som en (samma ord som för HTTP-metoder, Hypertext Transfer Protocol, i <a href="0049-http-metod.html">lektion 49</a>). Funktionen skriver tiden för välkomsten i <code>welcome_sent_at</code>. Med <code>SET welcome_sent_at = :t</code> skriver andra körningen över tiden med en ny, och då är den inte idempotent.</p>
+
+<p><code>if_not_exists(path, value)</code> löser det. Den ger <code>value</code> om attributet saknas, annars det som redan står där, och går bara att använda i <code>SET</code>:</p>
+
+<pre><code>new UpdateCommand({
+  TableName: TABLE,
+  Key: { id: msg.id },
+  UpdateExpression: "SET welcome_sent_at = if_not_exists(welcome_sent_at, :t)",
+  ExpressionAttributeValues: { ":t": new Date().toISOString() },
+  ConditionExpression: "attribute_exists(id)",
+})</code></pre>
+
+<p>Villkoret är det från <a href="0095-aterforsok-och-fel.html">förra lektionen</a>: det hindrar UpdateItem från att skapa en ny kund. Andra körningen skickar ett nytt <code>:t</code>, men attributet finns, så första tiden ligger kvar. Skickas samma meddelande två gånger för kunden Dubbel Testsson står "Välkommen Dubbel Testsson!" två gånger i loggen, men tabellen visar samma <code>welcome_sent_at</code> som förut. Bara attributet är skyddat: loggraden skrivs ändå två gånger.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Funktionen skulle skicka ett mejl per meddelande. Varför kan kunden få två?</p>
+  <div class="options">
+    <button class="opt" data-why="Standardkön filtrerar inte bort dubbletter, så kunden får två mejl.">Kön tar bort dubbletter först när kunden svarat</button>
+    <button class="opt" data-correct data-why="Standardkön levererar minst en gång, så samma meddelande kan komma fram igen och köra koden en gång till.">Samma meddelande kan levereras och köras två gånger</button>
+    <button class="opt" data-why="Ett lyckat anrop tar bort meddelandet. Dubbletter har andra orsaker än att triggern glömmer.">Triggern glömmer ta bort meddelandet efter lyckad körning</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Kunden har redan welcome_sent_at. Vad händer vid andra körningen med if_not_exists(welcome_sent_at, :t)?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Attributet finns, så if_not_exists ger det som står där och :t ignoreras.">Den första tiden ligger kvar</button>
+    <button class="opt" data-why="Det nya :t används bara när attributet saknas.">Attributet får den nya tiden</button>
+    <button class="opt" data-why="Villkoret attribute_exists(id) gäller id, som finns, så anropet godtas.">Anropet kastar ConditionalCheckFailedException</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Handlern kastade och meddelandet försöks igen (lektion 95). Vad betyder det för koden?</p>
+  <div class="options">
+    <button class="opt" data-why="Det tillfälliga felet kan ha inträffat efter att något hunnit skrivas, så koden måste tåla en andra körning.">Andra körningen börjar alltid från noll</button>
+    <button class="opt" data-correct data-why="Ett nytt försök kör samma kod med samma meddelande, så den ska ge samma resultat som en körning.">Koden körs igen och ska tåla det</button>
+    <button class="opt" data-why="Kön ger inget skydd mot dubbletter, det ligger i koden.">Kön hoppar över det som lyckades</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En standardkö levererar minst en gång. Samma meddelande kan komma fram mer än en gång, och koden måste tåla det.</li>
+    <li>Idempotent: två körningar ger samma resultat som en.</li>
+    <li><code>SET welcome_sent_at = if_not_exists(welcome_sent_at, :t)</code> skriver tiden bara första gången. Loggrader och mejl skyddas inte.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkällor: <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a>, <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html">AWS: Standard queues</a> och <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html">AWS: Update expressions</a>. Om begreppet: <a href="https://developer.mozilla.org/en-US/docs/Glossary/Idempotent">MDN (Mozilla Developer Network): Idempotent</a>. AWS skriver att funktionskoden starkt rekommenderas vara idempotent, kursen kallar det ett krav.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0095-aterforsok-och-fel.html">Förra: Återförsök och två sorters fel</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0097-handelse-och-eventbridge.html">Nästa: Händelse och EventBridge</a>
+</nav>
+
+</main>
+</body>
+</html>

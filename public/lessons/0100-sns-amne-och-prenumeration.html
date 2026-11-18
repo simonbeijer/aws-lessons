@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SNS-ämne och prenumeration</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 100 · V43, 15 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 100 · V43, 15 av 16 i veckan</p>
+<h1>Vad är ett SNS-ämne?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Händelsen kan nu gå till en kö, men ibland ska någon bara få veta att något hänt, till exempel i ett mejl. Det gör ett SNS-ämne (Simple Notification Service): det skickar samma meddelande direkt till alla som prenumererar.
+</div>
+
+<section class="explain">
+<h2>Vad gör ett ämne?</h2>
+
+<p>En kö (<a href="0087-sqs-ko-och-meddelande.html">lektion 87</a>) håller meddelandet tills konsumenten hämtar det. Ett ämne (topic) gör tvärtom. Den som publicerar skickar ett meddelande till ämnet, och SNS trycker ut det direkt till alla prenumeranter. Det kallas push, och ingen mottagare frågar efter något.</p>
+
+<p>En prenumerant är den som en prenumeration pekar på: en e-postadress, en kö, en Lambda-funktion och fler. När ämnet är mål i en regel (<a href="0098-regel-mal-och-access-policy.html">lektion 98</a>) är meddelandet hela händelsen som JSON (JavaScript Object Notation), så mejlet visar kuvertet från förra lektionen.</p>
+</section>
+
+<section class="explain">
+<h2>Går det att hämta efteråt?</h2>
+
+<p>Nej. SNS har ingen åtgärd för att hämta ett publicerat meddelande, bara Publish för att skicka det. Vill du kunna läsa meddelandet senare, låt en kö prenumerera på ämnet, så hamnar det också där.</p>
+
+<p>Går leveransen till en mottagare inte fram, försöker SNS igen. När försöken är slut kasseras meddelandet, om ingen <a href="0089-dodbrevsko.html">dödbrevskö</a> är kopplad till prenumerationen.</p>
+</section>
+
+<section class="explain">
+<h2>Varför måste e-post bekräftas?</h2>
+
+<p>SNS får inte skicka mejl till vem som helst, så den som äger adressen måste godkänna det. När en e-postprenumeration skapas (Protocol Email, Endpoint adressen, på ett ämne av typen Standard) mejlar SNS därför en länk, Confirm subscription. Tills ägaren klickat på den står prenumerationen som <code>pending confirmation</code>, och inget som publiceras skickas till adressen. Efter klicket står den som Confirmed.</p>
+
+<p>Titta i skräpposten om mejlet uteblir. Klickar ingen inom 48 timmar raderar SNS prenumerationen, och då måste den skapas på nytt.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du publicerade ett meddelande i går, och ingen läste det då. Hur kommer du åt det i dag?</p>
+  <div class="options">
+    <button class="opt" data-why="SNS har ingen åtgärd för att hämta meddelanden, bara för att skicka dem.">Hämtar det från ämnet med ReceiveMessage</button>
+    <button class="opt" data-correct data-why="Rätt, ämnet går inte att läsa i efterhand. Hade en kö prenumererat hade meddelandet legat där.">Det går inte, om inte en kö prenumererade</button>
+    <button class="opt" data-why="Ämnet skickar redan direkt till prenumeranterna, ingen väntar på en begäran.">Ber ämnet skicka det igen när du vill</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Prenumerationen står som <code>pending confirmation</code>, och du publicerar ett meddelande. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Utan bekräftelse skickar SNS inget till adressen.">Adressen får mejlet och bekräftar efteråt</button>
+    <button class="opt" data-why="SNS kan inte bekräfta åt ägaren, bara ägaren kan klicka på länken.">SNS bekräftar själv och skickar mejlet</button>
+    <button class="opt" data-correct data-why="Prenumerationen väntar på ägarens klick, så inget skickas till adressen.">Inget skickas förrän ägaren klickat på länken</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Leveransen till en prenumerant misslyckas varje gång, och ingen dödbrevskö är kopplad. Vad händer med meddelandet?</p>
+  <div class="options">
+    <button class="opt" data-why="Ämnet har inget att hämta från. Meddelandet skickas, det väntar inte.">Det väntar i ämnet tills mottagaren hämtar det</button>
+    <button class="opt" data-correct data-why="SNS gör omförsök, och när de är slut kasseras meddelandet om ingen dödbrevskö finns.">Det kasseras när omförsöken är slut</button>
+    <button class="opt" data-why="Dödbrevskön måste kopplas till prenumerationen, den skapas inte av sig själv.">Det flyttas till en dödbrevskö SNS skapar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett SNS-ämne trycker (push) ut samma meddelande direkt till alla prenumeranter. Det går inte att hämta efteråt. Vill du det, låt en kö prenumerera.</li>
+    <li>Misslyckas leveransen gör SNS omförsök och kasserar sedan meddelandet, om ingen dödbrevskö är kopplad.</li>
+    <li>En e-postprenumeration måste bekräftas av adressens ägare med länken i mejlet. Före det är den <code>pending confirmation</code>, och efter 48 timmar utan klick raderas den.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkällor: <a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html">AWS: What is Amazon SNS?</a> och <a href="https://docs.aws.amazon.com/sns/latest/dg/sns-email-notifications.html">AWS: Email subscriptions</a>. Att SNS trycker ut direkt: <a href="https://aws.amazon.com/sns/faqs/">AWS: SNS FAQ</a>. Att ingen åtgärd hämtar meddelanden: <a href="https://docs.aws.amazon.com/sns/latest/api/API_Operations.html">AWS: SNS API Actions</a>. Omförsök och kassering: <a href="https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html">AWS: Delivery retries</a>. Att ägaren bekräftar och statusen <code>pending confirmation</code>: <a href="https://docs.aws.amazon.com/sns/latest/api/API_Subscribe.html">AWS: Subscribe</a>. Att ämnet som mål får hela händelsen: <a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutTargets.html">AWS: PutTargets</a>. Kursmaterialet säger att SNS inte sparar något. AWS säger att SNS lagrar mottagna meddelanden hållbart innan de kvitteras, men inte att de kan läsas senare. Här står det som går att belägga: ingen åtgärd hämtar dem. Namnet Confirmed efter klicket kommer från kursmaterialet, inte från AWS dokumentation.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0099-putevents-och-kuvertet.html">Förra: PutEvents och kuvertet</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0101-scheduler-cron-och-rate.html">Nästa: Bonus: EventBridge Scheduler, cron och rate</a>
+</nav>
+
+</main>
+</body>
+</html>

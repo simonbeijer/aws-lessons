@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PutEvents och kuvertet</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 99 · V43, 14 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 99 · V43, 14 av 16 i veckan</p>
+<h1>Hur skickar API:et en händelse?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Regeln och målen står klara (förra lektionen). Nu ska API:et skicka händelsen, med PutEvents i stället för SendMessage. Händelsen kommer fram till kön inlindad i ett kuvert, och därför läser konsumenten den på ett nytt sätt.
+</div>
+
+<section class="explain">
+<h2>Vad skickar anropet?</h2>
+
+<p>API:et (Application Programming Interface) byter <code>SendMessage</code> (<a href="0091-sendmessage-och-innehall.html">lektion 91</a>) mot <code>PutEventsCommand</code> i AWS SDK (Software Development Kit). Anropet tar <code>Entries</code>, en lista med poster med tre fält var:</p>
+
+<pre><code>Entries: [{
+  Source: "kundregister",
+  DetailType: "CustomerCreated",
+  Detail: JSON.stringify({ id, name }),
+}]</code></pre>
+
+<p><code>Source</code> och <code>DetailType</code> är det regeln matchar på (<a href="0098-regel-mal-och-access-policy.html">lektion 98</a>). <code>Detail</code> är innehållet, en sträng med JSON (JavaScript Object Notation) precis som <code>MessageBody</code>, och <code>JSON.stringify</code> gör objektet till den. Utan <code>EventBusName</code> går händelsen till bussen default.</p>
+
+<p>Rollen måste tillåta <code>events:PutEvents</code> på bussens ARN (Amazon Resource Name), annars blir det AccessDeniedException.</p>
+</section>
+
+<section class="explain">
+<h2>Kom den in?</h2>
+
+<p>En post kan misslyckas, till exempel om ett fält saknas, men anropet svarar ändå 200. <code>FailedEntryCount</code> i svaret är antalet poster som inte kom in. Är det över 0 måste koden kasta eller skicka om.</p>
+</section>
+
+<section class="explain">
+<h2>Vad får konsumenten?</h2>
+
+<p>Ett mål får hela händelsen, inte bara <code>Detail</code>. Den ligger i ett kuvert, med innehållet i fältet <code>detail</code>:</p>
+
+<pre><code>{
+  "id": "a1b2…",
+  "detail-type": "CustomerCreated",
+  "source": "kundregister",
+  "time": "2026-10-22T15:10:00Z",
+  "region": "eu-north-1",
+  "detail": { "id": "9b1d…", "name": "Alice" }
+}</code></pre>
+
+<p>Runt <code>detail</code> lägger EventBridge bland annat <code>id</code>, som identifierar händelsen, och <code>time</code>, när den hände. Kön får kuvertet som body, så efter <code>JSON.parse</code> (<a href="0094-event-fran-sqs-och-batch.html">lektion 94</a>) ligger det API:et skickade i <code>body.detail</code>.</p>
+
+<p>Därför läser konsumenten <code>body.detail ?? body</code>. Operatorn <code>??</code> tar vänstra värdet om det finns, annars det högra: <code>detail</code> via bussen, <code>body</code> direkt från kön. Utan raden blir kundens id undefined, och DynamoDB svarar ValidationException.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. PutEvents svarar 200 utan fel, men <code>FailedEntryCount</code> är 1. Vad betyder det?</p>
+  <div class="options">
+    <button class="opt" data-why="Bussen skickar inte om den som misslyckades. Det får koden göra.">Bussen skickar om den misslyckade posten själv</button>
+    <button class="opt" data-correct data-why="Rätt, 200 gäller anropet. Posterna redovisas var för sig, och koden måste själv skicka om den som blev fel.">En post kom inte in, och koden måste skicka om den</button>
+    <button class="opt" data-why="FailedEntryCount räknar bara de som misslyckades. De övriga går vidare ändå.">Ingen av posterna kom in, så ingen går vidare</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vad skickas som en sträng i en post?</p>
+  <div class="options">
+    <button class="opt" data-why="Entries är en lista, inte en sträng. Strängen gäller ett fält i varje post.">Hela listan Entries, gjord till ett JSON-block</button>
+    <button class="opt" data-correct data-why="Detail ska vara en sträng med JSON, så objektet görs om med JSON.stringify.">Detail, innehållet som objektet blir efter JSON.stringify</button>
+    <button class="opt" data-why="DetailType är en vanlig text som regeln matchar på, inget som tolkas.">DetailType, som beskriver vilken sorts händelse det är</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Konsumenten läser <code>body.detail ?? body</code>. Vad ligger i <code>body.detail</code> när händelsen kom via bussen?</p>
+  <div class="options">
+    <button class="opt" data-why="Source ligger i kuvertet, bredvid detail och inte i det.">Fältet Source som API:et skickade</button>
+    <button class="opt" data-why="Kuvertet är hela body, och detail är bara en del av det.">Hela kuvertet med id och time</button>
+    <button class="opt" data-correct data-why="Det API:et skickade som Detail hamnar i detail, inuti kuvertet.">Det API:et skickade som Detail</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>PutEventsCommand</code> skickar <code>Entries</code>. Varje post har <code>Source</code>, <code>DetailType</code> och <code>Detail</code> som sträng.</li>
+    <li>200 betyder inte att allt kom in. <code>FailedEntryCount</code> visar det som inte gjorde det.</li>
+    <li>EventBridge lägger ett kuvert runt <code>detail</code>, så konsumenten läser <code>body.detail ?? body</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkällor: <a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html">AWS: PutEvents</a>, <a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEventsRequestEntry.html">AWS: PutEventsRequestEntry</a> och <a href="https://docs.aws.amazon.com/eventbridge/latest/ref/events-structure.html">AWS: Event structure</a>. Behörigheten: <a href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_eventbridge.html">AWS: Actions, resources and condition keys for Amazon EventBridge</a> (PutEvents gäller resurstypen event-bus). Att ett mål får hela händelsen när inget Input, InputPath eller InputTransformer är satt: <a href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutTargets.html">AWS: PutTargets</a>. Att en saknad <code>body.detail ?? body</code> ger ValidationException står i kursmaterialet. Kursmaterialet säger också att <code>FailedEntryCount</code> blir 1 när bussen inte finns. AWS säger att anropet då ger 200 och inte räknas som misslyckat, och här gäller AWS.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0098-regel-mal-och-access-policy.html">Förra: Regel, mål och köns access policy</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0100-sns-amne-och-prenumeration.html">Nästa: SNS-ämne och prenumeration</a>
+</nav>
+
+</main>
+</body>
+</html>

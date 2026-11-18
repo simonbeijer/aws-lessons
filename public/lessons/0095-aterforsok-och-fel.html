@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Återförsök och två sorters fel</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 95 · V43, 10 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 95 · V43, 10 av 16 i veckan</p>
+<h1>Vad händer när handlern kastar?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Förra lektionen slutade med att ett kast skickar tillbaka meddelandet till kön. Här är vad som händer sedan: meddelandet får nya försök, och den som anropade API:et (Application Programming Interface) märker ingenting. Därför ska koden bara kasta när ett nytt försök kan hjälpa.
+</div>
+
+<section class="explain">
+<h2>Vad händer efter ett kast?</h2>
+
+<p>Klienten har redan fått sitt svar. API:et svarade 201 när <code>SendMessage</code> lagt meddelandet på kön (<a href="0091-sendmessage-och-innehall.html">lektion 91</a>), innan någon funktion körts. Till skillnad från ett kast bakom API:et (<a href="0083-event-och-svar-api-gateway.html">lektion 83</a>) når felet aldrig klienten. Det syns bara i loggen.</p>
+
+<p>Kastar handlern tas inget bort, och meddelandet blir synligt igen när visibility timeout gått ut (<a href="0088-hamta-och-ta-bort.html">lektion 88</a>). Receive count går upp vid varje hämtning, så loggen kan visa <code>attempt</code> 1, 2, 3. Efter tre misslyckade körningar flyttas meddelandet till <a href="0089-dodbrevsko.html">dödbrevskön</a>.</p>
+</section>
+
+<section class="explain">
+<h2>Kasta eller hoppa över?</h2>
+
+<p>Ett kast hjälper bara om ett nytt försök kan lyckas. Ett tillfälligt fel går över av sig självt, som throttling (<a href="0084-stage-behorighet-throttling.html">lektion 84</a>) eller ett 5xx-fel från tjänsten, och ska kastas. Ett sådant fel går att simulera genom att kasta med flit, till exempel när kundens namn börjar med FEL.</p>
+
+<p>Ett permanent fel ger samma svar varje gång. Är kunden borttagen ger <code>UpdateItem</code> med villkoret <code>attribute_exists(id)</code> felet <code>ConditionalCheckFailedException</code> (<a href="0079-lasa-och-skriva-i-dynamodb.html">lektion 79</a>), och inga försök får kunden tillbaka. Kastas det felet också hamnar meddelandet i dödbrevskön i onödan. Därför fångar koden just det felet, skriver en varning i loggen med <code>console.warn</code> och går vidare till nästa post med <code>continue</code>. Returnerar handlern utan fel tar triggern bort meddelandet. Så ser det ut:</p>
+
+<pre><code>try {
+  await db.send(new UpdateCommand({ /* … */ }));
+} catch (err) {
+  if (err.name === "ConditionalCheckFailedException") {
+    console.warn("Kunden finns inte");
+    continue;
+  }
+  throw err; // allt annat: tillbaka till kön
+}</code></pre>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Handlern kastar för ett meddelande tre gånger i rad. Vad har klienten som skapade kunden fått?</p>
+  <div class="options">
+    <button class="opt" data-why="API:et svarade redan när meddelandet låg på kön, så felet når inte klienten.">Ett 5xx-fel efter tredje försöket</button>
+    <button class="opt" data-correct data-why="201 kom redan när SendMessage lagt meddelandet på kön, innan någon funktion körts.">201, som kom redan innan funktionen kördes</button>
+    <button class="opt" data-why="Klienten väntar inte på konsumenten, så den får inget svar i efterhand.">Först 201 och sedan ett meddelande om felet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Kunden som meddelandet gäller är borttagen och UpdateItem ger ConditionalCheckFailedException. Vad ska handlern göra?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är ett permanent fel, så försöken räcker inte och meddelandet hamnar bara i dödbrevskön.">Kasta, så att kön ger nya försök</button>
+    <button class="opt" data-correct data-why="Kunden dyker inte upp av nya försök, så felet loggas och hoppas över och triggern tar bort meddelandet.">Logga och gå vidare utan att kasta</button>
+    <button class="opt" data-why="Handlern kan inte själv skicka till dödbrevskön, det gör kön efter för många hämtningar.">Skicka meddelandet till dödbrevskön själv</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Kunden heter FEL Testsson, så handlern kastar varje gång. Var är meddelandet efter tredje försöket?</p>
+  <div class="options">
+    <button class="opt" data-why="Ett kast tar aldrig bort meddelandet, det gör bara ett lyckat anrop.">Borttaget, eftersom felet syns i loggen</button>
+    <button class="opt" data-correct data-why="Efter tre misslyckade körningar flyttar kön det till dödbrevskön.">I dödbrevskön, där det kan läsas</button>
+    <button class="opt" data-why="Kön ger inte nya försök i all evighet. Efter tre flyttas det.">Kvar i kön tills ett försök lyckas</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett kast tar inte bort meddelandet. Det kommer tillbaka efter visibility timeout, och efter tre misslyckade körningar (maxReceiveCount 3) hamnar det i dödbrevskön.</li>
+    <li>Klienten har redan fått 201. Felet syns bara i loggen och i dödbrevskön.</li>
+    <li>Tillfälligt fel (går över): kasta. Permanent fel (kunden finns inte, <code>ConditionalCheckFailedException</code>): <code>console.warn</code> och <code>continue</code>, så att triggern tar bort meddelandet.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkällor: <a href="https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html">AWS: felhantering för SQS i Lambda</a> och <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">AWS: Lambda med SQS</a>. Dessutom <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html">AWS: SetQueueAttributes</a> och <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html">AWS: felhantering i DynamoDB</a>. Att <code>err.name</code> är <code>ConditionalCheckFailedException</code> i AWS SDK (software development kit) är hämtat från kursen, inte kontrollerat i AWS dokumentation. Vilket receive count dödbrevskön visar efter flytten är inte bekräftat: kursen säger 3, men AWS regel flyttar meddelandet vid fjärde hämtningen (<a href="0089-dodbrevsko.html">lektion 89</a>).</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0094-event-fran-sqs-och-batch.html">Förra: Event från SQS och batch size</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0096-minst-en-gang-och-idempotens.html">Nästa: Minst en gång och idempotens</a>
+</nav>
+
+</main>
+</body>
+</html>

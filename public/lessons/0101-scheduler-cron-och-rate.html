@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bonus: EventBridge Scheduler, cron och rate</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 101 · V43, 16 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 101 · V43, 16 av 16 i veckan</p>
+<h1>Hur körs en funktion på schema?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Hittills har något alltid anropat koden: API:et, kön eller bussen. Ett schema i EventBridge Scheduler är i stället en klocka som anropar funktionen på en bestämd tid. Det passar jobb som ska ske av sig själva, som en rapport varje natt.
+</div>
+
+<section class="explain">
+<h2>Vad är ett schema?</h2>
+
+<p>Ett schema (schedule) anropar ett mål (target) vid tider du bestämmer. Målet kan vara en Lambda-funktion, och funktionen körs då utan att någon skickat något till den. Det schemat skickar med (Payload) väljer du själv, och för en nattrapport räcker en tom händelse, <code>{}</code>.</p>
+
+<p>Schemat anropar funktionen med en egen roll, på samma sätt som funktionen har sin <a href="0080-execution-role-och-behorighet.html">execution role</a>. Rollen litar på tjänsten <code>scheduler.amazonaws.com</code> och tillåter <code>lambda:InvokeFunction</code>. Väljer du "Create new role for this schedule" i konsolen lägger Scheduler in det själv.</p>
+</section>
+
+<section class="explain">
+<h2>Cron eller rate?</h2>
+
+<p>Ett schema anger tiden på två sätt: cron pekar ut klockslag, rate anger ett fast intervall.</p>
+
+<p>Cron har sex fält: minut, timme, dag i månaden, månad, veckodag och år. <code>cron(0 2 * * ? *)</code> är minut 0, timme 2, alla dagar. Frågetecknet står i veckodagsfältet, eftersom dag i månaden redan säger "alla". Tidszonen är en egen inställning, till exempel Europe/Stockholm, och cron räknas i den. Med den är det varje dag 02:00 svensk tid, någon gång inom den minuten. Flexible time window låter Scheduler välja en tid inom ett längre fönster. Med Off sker anropet på utsatt minut.</p>
+
+<p>Rate skrivs som <code>rate(5 minutes)</code>, med enheten <code>minutes</code>, <code>hours</code> eller <code>days</code>. Utan startdatum anropar schemat direkt när det skapas, och sedan var femte minut, inte på jämna klockslag. Det är ett sätt att se schemat köra utan att vänta till natten. Men det fortsätter tills du stänger av det: state <code>DISABLED</code>, i konsolen Disable.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Ett schema ska köra varje dag 02:00 svensk tid. Vad väljer du?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Minut 0, timme 2, alla dagar, och tidszonen Europe/Stockholm.">cron(0 2 * * ? *) med tidszonen Europe/Stockholm</button>
+    <button class="opt" data-why="Minut kommer före timme, så det här är 00:02, två minuter över midnatt.">cron(2 0 * * ? *) med tidszonen Europe/Stockholm</button>
+    <button class="opt" data-why="Rate kör med fast intervall från när schemat skapas, inte vid ett visst klockslag.">rate(1 days) med tidszonen Europe/Stockholm</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Funktionen har en execution role med rätt att läsa tabellen. Varför behöver schemat ändå en egen roll?</p>
+  <div class="options">
+    <button class="opt" data-why="Funktionens roll styr vad funktionen får göra, inte vem som får anropa den.">Funktionens roll gäller bara när koden körs lokalt</button>
+    <button class="opt" data-correct data-why="Execution role är funktionens rättigheter. Att anropa funktionen är schemats rättighet, lambda:InvokeFunction.">Schemat anropar, och behöver lambda:InvokeFunction</button>
+    <button class="opt" data-why="Namnet avgör inget. Det som behövs är rättigheten lambda:InvokeFunction.">Scheduler får bara använda roller med samma namn</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Du skapar <code>rate(5 minutes)</code> klockan 14:03, utan startdatum. När sker första anropet?</p>
+  <div class="options">
+    <button class="opt" data-why="Rate räknas inte mot jämna klockslag.">14:05, nästa jämna femminutersslag</button>
+    <button class="opt" data-why="Det vore cron. Rate väntar inte på ett klockslag.">Vid nästa hel timme, klockan 15:00</button>
+    <button class="opt" data-correct data-why="Utan startdatum börjar ett rate-schema anropa direkt, sedan var femte minut.">Direkt, och sedan var femte minut</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ett schema i EventBridge Scheduler anropar ett mål, till exempel en Lambda-funktion, på bestämda tider. Det gör det med en egen roll som tillåter <code>lambda:InvokeFunction</code>.</li>
+    <li><code>cron(0 2 * * ? *)</code> med tidszonen Europe/Stockholm betyder varje dag 02:00 svensk tid. Cron har sex fält: minut, timme, dag, månad, veckodag, år.</li>
+    <li><code>rate(5 minutes)</code> kör med fast intervall. Schemat stängs av med <code>DISABLED</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html">AWS: Schedule types</a>. Rollen: <a href="https://docs.aws.amazon.com/scheduler/latest/UserGuide/setting-up.html">AWS: Setting up EventBridge Scheduler</a> och <a href="https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html">AWS: Getting started</a>. Att ett schema anropar ett mål: <a href="https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-schedule.html">AWS: Managing a schedule</a>. Att stänga av: <a href="https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-schedule-state.html">AWS: Schedule state</a>. Flexible time window: <a href="https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-schedule-flexible-time-windows.html">AWS: Flexible time windows</a>. Kursmaterialet och AWS säger samma sak. Om Scheduler räknas in i en fri kvot, och vad som syns om rollen saknar <code>lambda:InvokeFunction</code>, är inte bekräftat, och därför står det inte i lektionen.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0100-sns-amne-och-prenumeration.html">Förra: SNS-ämne och prenumeration</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="V44-start.html">Nästa: Start V44</a>
+</nav>
+
+</main>
+</body>
+</html>

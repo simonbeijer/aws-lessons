@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>docker build och .dockerignore</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 109 · V44, 8 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 109 · V44, 8 av 15 i veckan</p>
+<h1>Hur bygger man imagen?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Ett enda kommando gör Dockerfilen till en image som går att starta. Du bestämmer också vilka filer ur projektmappen som får följa med, så att hemligheter inte hamnar i imagen. Första starten visar sedan vad containern ännu inte klarar.
+</div>
+
+<section class="explain">
+<h2>Hur blir receptet en image?</h2>
+
+<p>Kommandot <code>docker build -t kundregister-api:1 .</code> gör Dockerfilen till en <a href="0102-container-image-och-docker.html">image</a>. Med <code>-t</code> får imagen <a href="0103-docker-run-taggar-och-portar.html">namn och tagg</a>, här <code>kundregister-api</code> och <code>1</code>.</p>
+
+<p>Punkten sist är byggkontexten: de filer bygget får se. <code>COPY</code> i Dockerfilen kan bara hämta filer därifrån.</p>
+</section>
+
+<section class="explain">
+<h2>Vad ska inte följa med?</h2>
+
+<p><code>COPY . .</code> tar allt i byggkontexten, men i projektmappen ligger sådant som inte ska in i imagen. Filen <code>.dockerignore</code> löser det: det som matchar den tas bort ur byggkontexten innan den skickas till bygget, så <code>COPY . .</code> kan inte kopiera det. Här innehåller den tre rader:</p>
+
+<pre><code>node_modules
+.env
+.git</code></pre>
+
+<p><code>.env</code> innehåller hemligheter, och <code>.git</code> är historik som imagen inte behöver. Datorns <code>node_modules</code> ska inte med, eftersom imagen installerar egna paket med <code>npm ci</code>, byggda för Linux. Inne i containern syns det: <code>ls -a</code> visar ingen <code>.env</code> och ingen <code>.git</code>.</p>
+</section>
+
+<section class="explain">
+<h2>Varför ger /customers 500?</h2>
+
+<p>Starta imagen med <code>docker run</code> och <code>-p 3000:3000</code>. <code>curl -i localhost:3000/health</code> ger 200 med <code>{"status":"ok","version":"1.0.0"}</code>, men <code>/customers</code> ger 500, och loggen visar <code>connect ECONNREFUSED ::1:5432</code> eller <code>127.0.0.1:5432</code>.</p>
+
+<p><code>printenv | grep DB_</code> i containern skriver ingenting: ingen <code>DB_HOST</code> är satt, så pg väljer localhost (<a href="0106-konfiguration-ur-miljon.html">lektion 106</a>). I en container är localhost containern själv, och där finns ingen databas på port 5432. RDS-databasen (Relational Database Service) går inte heller att ange: den ligger i ett privat subnät som datorn inte når. Lektion 111 ger databasen en plats bredvid API:et.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad betyder punkten sist i <code>docker build -t kundregister-api:1 .</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Namn och tagg anges med -t. Punkten är något annat: mappen vars filer bygget får se.">Den anger namnet och taggen på imagen</button>
+    <button class="opt" data-correct data-why="Punkten är byggkontexten, de filer bygget får se. COPY kan bara hämta därifrån.">Byggkontexten: mappen vars filer COPY kan hämta</button>
+    <button class="opt" data-why="Dockerfilen läses av bygget, men punkten pekar ut byggkontexten, de filer som finns att kopiera.">Sökvägen till själva Dockerfilen som ska läsas</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Dockerfilen har <code>COPY . .</code> och projektmappen har en <code>.env</code> med lösenord. Står <code>.env</code> i <code>.dockerignore</code> hamnar den i imagen?</p>
+  <div class="options">
+    <button class="opt" data-why="COPY . . tar det som finns i byggkontexten. Filer i .dockerignore tas bort därifrån först.">Ja, COPY . . kopierar allt i projektmappen</button>
+    <button class="opt" data-why="Tvärtom: .dockerignore tar bort filen ur byggkontexten, så COPY har inget att kopiera.">Ja, men den är dold i imagen för alla</button>
+    <button class="opt" data-correct data-why="Filen tas bort ur byggkontexten innan bygget, så COPY . . kan inte kopiera den.">Nej, den tas bort ur byggkontexten före bygget</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Containern startas utan <code>DB_HOST</code>. Varför ger <code>/customers</code> 500?</p>
+  <div class="options">
+    <button class="opt" data-why="Portkopplingen fungerar: /health svarar 200 på samma port. Felet gäller databasen.">Porten 3000 når inte ut till värddatorn</button>
+    <button class="opt" data-correct data-why="Utan DB_HOST väljer pg localhost, och i containern är det containern själv. Där finns ingen databas.">Localhost är containern själv, utan databas</button>
+    <button class="opt" data-why="Databasen är inte nedstängd för alla. Containern försöker bara nå fel adress, sin egen.">Databasen på RDS har tagits bort av AWS</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>docker build -t kundregister-api:1 .</code> bygger imagen. <code>-t</code> ger namn och tagg, punkten är byggkontexten.</li>
+    <li><code>.dockerignore</code> (<code>node_modules</code>, <code>.env</code>, <code>.git</code>) tas bort ur byggkontexten, så <code>COPY . .</code> kan inte kopiera det till imagen.</li>
+    <li>Containern ger 200 på <code>/health</code> men 500 på <code>/customers</code>: utan <code>DB_HOST</code> är localhost containern själv, och där finns ingen databas.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.docker.com/build/concepts/context/">Docker: Build context</a> (byggkontext, .dockerignore). <code>-t</code> och byggkontexten: <a href="https://docs.docker.com/reference/cli/docker/image/build/">Docker: docker image build</a>. Containerns egen loopback: <a href="https://docs.docker.com/engine/network/">Docker: Networking</a>. ECONNREFUSED: <a href="https://nodejs.org/api/errors.html#common-system-errors">Node.js: Common system errors</a>. Dokumentationen säger att filerna tas bort ur byggkontexten innan den skickas till byggaren. Den säger inte uttryckligen att de aldrig når Docker, och det är därför inte påstått här. Innehållet i <code>.dockerignore</code>, vad <code>ls -a</code> och <code>printenv</code> visar, felmeddelandena och RDS-databasens privata subnät kommer från kursen.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0108-dockerfilen-rad-for-rad.html">Förra: Dockerfilen rad för rad</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0110-lager-och-byggcache.html">Nästa: Lager och byggcache</a>
+</nav>
+
+</main>
+</body>
+</html>

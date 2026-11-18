@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konfiguration ur miljön</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 106 · V44, 5 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 106 · V44, 5 av 15 i veckan</p>
+<h1>Hur kan samma image köra på datorn och i AWS?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  API:et får sina inställningar utifrån i stället för att själv veta var det körs. Då kan samma image köra på din dator och i AWS, och bara inställningarna skiljer. Det är första steget i att göra API:et från v41 redo att packas till en egen image.
+</div>
+
+<section class="explain">
+<h2>Vad ska skilja?</h2>
+
+<p>I v41 låg allt fast i API:et: databasen, användaren, porten och SSL (Secure Sockets Layer), krypteringen mot databasen i RDS (Relational Database Service). Det går inte när samma image ska köra på din dator, mot en databas i en container, och i ECS (Elastic Container Service), AWS tjänst för containrar.</p>
+
+<p>Därför står inget av det i koden eller imagen. API:et läser det ur <a href="0044-miljovariabel.html">miljövariabler</a>, namn med värden som programmet får utifrån, via <code>process.env</code>, Node.js lista över dem.</p>
+</section>
+
+<section class="explain">
+<h2>Standardvärde eller inget?</h2>
+
+<p>API:et läser sju: <code>PORT</code>, <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_NAME</code>, <code>DB_USER</code>, <code>DB_PASSWORD</code> och <code>DB_SSL</code>. Fyra har standardvärde: <code>PORT</code> 3000, <code>DB_PORT</code> 5432, <code>DB_NAME</code> labdb och <code>DB_USER</code> labadmin.</p>
+
+<pre><code>Number(process.env.PORT ?? 3000)</code></pre>
+
+<p><code>??</code> ger värdet till höger bara när det till vänster saknas, så utan <code>PORT</code> blir porten 3000.</p>
+
+<p><code>DB_HOST</code> och <code>DB_PASSWORD</code> saknar standardvärde med flit. Adressen skiljer mellan datorn och RDS, och lösenordet hör inte hemma i koden. Saknas <code>DB_HOST</code> väljer databasbiblioteket pg localhost, som i en container är containern själv, och loggen visar ECONNREFUSED (connection refused).</p>
+</section>
+
+<section class="explain">
+<h2>DB_SSL och -e</h2>
+
+<p>SSL stängs av bara när <code>DB_SSL</code> är exakt strängen <code>"false"</code>. Allt annat, också <code>0</code> eller en saknad variabel, sätter på det. Databasen i containern har inget certifikat och svarar "The server does not support SSL connections".</p>
+
+<p>Du skickar in en variabel med <code>-e</code> (<code>--env</code>). <code>kundregister-api:1</code> är API:ets image, byggd senare i veckan:</p>
+
+<pre><code>docker run --rm -e PORT=4000 -p 4000:4000 kundregister-api:1</code></pre>
+
+<p>Koden lyssnar på 4000, och <code>-p</code> kopplar värdens 4000 dit.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du startar API:ets image utan <code>-e PORT</code>. Vilken port lyssnar det på?</p>
+  <div class="options">
+    <button class="opt" data-why="PORT har ett standardvärde. ?? ger 3000 när variabeln saknas.">Ingen, för API:et startar inte utan PORT</button>
+    <button class="opt" data-correct data-why="Koden är Number(process.env.PORT ?? 3000). Saknas PORT ger ?? värdet till höger, 3000.">3000, standardvärdet i koden</button>
+    <button class="opt" data-why="Docker väljer ingen port åt programmet. Programmet väljer själv, och här blir det 3000.">En ledig port som Docker väljer</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du kör mot databasen i en container, utan certifikat, med <code>-e DB_SSL=0</code>. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Bara exakt strängen false stänger av SSL. 0 är en annan sträng.">SSL stängs av, för 0 betyder falskt</button>
+    <button class="opt" data-why="DB_SSL har inget med lösenordet att göra. Felet kommer av SSL.">Anslutningen nekas, för lösenordet saknas</button>
+    <button class="opt" data-correct data-why="Allt utom exakt false sätter på SSL. Databasen saknar certifikat och svarar att den inte stödjer SSL.">SSL sätts på, och databasen vägrar den</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Samma API ska flyttas från datorn till ECS. Vad ändras?</p>
+  <div class="options">
+    <button class="opt" data-why="Då vore det inte samma image. Poängen är att koden inte ändras.">Koden byggs om med ECS-värden</button>
+    <button class="opt" data-correct data-why="Koden läser sina värden ur miljön, så imagen är densamma. Bara miljövariablerna skiljer.">Bara miljövariablernas värden</button>
+    <button class="opt" data-why="Standardvärdena finns i koden och gäller överallt. Det som skiljer är miljövariablerna.">Standardvärdena byts i en ny image</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Samma image körs på datorn och i ECS. Bara miljövariablerna skiljer, och koden läser dem med <code>process.env</code>.</li>
+    <li><code>PORT</code> 3000, <code>DB_PORT</code> 5432, <code>DB_NAME</code> labdb och <code>DB_USER</code> labadmin har standardvärde via <code>??</code>. <code>DB_HOST</code> och <code>DB_PASSWORD</code> saknar det med flit.</li>
+    <li><code>DB_SSL</code> stänger av SSL bara som exakt <code>"false"</code>.</li>
+    <li><code>-e NAMN=värde</code> skickar in en variabel till containern.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.docker.com/reference/cli/docker/container/run/">Docker: docker container run</a> (<code>-e</code>). <code>process.env</code>: <a href="https://nodejs.org/api/process.html#processenv">Node.js: process.env</a>. <code>??</code>: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing">MDN: Nullish coalescing</a>. Att pg använder localhost som standardvärde för host: <a href="https://node-postgres.com/features/connecting">node-postgres: Connecting</a>. Att SSL står för Secure Sockets Layer: <a href="https://developer.mozilla.org/en-US/docs/Glossary/SSL">MDN: SSL</a>. Variablerna, standardvärdena, DB_SSL-regeln och de två felmeddelandena kommer från kursen.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0105-stoppad-borttagen-och-skrivlagret.html">Förra: Stoppad, borttagen och skrivlagret</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0107-health-och-sigterm.html">Nästa: /health och SIGTERM</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -673,151 +673,171 @@
           "tag": "labb 1, 3"
         },
         {
-          "nr": 124,
-          "file": "0124-dlq-redrive.html",
-          "title": "DLQ redrive",
-          "goal": "Att DLQ redrive flyttar meddelanden från dödbrevskön tillbaka till huvudkön, och att de där räknas som nya meddelanden.",
+          "nr": 90,
+          "file": "0090-dlq-redrive.html",
+          "title": "Hur får man tillbaka ett trasigt meddelande?",
+          "goal": "Att Start DLQ redrive flyttar meddelandet tillbaka till källkön som en ny kopia, med nytt message ID och receive count från 0.",
           "tag": "labb 1, 3"
         },
         {
-          "nr": 126,
-          "file": "0126-sendmessage.html",
-          "title": "SendMessage",
-          "goal": "Att <code>SendMessageCommand</code> med <code>QueueUrl</code> och <code>MessageBody</code> lägger ett meddelande på kön, och att rollen bara får <code>sqs:SendMessage</code> på den kön.",
-          "tag": "labb 2"
-        },
-        {
-          "nr": 127,
-          "file": "0127-meddelandets-innehall.html",
-          "title": "Meddelandets innehåll",
-          "goal": "Att meddelandet bara bär det konsumenten behöver (typ, id, namn, tid), inte hela objektet, och att det är en kopia som kan bli inaktuell.",
+          "nr": 91,
+          "file": "0091-sendmessage-och-innehall.html",
+          "title": "Hur lägger API:et ett meddelande i kön?",
+          "goal": "Att <code>SendMessageCommand</code> med <code>QueueUrl</code> och <code>MessageBody</code> (en sträng) lägger ett meddelande på kön, att rollen bara får <code>sqs:SendMessage</code> på en kö, och att meddelandet bara bär det konsumenten behöver och är en kopia som kan bli inaktuell.",
           "tag": "labb 2–3"
         },
         {
-          "nr": 128,
-          "file": "0128-spara-forst-skicka-sedan.html",
-          "title": "Spara först, skicka sedan",
+          "nr": 92,
+          "file": "0092-spara-forst-skicka-sedan.html",
+          "title": "Vad händer om skickandet felar?",
           "goal": "Att API:et sparar kunden före SendMessage, och att ett fel i SendMessage ger ett 5xx-fel fast kunden redan finns: två skrivningar till två system.",
           "tag": "labb 2"
         },
         {
-          "nr": 129,
-          "file": "0129-sqs-trigger.html",
-          "title": "SQS-trigger",
-          "goal": "Att triggern hämtar från kön åt funktionen och anropar handlern, att den tar bort meddelandena när handlern returnerar utan fel, och att du inte skriver någon loop.",
+          "nr": 93,
+          "file": "0093-sqs-trigger-och-roll.html",
+          "title": "Vem hämtar meddelandet åt funktionen?",
+          "goal": "Att triggern hämtar från kön åt funktionen, anropar handlern och tar bort meddelandena när den returnerar utan fel, och att rollen måste ha <code>AWSLambdaSQSQueueExecutionRole</code> innan triggern skapas.",
           "tag": "labb 3"
         },
         {
-          "nr": 130,
-          "file": "0130-konsumentens-roll.html",
-          "title": "Konsumentens roll",
-          "goal": "Att konsumentens roll är en execution role med AWSLambdaSQSQueueExecutionRole, att den måste finnas innan triggern skapas, och att jobbet får en egen policy med bara UpdateItem.",
+          "nr": 94,
+          "file": "0094-event-fran-sqs-och-batch.html",
+          "title": "Vad får handlern in från kön?",
+          "goal": "Att eventet har listan <code>Records</code> med <code>body</code> som sträng och <code>attributes.ApproximateReceiveCount</code>, att batch size 1 ger ett meddelande per anrop, och att ett kast skickar tillbaka hela batchen.",
           "tag": "labb 3"
         },
         {
-          "nr": 131,
-          "file": "0131-event-fran-sqs.html",
-          "title": "Event från SQS",
-          "goal": "Att eventet från SQS har listan Records med en post per meddelande, att body är en sträng som du tolkar med JSON.parse, och att attributes.ApproximateReceiveCount säger vilket försök det är.",
+          "nr": 95,
+          "file": "0095-aterforsok-och-fel.html",
+          "title": "Vad händer när handlern kastar?",
+          "goal": "Att ett kast gör att meddelandet kommer tillbaka efter visibility timeout och hamnar i dödbrevskön efter tre försök, medan klienten redan fått 201, och att tillfälliga fel kastas medan permanenta loggas och hoppas över.",
           "tag": "labb 3"
         },
         {
-          "nr": 132,
-          "file": "0132-batch-size.html",
-          "title": "Batch size",
-          "goal": "Att batch size är det högsta antalet meddelanden i ett anrop, att batch size 1 ger ett meddelande per anrop, och att ett kast skickar tillbaka alla meddelanden i batchen.",
+          "nr": 96,
+          "file": "0096-minst-en-gang-och-idempotens.html",
+          "title": "Kan ett meddelande komma två gånger?",
+          "goal": "Att samma meddelande kan komma fram mer än en gång och att koden måste tåla det, och att <code>if_not_exists(welcome_sent_at, :t)</code> gör skrivningen idempotent: tiden skrivs bara första gången.",
           "tag": "labb 3"
         },
         {
-          "nr": 133,
-          "file": "0133-aterforsok.html",
-          "title": "Återförsök",
-          "goal": "Att ett kast i handlern gör att meddelandet kommer tillbaka efter visibility timeout och till slut hamnar i dödbrevskön, medan den som anropade API:et redan fått 201.",
+          "nr": 97,
+          "file": "0097-handelse-och-eventbridge.html",
+          "title": "Vad är en händelse?",
+          "goal": "Att en händelse berättar att något hänt utan att källan vet vem som bryr sig (till skillnad från ett meddelande till en bestämd kö), och att EventBridge tar emot händelser på en bus (<code>default</code>) och skickar dem vidare enligt regler.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 98,
+          "file": "0098-regel-mal-och-access-policy.html",
+          "title": "Hur väljer bussen vart händelsen går?",
+          "goal": "Att regeln matchar på <code>source</code> och <code>detail-type</code>, exakt och skiftlägeskänsligt, att en regel kan ha flera mål som läggs till utan att API:et ändras, och att köns policy måste släppa in <code>events.amazonaws.com</code> med villkor på regelns ARN.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 99,
+          "file": "0099-putevents-och-kuvertet.html",
+          "title": "Hur skickar API:et en händelse?",
+          "goal": "Att <code>PutEventsCommand</code> skickar <code>Entries</code> med <code>Source</code>, <code>DetailType</code> och <code>Detail</code> som sträng, att <code>FailedEntryCount</code> visar det som inte kom in, att EventBridge lägger ett kuvert runt <code>detail</code>, och varför konsumenten läser <code>body.detail ?? body</code>.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 100,
+          "file": "0100-sns-amne-och-prenumeration.html",
+          "title": "Vad är ett SNS-ämne?",
+          "goal": "Att ett SNS-ämne trycker ut samma meddelande till alla prenumeranter direkt och inte går att hämta från efteråt, och att en e-postprenumeration måste bekräftas med länken i mejlet.",
+          "tag": "labb 4"
+        },
+        {
+          "nr": 101,
+          "file": "0101-scheduler-cron-och-rate.html",
+          "title": "Hur körs en funktion på schema?",
+          "goal": "Att ett schema anropar funktionen på en bestämd tid med en egen roll, att <code>cron(0 2 * * ? *)</code> med tidszon Europe/Stockholm betyder varje dag 02:00, och att rate kör med fast intervall.",
+          "tag": "bonus"
+        }
+      ]
+    },
+    {
+      "code": "v44",
+      "title": "V44 – Containerisera en applikation",
+      "lessons": [
+        {
+          "nr": null,
+          "file": "V44-start.html",
+          "title": "Veckan i överblick: containerisera en applikation",
+          "goal": "Vad veckans resultat blir (API:et från v41 som image, databasen bredvid i compose, imagen i ECR), varför det är nästa steg efter v43, och vad varje steg i veckans väg ger.",
+          "tag": ""
+        },
+        {
+          "nr": 102,
+          "file": "0102-container-image-och-docker.html",
+          "title": "Vad är en container?",
+          "goal": "Att en container är några processer med en egen vy av filsystemet som delar värdens Linux-kärna, inte en hel server, att en image är den skrivskyddade mallen och containern en körande kopia, och att <code>docker</code> är en klient som pratar med Docker Engine, som på Mac och Windows kör i en liten Linux-maskin i Docker Desktop.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 103,
+          "file": "0103-docker-run-taggar-och-portar.html",
+          "title": "Hur startar man en container?",
+          "goal": "Att <code>docker run -d -p 8080:80 --name web nginx:alpine</code> letar efter imagen lokalt, annars hämtar den från registret Docker Hub, och skapar och startar en container, att <code>nginx:alpine</code> är namn och tagg, vad <code>-d</code> och <code>--name</code> gör, och att <code>-p 8080:80</code> kopplar värdens port till containerns, värden först, utan att programmet i containern vet om 8080.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 104,
+          "file": "0104-logs-och-exec.html",
+          "title": "Hur ser man vad som händer i en container?",
+          "goal": "Att programmet i en container skriver loggen till stdout och stderr och att <code>docker logs</code> (med <code>-f</code> löpande) läser den, att <code>docker exec</code> kör ett kommando i en container som redan kör, och att <code>-it</code> bara behövs när du vill ha ett skal.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 105,
+          "file": "0105-stoppad-borttagen-och-skrivlagret.html",
+          "title": "Vad händer när containern stoppas eller tas bort?",
+          "goal": "Att <code>docker stop</code> behåller containern (Exited i <code>docker ps -a</code>) och <code>docker rm</code> tar bort den, att allt som ändrats i containern ligger i dess skrivlager och försvinner med <code>rm</code> medan imagen aldrig ändras, vad <code>--rm</code> gör, och att det som ska överleva därför måste ligga utanför containern.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 106,
+          "file": "0106-konfiguration-ur-miljon.html",
+          "title": "Hur kan samma image köra på datorn och i AWS?",
+          "goal": "Att samma image ska köra på datorn och i ECS och att bara miljövariablerna skiljer, att <code>process.env.PORT ?? 3000</code> ger ett standardvärde medan <code>DB_HOST</code> och <code>DB_PASSWORD</code> saknar det med flit, att <code>DB_SSL</code> måste vara exakt strängen <code>\"false\"</code> för att stänga av SSL, och att <code>-e</code> skickar in en variabel.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 107,
+          "file": "0107-health-och-sigterm.html",
+          "title": "Hur vet omvärlden att API:et lever, och hur stoppas det?",
+          "goal": "Att <code>/health</code> svarar på om processen lever utan att fråga databasen och därför ger 200 fast <code>/customers</code> ger 500, att containern får signalen SIGTERM när den ska stoppas, att API:et då slutar ta emot, låter pågående anrop bli klara och avslutar, och att Docker annars väntar 10 sekunder och dödar processen.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 108,
+          "file": "0108-dockerfilen-rad-for-rad.html",
+          "title": "Vad står i en Dockerfile?",
+          "goal": "Att Dockerfilen är receptet för en image, läst uppifrån: <code>FROM node:22-alpine</code> väljer basimagen, <code>WORKDIR</code> mappen, <code>COPY</code> kopierar in filer, <code>RUN npm ci --omit=dev</code> installerar exakt det <code>package-lock.json</code> säger under bygget, <code>USER node</code> byter från root, <code>EXPOSE 3000</code> bara dokumenterar porten och <code>CMD [\"node\", \"server.js\"]</code> säger vad som körs när containern startar.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 109,
+          "file": "0109-docker-build-och-dockerignore.html",
+          "title": "Hur bygger man imagen?",
+          "goal": "Att <code>docker build -t kundregister-api:1 .</code> bygger imagen, att <code>-t</code> ger namn och tagg och punkten är byggkontexten, att det som står i <code>.dockerignore</code> (<code>node_modules</code>, <code>.env</code>, <code>.git</code>) aldrig skickas till bygget och därför inte kan hamna i imagen, och varför containern ändå ger 500 på <code>/customers</code>: dess localhost är containern själv.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 110,
+          "file": "0110-lager-och-byggcache.html",
+          "title": "Måste allt byggas om?",
+          "goal": "Att varje rad som ändrar filer blir ett lager som <code>docker image history</code> visar, att <code>USER</code>, <code>EXPOSE</code> och <code>CMD</code> är 0 B, att ett oförändrat lager återanvänds (CACHED) och allt efter första ändrade lager byggs om, att paketfilerna därför kopieras före koden, och att taggen flyttas till den nya imagen medan den gamla blir <code>&lt;none&gt;</code>.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 111,
+          "file": "0111-compose-och-tjanstens-namn.html",
+          "title": "Hur startar API:et och databasen tillsammans?",
+          "goal": "Att <code>compose.yaml</code> beskriver flera tjänster i en fil (image eller <code>build</code>, portar, miljövariabler), att <code>docker compose up</code> startar alla och <code>down</code> tar bort dem, och att tjänsterna hamnar i ett eget nät där tjänstens namn är adressen, så att <code>DB_HOST: db</code> räcker.",
           "tag": "labb 3"
-        },
-        {
-          "nr": 134,
-          "file": "0134-tillfalligt-och-permanent-fel.html",
-          "title": "Tillfälligt och permanent fel",
-          "goal": "Att ett tillfälligt fel ska kastas, så att kön försöker igen, och att ett permanent fel ska loggas och hoppas över, så att meddelandet inte fastnar.",
-          "tag": "labb 3"
-        },
-        {
-          "nr": 135,
-          "file": "0135-minst-en-gang.html",
-          "title": "Minst en gång",
-          "goal": "Att samma meddelande kan komma fram mer än en gång, och att det är ett krav på koden som tar emot det, inte något kön löser.",
-          "tag": "labb 3"
-        },
-        {
-          "nr": 136,
-          "file": "0136-idempotens.html",
-          "title": "Idempotens",
-          "goal": "Att idempotent betyder att samma meddelande två gånger ger samma resultat som en gång, och att <code>if_not_exists(welcome_sent_at, :t)</code> skriver tiden bara första gången.",
-          "tag": "labb 3"
-        },
-        {
-          "nr": 137,
-          "file": "0137-handelse.html",
-          "title": "Händelse",
-          "goal": "Att en händelse berättar att något har hänt utan att källan vet vem som bryr sig, medan ett meddelande på en kö går till en bestämd kö.",
-          "tag": "labb 4"
-        },
-        {
-          "nr": 138,
-          "file": "0138-eventbridge-och-event-bus.html",
-          "title": "EventBridge och event bus",
-          "goal": "Att EventBridge tar emot händelser på en event bus, till exempel <code>default</code>, och skickar dem vidare enligt regler.",
-          "tag": "labb 4"
-        },
-        {
-          "nr": 139,
-          "file": "0139-regel-och-event-pattern.html",
-          "title": "Regel och event pattern",
-          "goal": "Att regeln matchar händelsen på <code>source</code> och <code>detail-type</code>, och att värdena måste vara exakt likadana, med samma skiftläge, i händelsen och i regeln.",
-          "tag": "labb 4"
-        },
-        {
-          "nr": 140,
-          "file": "0140-mal-i-en-regel.html",
-          "title": "Mål i en regel",
-          "goal": "Att en regel kan ha flera mål, till exempel en SQS-kö, ett SNS-ämne och en logggrupp, och att ett nytt mål läggs till på regeln utan att något hos källan ändras.",
-          "tag": "labb 4"
-        },
-        {
-          "nr": 141,
-          "file": "0141-putevents.html",
-          "title": "PutEvents",
-          "goal": "Att PutEvents skickar en lista Entries med Source, DetailType och Detail (JSON som sträng) till en event bus, att FailedEntryCount i svaret visar hur många poster som inte togs emot, och att anroparen behöver <code>events:PutEvents</code> på bussens ARN.",
-          "tag": "labb 4"
-        },
-        {
-          "nr": 142,
-          "file": "0142-eventbridge-kuvertet.html",
-          "title": "EventBridge-kuvertet",
-          "goal": "Att EventBridge lägger id, version, account, region och time runt innehållet i detail, och att konsumenten därför läser <code>body.detail ?? body</code>.",
-          "tag": "labb 4"
-        },
-        {
-          "nr": 143,
-          "file": "0143-sns-amne.html",
-          "title": "SNS-ämne",
-          "goal": "Att ett ämne trycker ut samma meddelande till alla prenumeranter direkt, medan en kö väntar på att konsumenten hämtar.",
-          "tag": "labb 4"
-        },
-        {
-          "nr": 144,
-          "file": "0144-prenumeration.html",
-          "title": "Prenumeration",
-          "goal": "Att en prenumeration med e-post måste bekräftas med länken i mejlet innan SNS skickar något till adressen.",
-          "tag": "labb 4"
-        },
-        {
-          "nr": 145,
-          "file": "0145-kons-access-policy.html",
-          "title": "Köns access policy",
-          "goal": "Att köns resource-based policy släpper in <code>events.amazonaws.com</code> med <code>sqs:SendMessage</code>, och bara från regelns ARN (<code>aws:SourceArn</code>).",
-          "tag": "labb 4"
         }
       ]
     }

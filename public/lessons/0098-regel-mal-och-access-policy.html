@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regel, mål och köns access policy</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="fördjupning">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 98 · V43, 13 av 16 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 98 · V43, 13 av 16 i veckan</p>
+<h1>Hur väljer bussen vart händelsen går?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Bussen delar ut händelser enligt regler (förra lektionen). En regel är två saker: ett mönster som väljer händelser, och en lista med mål dit de går. Är målet en kö måste kön dessutom släppa in EventBridge, annars kommer inget fram och inget fel syns.
+</div>
+
+<section class="explain">
+<h2>Vad matchar regeln?</h2>
+
+<p>En regel (rule) sitter på bussen. Mönstret i den kallas event pattern och är ett <a href="0052-json.html">JSON</a>-mönster (JavaScript Object Notation) med de fält händelsen ska ha. <code>source</code> säger vem som skickade den, <code>detail-type</code> vad som hände:</p>
+
+<pre><code>{
+  "source": ["kundregister"],
+  "detail-type": ["CustomerCreated"]
+}</code></pre>
+
+<p>Värdena står i listor, och händelsen matchar om fältet har något av dem. Andra fält i händelsen ignoreras.</p>
+
+<p>Matchningen är exakt, tecken för tecken, och skiftläget räknas. <code>CustomerCreated</code> matchar inte <code>customercreated</code>. Matchar händelsen inte blir det inget fel, den skickas bara inte vidare. När inget händer är en felstavad <code>source</code> eller <code>detail-type</code> det första att misstänka.</p>
+</section>
+
+<section class="explain">
+<h2>Vart går händelsen?</h2>
+
+<p>Matchar händelsen skickas den till varje mål (target) i regeln, samtidigt. Tre mål ger tre leveranser av samma händelse. Målen hör till regeln, så ett nytt mål är en rad till där, och API:et ändras inte (<a href="0097-handelse-och-eventbridge.html">förra lektionen</a>). Tre vanliga mål:</p>
+
+<ul>
+  <li>SQS-kö (Simple Queue Service): händelsen sparas tills någon hämtar den.</li>
+  <li>SNS-ämne (Simple Notification Service): skickar vidare till prenumeranterna, till exempel en e-postadress.</li>
+  <li>CloudWatch-logggrupp: händelsen blir en loggrad. Gruppen måste finnas innan den väljs som mål.</li>
+</ul>
+</section>
+
+<section class="explain">
+<h2>Vad måste kön tillåta?</h2>
+
+<p>Kön släpper bara in det dess access policy tillåter. Det är köns <a href="0084-stage-behorighet-throttling.html">resource-based policy</a>, och i en ny kö är den tom. Utan en sats där får regeln inte lägga något i kön, och kön förblir tom fast regeln matchar.</p>
+
+<pre><code>{
+  "Effect": "Allow",
+  "Principal": { "Service": "events.amazonaws.com" },
+  "Action": "sqs:SendMessage",
+  "Resource": "arn:aws:sqs:eu-north-1:123456789012:v43-customer-events",
+  "Condition": {
+    "ArnEquals": {
+      "aws:SourceArn": "arn:aws:events:eu-north-1:123456789012:rule/v43-customer-created"
+    }
+  }
+}</code></pre>
+
+<p>Principal är EventBridge som tjänst, och Resource är köns <a href="0073-load-balancer-och-arn.html">ARN</a> (Amazon Resource Name). Villkoret kräver att avsändaren är exakt den här regelns ARN. Utan det fick varje EventBridge-regel skicka till kön.</p>
+
+<p>Konsolen brukar lägga till satsen när kön väljs som mål. Den syns då under Access policy på kön. Saknas den läggs den till för hand.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Mönstret har <code>detail-type</code> CustomerCreated, men koden skickar customercreated. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Skiftläget räknas, så regeln matchar inte. Inget fel visas, målen får bara ingenting.">Inget mål får händelsen, och inget fel visas</button>
+    <button class="opt" data-why="Bussen rättar inte värden. Matchningen är tecken för tecken.">Bussen rättar skiftläget och skickar den vidare</button>
+    <button class="opt" data-why="Utan träff går händelsen inte till något mål, inte heller ett om felet.">Regeln ger ett felmeddelande till källan</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Regeln har en kö, ett SNS-ämne och en logggrupp som mål. En händelse matchar. Vem får den?</p>
+  <div class="options">
+    <button class="opt" data-why="Bussen väljer inte ett mål. Varje mål i regeln får händelsen.">Det mål som står först i regeln</button>
+    <button class="opt" data-correct data-why="Varje mål får händelsen, så tre mål ger tre leveranser.">Alla tre, var och en sin leverans</button>
+    <button class="opt" data-why="Målen får händelsen direkt från bussen, inte via kön.">Kön, som delar den med de andra</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Regeln matchar och har kön som mål, men kön är tom. Vad kontrollerar du?</p>
+  <div class="options">
+    <button class="opt" data-why="Det styr vilka händelser som matchar, och den här matchar redan.">Att mönstret har rätt fält och värden</button>
+    <button class="opt" data-correct data-why="Utan en sats som släpper in events.amazonaws.com får regeln inte lägga något i kön.">Att köns policy släpper in EventBridge</button>
+    <button class="opt" data-why="Antalet mål gör inte kön tom, och den här regeln matchar redan.">Att kön inte har fått för många mål</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">4. Vad gör villkoret på <code>aws:SourceArn</code> i köns policy?</p>
+  <div class="options">
+    <button class="opt" data-why="Åtgärden står i Action. Villkoret säger vem som skickar.">Det väljer vilka åtgärder som får göras</button>
+    <button class="opt" data-why="Det är Resource, med köns ARN, som pekar ut kön.">Det pekar ut vilken kö satsen gäller</button>
+    <button class="opt" data-correct data-why="Bara den regel vars ARN stämmer får skicka, inte andra regler i kontot.">Det släpper in just den här regeln</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Regeln matchar på <code>source</code> och <code>detail-type</code> i en event pattern. Matchningen är exakt och skiftlägeskänslig, och utan träff händer inget alls.</li>
+    <li>En regel kan ha flera mål (SQS-kö, SNS-ämne, logggrupp). Ett nytt mål läggs till i regeln, utan ändring hos källan.</li>
+    <li>Köns policy måste släppa in <code>events.amazonaws.com</code> med <code>sqs:SendMessage</code>, med villkor <code>aws:SourceArn</code> på regelns ARN.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkällor: <a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-pattern.html">AWS: Skapa event patterns</a>, <a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html">AWS: Targets</a> och <a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html">AWS: Using resource-based policies for EventBridge</a>. En regel kan ha upp till fem mål (<a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-quota.html">AWS: Quotas</a>). Att konsolen lägger till köns sats står i kursmaterialet. AWS bekräftar det bara för logggrupper och beskriver köns policy som något man sätter själv, därför: titta under Access policy och lägg till satsen om den saknas.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0097-handelse-och-eventbridge.html">Förra: Händelse och EventBridge</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0099-putevents-och-kuvertet.html">Nästa: PutEvents och kuvertet</a>
+</nav>
+
+</main>
+</body>
+</html>

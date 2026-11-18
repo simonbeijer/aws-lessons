@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lager och byggcache</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 110 · V44, 9 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 110 · V44, 9 av 15 i veckan</p>
+<h1>Måste allt byggas om?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Första bygget installerar alla paket. En image byggs dock i lager, och Docker återanvänder de som inte ändrats. Därför går ombygget snabbt efter en liten kodändring, så länge raderna i Dockerfilen ligger i rätt ordning.
+</div>
+
+<section class="explain">
+<h2>Vad är ett lager?</h2>
+
+<p>Du ändrar en rad i <code>server.js</code> och bygger imagen igen. Ska alla paket installeras på nytt? Nej: imagen byggs i lager.</p>
+
+<p>Varje rad i Dockerfilen som ändrar filer blir ett lager, ett steg som lägger filer ovanpå de tidigare. <code>docker image history kundregister-api:1</code> visar ett lager per rad, med kommandot och storleken. <code>COPY package*.json</code>, <code>RUN npm ci</code> och <code>COPY . .</code> har storlek (paketen cirka 21 MB, koden 45 kB). <code>USER</code>, <code>EXPOSE</code> och <code>CMD</code> visar 0 B, eftersom de <a href="0108-dockerfilen-rad-for-rad.html">bara ändrar metadata</a>. Det här är imagens lager, inte containerns <a href="0105-stoppad-borttagen-och-skrivlagret.html">skrivlager</a>.</p>
+</section>
+
+<section class="explain">
+<h2>Vad återanvänds?</h2>
+
+<p>Docker sparar lagren från förra bygget i byggcachen och jämför varje rad med dem. En <code>RUN</code> är densamma om kommandot är det, en <code>COPY</code> om filerna har samma innehåll. Är raden oförändrad återanvänds lagret, och utskriften säger <code>CACHED</code>. Ändras en rad byggs den om, och allt efter den också.</p>
+</section>
+
+<div class="picker">
+  <p><strong>Vad byggs om i Dockerfilen från lektion 108?</strong></p>
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-kod">Jag ändrar server.js</button>
+    <button class="chip" data-target="p-paket">Jag ändrar package.json</button>
+  </div>
+  <div class="picker-panel" id="p-kod">
+    <div class="table-wrap"><table>
+      <tr><td><code>FROM</code>, <code>WORKDIR</code></td><td><span class="tag good">CACHED</span></td></tr>
+      <tr><td><code>COPY package*.json</code></td><td><span class="tag good">CACHED</span></td></tr>
+      <tr><td><code>RUN npm ci</code></td><td><span class="tag good">CACHED</span></td></tr>
+      <tr><td><code>COPY . .</code></td><td><span class="tag note">byggs om</span></td></tr>
+    </table></div>
+  </div>
+  <div class="picker-panel" id="p-paket">
+    <div class="table-wrap"><table>
+      <tr><td><code>FROM</code>, <code>WORKDIR</code></td><td><span class="tag good">CACHED</span></td></tr>
+      <tr><td><code>COPY package*.json</code></td><td><span class="tag note">byggs om</span></td></tr>
+      <tr><td><code>RUN npm ci</code></td><td><span class="tag note">byggs om</span></td></tr>
+      <tr><td><code>COPY . .</code></td><td><span class="tag note">byggs om</span></td></tr>
+    </table></div>
+  </div>
+</div>
+
+<section class="explain">
+<h2>Varför paketfilerna först?</h2>
+
+<p>Koden ändras ofta, paketen sällan. Därför kopieras och installeras paketen före resten av koden. Ändras bara <code>server.js</code> är allt före <code>COPY . .</code> oförändrat, och <code>npm ci</code> slipper köras. Hade <code>COPY . .</code> stått först hade varje kodändring ändrat det lagret och installerat alla paket igen.</p>
+
+<p>Bygger du om med samma tagg flyttas taggen till den nya imagen. En tagg är en pekare, inte en kopia, så den gamla imagen blir kvar utan namn och visas som <code>&lt;none&gt;</code> i <code>docker image ls</code>. <code>docker image prune</code> tar bort de namnlösa.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Du ändrar bara <code>server.js</code> och bygger om. Vad byggs om?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Raderna före COPY . . är oförändrade och återanvänds. COPY . . är första ändrade raden och byggs om, med det som kommer efter.">COPY . . och det som kommer efter den</button>
+    <button class="opt" data-why="Bara lager från första ändrade raden och framåt byggs om. Paketen ligger före och återanvänds.">Hela Dockerfilen, eftersom en fil ändrats</button>
+    <button class="opt" data-why="RUN npm ci är oförändrad, och dessutom ligger den före den ändrade raden. Då återanvänds den.">Bara RUN npm ci, eftersom den tar längst tid</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Varför kopieras <code>package*.json</code> och paketen installeras före <code>COPY . .</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Ordningen avgör inte vad som hamnar i imagen. Den avgör vad som kan återanvändas vid nästa bygge.">Annars hamnar paketen inte i imagen</button>
+    <button class="opt" data-correct data-why="Koden ändras ofta. Ligger paketen före den återanvänds npm ci, i stället för att köras igen vid varje kodändring.">Koden ändras oftare, så paketlagret kan återanvändas</button>
+    <button class="opt" data-why="Lagren byggs inte parallellt. Vinsten är att oförändrade lager återanvänds.">Lagren byggs då samtidigt och går snabbare</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Du bygger om <code>kundregister-api:1</code> med samma tagg. Vad händer med den gamla imagen?</p>
+  <div class="options">
+    <button class="opt" data-why="Inget tas bort automatiskt. Den gamla imagen finns kvar tills du tar bort den.">Den raderas automatiskt av bygget</button>
+    <button class="opt" data-why="Taggen finns bara på en image, den nya. Den gamla får inget nytt namn.">Den får en ny tagg, till exempel 2</button>
+    <button class="opt" data-correct data-why="Taggen är en pekare och flyttas till den nya imagen. Den gamla blir kvar som &lt;none&gt; tills docker image prune.">Den blir kvar utan namn, som &lt;none&gt;</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Varje rad som ändrar filer blir ett lager. <code>docker image history</code> visar dem, och <code>USER</code>, <code>EXPOSE</code> och <code>CMD</code> är 0 B.</li>
+    <li>Oförändrade rader återanvänds (<code>CACHED</code>). Första ändrade raden och allt efter den byggs om.</li>
+    <li>Paketfilerna kopieras före koden, så att <code>npm ci</code> inte körs vid varje kodändring.</li>
+    <li>Taggen flyttas till nya imagen, och den gamla blir <code>&lt;none&gt;</code> tills <code>docker image prune</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.docker.com/build/cache/invalidation/">Docker: Build cache invalidation</a> (jämförelsen per rad, ombyggnad av allt efter första ändrade lagret). <code>CACHED</code> i byggutskriften: <a href="https://docs.docker.com/get-started/docker-concepts/building-images/using-the-build-cache/">Docker: Using the build cache</a>. Lager och att varje rad blir ett lager: <a href="https://docs.docker.com/build/cache/">Docker: Build cache</a> och <a href="https://docs.docker.com/build/guide/layers/">Docker: Layers</a>. <a href="https://docs.docker.com/reference/cli/docker/image/history/">docker image history</a> visar kolumnerna CREATED BY och SIZE, med 0B för en <code>CMD</code>. Taggen som pekare: <a href="https://docs.docker.com/reference/cli/docker/image/tag/">docker image tag</a>. <code>&lt;none&gt;</code>: <a href="https://docs.docker.com/reference/cli/docker/image/ls/">docker image ls</a>. Rensning: <a href="https://docs.docker.com/reference/cli/docker/image/prune/">docker image prune</a>.</p>
+
+<div class="box note">
+  <p>Det här kommer från kursen, inte från Docker-dokumentationen: att <code>USER</code> och <code>EXPOSE</code> också visar 0 B, och storlekarna (paketen cirka 21 MB, koden 45 kB).</p>
+</div>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0109-docker-build-och-dockerignore.html">Förra: docker build och .dockerignore</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0111-compose-och-tjanstens-namn.html">Nästa: Docker Compose och tjänstens namn</a>
+</nav>
+
+</main>
+</body>
+</html>

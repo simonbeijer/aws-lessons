@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker Compose och tjänstens namn</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 111 · V44, 10 av 15 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 111 · V44, 10 av 15 i veckan</p>
+<h1>Hur startar API:et och databasen tillsammans?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  API:et har en image men ingen databas att prata med. Docker Compose beskriver API:et och en databas i en enda fil, startar båda med ett kommando och låter dem hitta varandra på namn. Då har API:et något att svara med på /customers.
+</div>
+
+<section class="explain">
+<h2>Vad gör Compose?</h2>
+
+<p>Imagen från <a href="0109-docker-build-och-dockerignore.html">lektion 109</a> ger 500 på <code>/customers</code>, eftersom det inte finns någon databas att nå. Den behöver en egen container bredvid. I stället för två långa <code>docker run</code>-rader läser Docker Compose en fil, <code>compose.yaml</code>, där varje container är en tjänst. <code>docker compose up</code> startar alla tjänster, och <code>docker compose down</code> stoppar och tar bort dem.</p>
+</section>
+
+<section class="explain">
+<h2>Vad står i filen?</h2>
+
+<p>Filen är <a href="0064-yaml.html">YAML</a> (YAML Ain't Markup Language). Här är den nedkortad: databasens inställningar, lagring och väntan på start kommer i nästa lektioner.</p>
+
+<pre><code>services:
+  db:
+    image: postgres:16-alpine
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_SSL: "false"</code></pre>
+
+<p>Under <code>services</code> får varje tjänst ett namn, här <code>db</code> och <code>api</code>. Databasen startas från en färdig image som hämtas. API:et har ingen färdig image utan <code>build: .</code>, som bygger den från Dockerfilen i mappen (punkten är byggkontexten, <a href="0109-docker-build-och-dockerignore.html">lektion 109</a>). <code>ports</code> är <a href="0103-docker-run-taggar-och-portar.html"><code>-p</code></a>, och <code>environment</code> är <a href="0106-konfiguration-ur-miljon.html"><code>-e</code></a>. Citattecknen kring <code>"false"</code> gör det till strängen API:et kräver. <code>docker compose up -d</code> kör tjänsterna i bakgrunden, och <code>--build</code> bygger om imagen först.</p>
+</section>
+
+<section class="explain">
+<h2>Hur hittar de varandra?</h2>
+
+<p>När <code>up</code> startar tjänsterna skapar Compose ett eget nät, en privat förbindelse som bara tjänsterna delar. Varje tjänst registreras där med sitt namn i Dockers DNS (Domain Name System), som slår upp namnet till en IP-adress. <code>db</code> blir databascontainerns adress, och <code>DB_HOST: db</code> räcker, samma roll som <a href="0042-rds-endpoint.html">RDS-endpointen</a> hade. IP-adressen kan ändras när containern skapas på nytt, men namnet ligger fast. <code>down</code> tar bort nätet tillsammans med containrarna.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad sätter du <code>DB_HOST</code> till i filen, och varför?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Tjänstens namn är adressen i nätet. Docker slår upp db till databascontainerns IP, som kan ändras.">db, tjänstens namn, som Docker slår upp åt dig</button>
+    <button class="opt" data-why="IP-adressen kan ändras när containern skapas på nytt. Då slutar API:et nå databasen.">Databascontainerns IP-adress, eftersom den ligger fast</button>
+    <button class="opt" data-why="Localhost i API-containern är API-containern själv. Databasen är en annan tjänst och nås med sitt namn.">localhost, eftersom båda ligger på samma dator</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Varför har <code>db</code> en <code>image</code> men <code>api</code> en <code>build</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Båda kan ha antingen image eller build. Skillnaden är var imagen kommer ifrån.">Compose tillåter bara build för den första tjänsten</button>
+    <button class="opt" data-correct data-why="Postgres finns som färdig image att hämta. API:et är vår egen kod, så imagen byggs från Dockerfilen.">Databasen hämtas färdig, API:et byggs av vår Dockerfile</button>
+    <button class="opt" data-why="Ingen ordning mellan tjänsterna styrs av image eller build. Det är bara hur imagen skaffas.">Databasen startar först, så den får en färdig image</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Vad gör <code>docker compose down</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="down pausar inget. Containrarna tas bort, så de går inte att återuppta.">Pausar tjänsterna så att de kan återupptas</button>
+    <button class="opt" data-why="Det är up (med --build) som bygger. down tar bort det som up skapade.">Bygger om API:et och startar om tjänsterna</button>
+    <button class="opt" data-correct data-why="down stoppar och tar bort containrarna och nätet som up skapade.">Stoppar och tar bort containrarna och nätet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li><code>compose.yaml</code> beskriver flera tjänster i en fil. Under <code>services</code> får varje tjänst ett namn, och en <code>image</code> eller en <code>build</code>, <code>ports</code> och <code>environment</code>.</li>
+    <li><code>docker compose up</code> startar alla tjänster (<code>-d</code> i bakgrunden), och <code>down</code> stoppar och tar bort containrarna och nätet.</li>
+    <li>Tjänsterna delar ett nät där tjänstens namn är adressen: <code>DB_HOST: db</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.docker.com/reference/compose-file/services/">Docker: Services (Compose file reference)</a> (tjänstens namn, <code>image</code>, <code>ports</code>, <code>environment</code>). <code>build</code>: <a href="https://docs.docker.com/reference/compose-file/build/">Docker: Build</a>. Kommandona: <a href="https://docs.docker.com/reference/cli/docker/compose/up/">docker compose up</a> och <a href="https://docs.docker.com/reference/cli/docker/compose/down/">docker compose down</a>. Nätet, namnen och varningen för IP-adresser: <a href="https://docs.docker.com/compose/how-tos/networking/">Docker: Networking in Compose</a>. Compose och tjänster i en fil: <a href="https://docs.docker.com/compose/intro/compose-application-model/">Docker: How Compose works</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0110-lager-och-byggcache.html">Förra: Lager och byggcache</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0112-volym-bind-mount-och-startskript.html">Nästa: Volym, bind mount och startskript</a>
+</nav>
+
+</main>
+</body>
+</html>
