@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ECS och receptet för containern</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="fördjupning">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 117 · V45, 1 av 4 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 117 · V45, 1 av 4 i veckan</p>
+<h1>Hur säger man åt AWS att köra en container?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Imagen från V44 ligger i AWS men körs ingenstans. ECS är tjänsten som kör den, och i stället för flaggor som till docker run vill den ha ett recept, en task definition. Receptet kommer först, för utan det kan inget startas.
+</div>
+
+<section class="explain">
+<h2>Vad gör ECS?</h2>
+
+<p>ECS (Elastic Container Service) startar containrar från en image i ECR (Elastic Container Registry), där <a href="0102-container-image-och-docker.html">imagen</a> från V44 ligger. På datorn skrev du image, port och variabler i <a href="0103-docker-run-taggar-och-portar.html"><code>docker run</code></a> eller i <a href="0111-compose-och-tjanstens-namn.html"><code>compose.yaml</code></a>. I AWS står samma uppgifter i receptet, så koden ändras inte.</p>
+
+<p>Containrarna körs i Fargate, vilket betyder att AWS äger servrarna och du sköter ingen dator. Ett kluster är bara ett namn att samla det som körs under.</p>
+</section>
+
+<section class="explain">
+<h2>Vad står i receptet?</h2>
+
+<p>Receptet är en JSON-fil. Klicka på en del för att se vad den motsvarar på datorn.</p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-image">Image och storlek</button>
+    <button class="chip" data-target="p-port">Port och variabler</button>
+    <button class="chip" data-target="p-logg">Loggar</button>
+  </div>
+  <div class="picker-panel" id="p-image">
+    <p>Imagen anges med hela adressen i ECR: kontonummer, region och <code>v44-api:latest</code>, med taggen. Storleken är 0,25 vCPU (virtual CPU, en fjärdedels processorkärna) och 0,5 GB minne. Operativsystemet är Linux och processorn X86_64, samma sak som <code>amd64</code>. Det måste stämma med imagen, som byggdes för <code>linux/amd64</code>, annars startar den inte.</p>
+  </div>
+  <div class="picker-panel" id="p-port">
+    <p><strong>Container port</strong> är porten API:et lyssnar på, 3000. <strong>Miljövariablerna</strong> är samma som <a href="0106-konfiguration-ur-miljon.html"><code>-e</code></a>, här <code>DB_HOST</code> mot RDS (Relational Database Service) och de andra. <code>DB_SSL</code> utelämnas: RDS har certifikat, så koden slår på SSL (Secure Sockets Layer) av sig själv. Lösenordet står i klartext i receptet. AWS avråder från det för känsliga värden och har fältet <code>secrets</code> för dem.</p>
+  </div>
+  <div class="picker-panel" id="p-logg">
+    <p>Containerns stdout, det <code>docker logs</code> läste, skickas med <code>awslogs</code> till CloudWatch Logs, i loggruppen <code>/ecs/v45-api</code>.</p>
+  </div>
+</div>
+</section>
+
+<section class="explain">
+<h2>Vilka roller behövs?</h2>
+
+<p>Receptet pekar också ut två <a href="0018-service-role.html">IAM-roller</a> (Identity and Access Management). De låter lika men används av olika parter.</p>
+
+<ul>
+  <li><strong>Execution role</strong> använder ECS själv, för att hämta imagen från ECR och skriva loggarna. Containern kommer inte åt den.</li>
+  <li><strong>Task role</strong> är rollen koden får när den anropar AWS. Den är tom tills vidare, eftersom API:et inte anropar något AWS-API.</li>
+</ul>
+</section>
+
+<section class="explain">
+<h2>Hur ändrar man receptet?</h2>
+
+<p>Ett registrerat recept ändras aldrig. Varje ändring, till exempel en ny miljövariabel, blir en ny revision: <code>v45-api:1</code>, sedan <code>v45-api:2</code>. Namnet före kolonet är receptets familj, siffran efter är revisionen.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. ECS ska hämta imagen ur ECR. Vilken roll gör det?</p>
+  <div class="options">
+    <button class="opt" data-why="Task role är rollen koden får när den anropar AWS. Att hämta imagen sker innan koden startar.">Task role, eftersom den hör till containern</button>
+    <button class="opt" data-correct data-why="Execution role är ECS egen roll: den hämtar imagen och skriver loggarna.">Execution role, som ECS använder själv</button>
+    <button class="opt" data-why="ECS måste ha rätt att läsa ur ECR, och den rätten ges genom execution role.">Ingen roll, ECR är öppet för ECS</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Du ändrar <code>DB_HOST</code> i receptet <code>v45-api:1</code>. Vad blir resultatet?</p>
+  <div class="options">
+    <button class="opt" data-why="Ett registrerat recept skrivs inte över. Den gamla revisionen finns kvar.">Revision 1 skrivs över med det nya värdet</button>
+    <button class="opt" data-why="Ändringen sparas som en revision i samma familj, inte som ett nytt namn.">Ett nytt recept med ett helt nytt namn</button>
+    <button class="opt" data-correct data-why="Varje ändring registreras som en ny revision, så v45-api:1 finns kvar och v45-api:2 tillkommer.">En ny revision, <code>v45-api:2</code>, bredvid revision 1</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Vad i receptet motsvarar <code>-e DB_HOST=...</code> i <code>docker run</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Execution role anger vem som får hämta imagen och skriva loggar, inte värden till koden.">Execution role</button>
+    <button class="opt" data-correct data-why="Miljövariablerna i receptet är -e: namn med värden som koden läser ur process.env.">Miljövariablerna</button>
+    <button class="opt" data-why="Container port säger vilken port API:et lyssnar på, inte var databasen finns.">Container port</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>ECS startar containrar från en image i ECR, i Fargate där AWS äger servrarna. Klustret är ett namn att samla dem under.</li>
+    <li>Task definition är receptet: image, storlek (0,25 vCPU, 0,5 GB, Linux/X86_64), Container port 3000, miljövariabler mot RDS och <code>awslogs</code> till <code>/ecs/v45-api</code>. Lösenordet i variablerna står i klartext.</li>
+    <li>Execution role används av ECS för att hämta imagen och skriva loggar. Task role är kodens egen och tom än så länge.</li>
+    <li>Varje ändring blir en ny revision: <code>v45-api:1</code>, <code>:2</code>.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-definition-parameters.html">AWS: Task definition parameters</a> (storlek, arkitektur, miljövariabler, <code>awslogs</code>, task role, revisioner). Execution role: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html">AWS: Task execution IAM role</a>. Task definition: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html">AWS: Task definitions</a>. Kluster och Fargate: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html">AWS: Clusters</a>. Containerns namn, port och loggruppen <code>/ecs/v45-api</code> kommer från kursen. Priset för Fargate är inte kontrollerat och står inte här.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="V45-start.html">Förra: Veckan i en bild</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0118-task-kors-och-stoppar.html">Nästa: En task körs, och när den stoppar</a>
+</nav>
+
+</main>
+</body>
+</html>

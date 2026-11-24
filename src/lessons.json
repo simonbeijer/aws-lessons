@@ -840,6 +840,47 @@
           "tag": "labb 3"
         }
       ]
+    },
+    {
+      "code": "v45",
+      "title": "V45 – ECS, Fargate och lastbalansering",
+      "lessons": [
+        {
+          "nr": null,
+          "file": "V45-start.html",
+          "title": "Veckan i en bild: containern i AWS",
+          "goal": "Hela kedjan i ett diagram: webbläsare, lastbalanserare, två containrar i Fargate och databasen, och vad varje del gör.",
+          "tag": ""
+        },
+        {
+          "nr": 117,
+          "file": "0117-ecs-och-task-definition.html",
+          "title": "Hur säger man åt AWS att köra en container?",
+          "goal": "Vad ECS och Fargate är, att klustret bara är ett namn, och vad task definition innehåller: image, storlek, port, miljövariabler, loggar och de två rollerna. Varje ändring blir en ny revision.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 118,
+          "file": "0118-task-kors-och-stoppar.html",
+          "title": "Vad är en task, och var syns felet när den stoppar?",
+          "goal": "Att en task är en engångskopia av receptet med egen IP-adress, varför den behöver Public IP, stegen från start till stopp, och om felet står i Stopped reason eller i loggen.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 119,
+          "file": "0119-lastbalanseraren.html",
+          "title": "Vad gör lastbalanseraren framför containrarna?",
+          "goal": "Att lastbalanseraren tar emot på port 80 och skickar till en målgrupp med tasks IP-adresser, hur hälsokontrollen mot /health fungerar, och kedjan av säkerhetsgrupper från internet till databasen.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 120,
+          "file": "0120-tjansten-och-deployment.html",
+          "title": "Hur håller en tjänst allt igång?",
+          "goal": "Att tjänsten håller två tasks igång och ersätter en som dör, hur en rullande deployment byter version utan avbrott, att circuit breaker backar själv, och vad som kostar när ingen använder API:et.",
+          "tag": "labb 2"
+        }
+      ]
     }
   ]
 }

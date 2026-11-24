@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lastbalanseraren framför containrarna</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="fördjupning">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 119 · V45, 3 av 4 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 119 · V45, 3 av 4 i veckan</p>
+<h1>Vad gör lastbalanseraren framför containrarna?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Lastbalanseraren är den fasta adressen som tar emot anropen och skickar dem till en frisk task. Tasks byter adress vid varje start, så ingen kan peka på dem direkt. Därför står den framför dem.
+</div>
+
+<section class="explain">
+<h2>Vad tar emot anropen?</h2>
+
+<p>Den fasta punkten är <a href="0073-load-balancer-och-arn.html">lastbalanseraren</a>, här en ALB (Application Load Balancer) som ligger i publika subnät i två zoner. Den är internet-facing: den har ett DNS-namn (Domain Name System) som går att nå från internet. Använd alltid namnet, för adresserna bakom det kan ändras.</p>
+
+<p>Inuti finns två delar. En lyssnare (listener) tar emot på en port och ett protokoll, här HTTP (Hypertext Transfer Protocol) port 80. Dess regel skickar vidare till en målgrupp (target group), listan över de mål som får trafiken. Målen är IP-adresser, eftersom en Fargate-task har ett nätverkskort men ingen instans. Att tasks hamnar i listan sköter tjänsten, i nästa lektion.</p>
+</section>
+
+<section class="explain">
+<h2>Vem släpps in?</h2>
+
+<p>Bara lastbalanseraren ska nå tasks, och bara tasks ska nå databasen. Varje steg släpper in <a href="0034-security-group.html">säkerhetsgruppen</a> från steget före, på samma sätt som databasen släppte in tasken i <a href="0118-task-kors-och-stoppar.html">förra lektionen</a>. Tasks tar emot på port 3000:</p>
+
+<svg viewBox="0 0 360 440" role="img" aria-label="Internet når lastbalanseraren på port 80. Bara lastbalanseraren når tasks. Bara tasks når databasen." style="width:100%;max-width:420px;height:auto;margin:16px auto;display:block;font-size:15px">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+  <g fill="#fff" stroke="#2563eb" stroke-width="2">
+    <rect x="30" y="10" width="300" height="50" rx="8"/>
+    <rect x="30" y="100" width="300" height="70" rx="8"/>
+    <rect x="30" y="210" width="300" height="70" rx="8"/>
+    <rect x="30" y="320" width="300" height="70" rx="8"/>
+  </g>
+  <g fill="#111827" text-anchor="middle">
+    <text x="180" y="42" font-weight="700">Internet</text>
+    <text x="180" y="126" font-weight="700">Lastbalanserare</text><text x="180" y="148">v45-alb-sg: port 80 från alla</text>
+    <text x="180" y="236" font-weight="700">Tasks</text><text x="180" y="258">v45-ecs-sg: port 3000 från v45-alb-sg</text>
+    <text x="180" y="346" font-weight="700">Databas</text><text x="180" y="368">v40-db-sg: bara v45-ecs-sg</text>
+  </g>
+  <g stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#ah)">
+    <path d="M180,60 V98"/><path d="M180,170 V208"/><path d="M180,280 V318"/>
+  </g>
+</svg>
+
+<p>Ingen kommer åt en task förbi lastbalanseraren, vilken adress den än har.</p>
+</section>
+
+<section class="explain">
+<h2>Vilka mål är friska?</h2>
+
+<p>Lastbalanseraren frågar varje mål <code>/health</code> på port 3000, var 15:e sekund. Svarar det 200 två gånger i rad är det healthy. Misslyckas två i rad är det unhealthy och får ingen trafik, så länge det finns friska mål. Tjänsten stoppar då tasken och ersätter den.</p>
+
+<p>Därför ska <code>/health</code> bara svara om processen lever, som i <a href="0107-health-och-sigterm.html">lektion 107</a>. Frågade den databasen, skulle friska tasks räknas som döda när databasen är nere, och tjänsten byta ut dem utan nytta.</p>
+
+<p>Är alla mål unhealthy skickar lastbalanseraren trafiken till dem ändå, hellre än att inte svara alls. Felet 503 (Service Unavailable) betyder därför att målgruppen är tom, inte att alla mål är sjuka.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Varför pekar klienten på lastbalanserarens DNS-namn och inte på en tasks IP?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Tasken får ny IP vid varje start. Namnet pekar alltid på lastbalanseraren.">Tasks byter IP vid varje start, och namnet står still</button>
+    <button class="opt" data-why="Säkerhetsgruppen avgör vem som släpps in, inte vilken typ av adress som används.">En tasks IP är hemlig och får aldrig skickas ut</button>
+    <button class="opt" data-why="Lastbalanseraren sköter inte krypteringen i det här steget. Skälet är att adressen byts.">Namnet krypterar anropen så att de är säkrare</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Vem släpps in av <code>v45-ecs-sg</code>?</p>
+  <div class="options">
+    <button class="opt" data-why="Då kunde vem som helst nå tasks förbi lastbalanseraren.">Alla på internet, som når tasken direkt</button>
+    <button class="opt" data-correct data-why="Källan är lastbalanserarens säkerhetsgrupp, så bara anrop via den når tasks.">Bara lastbalanseraren, via <code>v45-alb-sg</code></button>
+    <button class="opt" data-why="Det är databasen som släpper in tasks, via v40-db-sg. Tasks släpper in lastbalanseraren.">Bara databasen, som tasken själv anropar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Lastbalanseraren svarar 503 och målgruppen är tom. Vad stämmer?</p>
+  <div class="options">
+    <button class="opt" data-why="Är alla mål unhealthy skickar lastbalanseraren trafiken ändå. Här finns inga mål alls.">Alla mål är unhealthy, så ingen trafik skickas</button>
+    <button class="opt" data-correct data-why="503 ges när målgruppen saknar mål. I nästa lektion registrerar tjänsten dem.">Inga mål är registrerade i målgruppen</button>
+    <button class="opt" data-why="Lyssnaren tar emot på port 80, och en blockerad port ger ingen 503.">Lyssnaren har stängt port 80</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">4. Databasen går ner och <code>/health</code> frågar databasen. Vad blir följden?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Hälsokontrollen misslyckas, och tjänsten ersätter friska tasks som inte hjälper.">Friska tasks blir unhealthy och byts ut i onödan</button>
+    <button class="opt" data-why="Lastbalanseraren räknar svaret från /health, och ett fel där gör målet unhealthy.">Ingenting, för lastbalanseraren bryr sig inte om svaret</button>
+    <button class="opt" data-why="Databasen ligger bakom tasks och påverkas inte av en hälsokontroll.">Databasen startar om sig själv</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>ALB (Application Load Balancer) är internet-facing med ett DNS-namn som alltid används. Lyssnaren tar emot HTTP på port 80 och skickar till målgruppen.</li>
+    <li>Målgruppen har IP som mål, eftersom Fargate-tasks har nätverkskort men ingen instans.</li>
+    <li>Kedjan: <code>v45-alb-sg</code> släpper in port 80, <code>v45-ecs-sg</code> port 3000 bara från lastbalanseraren, <code>v40-db-sg</code> bara tasks.</li>
+    <li>Hälsokontrollen frågar <code>/health</code> på port 3000 var 15:e sekund, 2 i rad avgör. <code>/health</code> frågar inte databasen.</li>
+    <li>503 betyder tom målgrupp. Alla unhealthy ger ändå trafik till dem.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html">AWS: Application Load Balancer</a>. Lyssnare: <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html">AWS: Listeners</a>. Hälsokontroll: <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html">AWS: Health checks</a>. 503 och säkerhetsgrupper: <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-troubleshooting.html">AWS: Troubleshooting</a>. IP-mål för Fargate: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/alb.html">AWS: ECS och lastbalanserare</a>. Kursen säger att inga friska mål ger 503, men AWS skickar då trafik ändå (fail open), och 503 ges när målgruppen saknar mål. Priset i eu-north-1 är inte bekräftat och nämns inte.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0118-task-kors-och-stoppar.html">Förra: En task körs, och när den stoppar</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0120-tjansten-och-deployment.html">Nästa: Tjänsten håller allt igång</a>
+</nav>
+
+</main>
+</body>
+</html>

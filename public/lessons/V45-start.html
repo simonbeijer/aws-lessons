@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start V45: containern i AWS</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="start">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Start · V45</span>
+</nav>
+
+<p class="lesson-no">Start · V45</p>
+<h1>Veckan i en bild: containern i AWS</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Imagen med API:et körs den här veckan i AWS, i två containrar. AWS sköter servrarna, och en lastbalanserare delar ut anropen mellan containrarna.
+</div>
+
+<section class="explain">
+<h2>Varför nu?</h2>
+
+<p>I V44 blev API:et en image i ECR (Elastic Container Registry), men den körs ingenstans i AWS än. Nu startar AWS den, utan att koden ändras, och byter en container som går sönder.</p>
+</section>
+
+<section class="explain">
+<h2>Bilden</h2>
+
+<svg viewBox="0 0 360 560" role="img" aria-label="En webbläsare anropar en lastbalanserare. Lastbalanseraren delar anropen mellan två containrar som körs i Fargate. Båda containrarna använder databasen. En tjänst håller containrarna igång." style="width:100%;max-width:420px;height:auto;margin:16px auto;display:block;font-size:15px">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+  <rect x="10" y="140" width="340" height="280" rx="12" fill="#f3f4f6" stroke="#6b7280" stroke-width="2" stroke-dasharray="6 4"/>
+  <g fill="#fff" stroke="#2563eb" stroke-width="2">
+    <rect x="80" y="10" width="200" height="60" rx="8"/>
+    <rect x="80" y="86" width="200" height="60" rx="8"/>
+    <rect x="25" y="230" width="150" height="70" rx="8"/>
+    <rect x="185" y="230" width="150" height="70" rx="8"/>
+    <rect x="80" y="470" width="200" height="60" rx="8"/>
+  </g>
+  <g fill="#111827" text-anchor="middle">
+    <text x="180" y="36" font-weight="700">Webbläsare</text><text x="180" y="56">anropar API:et</text>
+    <text x="180" y="112" font-weight="700">Lastbalanserare</text><text x="180" y="132">delar ut anropen</text>
+    <text x="100" y="260" font-weight="700">Container</text><text x="100" y="282">API-imagen</text>
+    <text x="260" y="260" font-weight="700">Container</text><text x="260" y="282">API-imagen</text>
+    <text x="180" y="496" font-weight="700">Databas</text><text x="180" y="516">sparar datan</text>
+    <text x="180" y="172" font-weight="700">Fargate</text>
+    <text x="180" y="192">AWS äger servrarna</text>
+    <text x="180" y="342" font-weight="700">Tjänsten</text>
+    <text x="180" y="362">håller två igång,</text>
+    <text x="180" y="382">byter trasiga</text>
+  </g>
+  <g stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#ah)">
+    <path d="M180,70 V84"/>
+    <path d="M140,146 L110,228"/><path d="M220,146 L250,228"/>
+    <path d="M100,300 L150,468"/><path d="M260,300 L210,468"/>
+  </g>
+</svg>
+</section>
+
+<section class="explain">
+<h2>Veckans väg</h2>
+
+<ol>
+  <li><a href="0117-ecs-och-task-definition.html">Receptet</a>: ECS (Elastic Container Service) startar containrar efter ett recept.</li>
+  <li><a href="0118-task-kors-och-stoppar.html">En container körs</a>, och varför den stoppar.</li>
+  <li><a href="0119-lastbalanseraren.html">Lastbalanseraren</a> delar ut anropen.</li>
+  <li><a href="0120-tjansten-och-deployment.html">Tjänsten</a> håller allt igång.</li>
+</ol>
+</section>
+
+<section class="explain">
+<h2>Efter veckan</h2>
+
+<p>Du kan peka ut varje del i bilden och säga vad den gör.</p>
+</section>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html">AWS: What is Amazon ECS?</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="V44-start.html">Förra: Start V44</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0117-ecs-och-task-definition.html">Nästa: ECS och receptet</a>
+</nav>
+
+</main>
+</body>
+</html>

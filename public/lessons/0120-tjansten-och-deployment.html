@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tjänsten håller allt igång</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="fördjupning">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 120 · V45, 4 av 4 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 120 · V45, 4 av 4 i veckan</p>
+<h1>Hur håller en tjänst allt igång?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  En tjänst startar tasks, ersätter dem som dör och byter version utan avbrott. Utan den kommer ingen task tillbaka och målgruppen förblir tom. Den sista biten är vad det kostar när ingen använder det.
+</div>
+
+<section class="explain">
+<h2>Vad gör tjänsten?</h2>
+
+<p>En task som stoppar kommer inte tillbaka, som <a href="0118-task-kors-och-stoppar.html">lektion 118</a> sa. Det löser tjänsten (service) i ECS (Elastic Container Service). Den får ett desired count, hur många tasks som ska köra, här 2, och sprider dem över de två zonerna. Dör en startar tjänsten en ny.</p>
+
+<p>Tjänsten är också den som fyller <a href="0119-lastbalanseraren.html">målgruppen</a>. Den registrerar varje ny task och tar bort den när den stoppas. Dör en task får lastbalanseraren alltså en frisk kvar medan den nya startar.</p>
+</section>
+
+<section class="explain">
+<h2>Hur byts versionen?</h2>
+
+<p>En ny <a href="0117-ecs-och-task-definition.html">revision</a> av receptet startar en deployment, ett byte av tasks. Det går också att tvinga fram en med samma revision (force new deployment). Tjänsten byter i rullande takt (rolling update) mellan två gränser: minst 100 % av desired count ska vara friska, och högst 200 % får köra samtidigt.</p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="r-1">1. Före</button>
+    <button class="chip" data-target="r-2">2. Nya startar</button>
+    <button class="chip" data-target="r-3">3. Gamla stoppas</button>
+  </div>
+  <div class="picker-panel" id="r-1">
+    <p><strong>2 gamla tasks</strong> tar emot trafik. Det är 100 %.</p>
+  </div>
+  <div class="picker-panel" id="r-2">
+    <p><strong>2 gamla + 2 nya.</strong> Det är 200 %, taket. De nya får ingen trafik förrän hälsokontrollen godkänt dem.</p>
+  </div>
+  <div class="picker-panel" id="r-3">
+    <p><strong>2 nya tasks.</strong> De gamla är tagna ur målgruppen och stoppade.</p>
+  </div>
+</div>
+
+<p>En ny task behöver tid att starta. Under health check grace period (här 30 sekunder) bortser tjänsten från misslyckade hälsokontroller, så att tasken inte stoppas för tidigt. Först när målgruppens hälsokontroll godkänt den räknas den som frisk, och då tas en gammal task ur målgruppen.</p>
+
+<p>Den gamla ligger då i draining: den får inga nya anrop, men de pågående hinner bli klara. Hur länge styr deregistration delay. Standard är 300 sekunder, vilket gör ett byte av två tasks över fem minuter långt. Här är den satt till 30. Sedan får tasken SIGTERM, som i <a href="0118-task-kors-och-stoppar.html">lektion 118</a>.</p>
+
+<p>Blir de nya aldrig friska, till exempel med fel image, märker deployment circuit breaker det. Den markerar deployment som FAILED, och med rollback på backar tjänsten till förra lyckade revisionen.</p>
+</section>
+
+<section class="explain">
+<h2>Vad kostar det i vila?</h2>
+
+<p>Lastbalanseraren debiteras per timme så länge den kör, med eller utan trafik. Tasks kostar medan de kör, och med desired 0 stoppar tjänsten dem.</p>
+
+<div class="box bad">
+  <span class="box-title">Stoppad databas är inte gratis</span>
+  En stoppad RDS (Relational Database Service) debiteras inte för instanstimmar, men lagring och backuper kostar fortsatt. Efter 7 dagar startar RDS den av sig själv, och då kostar den fullt igen.
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. En av två tasks kraschar. Vad händer i en tjänst med desired count 2?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Tjänsten jämför antalet körande tasks med desired count och startar en ny.">Tjänsten startar en ny task och registrerar den i målgruppen</button>
+    <button class="opt" data-why="Utan tjänst är en task engångs. Med tjänst startas en ny automatiskt.">Ingenting, tasken är engångs och kommer inte tillbaka</button>
+    <button class="opt" data-why="Lastbalanseraren startar inga tasks. Den skickar bara trafik till de som finns.">Lastbalanseraren startar en ny task åt tjänsten</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. När stoppas de gamla tasks under en rullande deployment?</p>
+  <div class="options">
+    <button class="opt" data-why="Då skulle det finnas ett avbrott utan någon frisk task.">Direkt när deployment startar, så att ingen tid går förlorad</button>
+    <button class="opt" data-correct data-why="Nya tasks räknas som friska först när målgruppens hälsokontroll godkänt dem.">När de nya har blivit friska i målgruppen</button>
+    <button class="opt" data-why="Taket på 200 % tillåter nya tasks, men det är hälsan som avgör när de gamla stoppas.">När taket på 200 % har nåtts, oavsett hälsa</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Den nya revisionen har fel image och nya tasks blir aldrig friska. Vad gör circuit breaker, med rollback på?</p>
+  <div class="options">
+    <button class="opt" data-why="Circuit breaker rullar tillbaka, den fortsätter inte försöka.">Låter deployment försöka för alltid medan trafiken tappas</button>
+    <button class="opt" data-why="Ingen tasks har stoppats i förväg, och en task kan inte skapa en ny revision åt sig själv.">Skapar en ny revision med rätt image</button>
+    <button class="opt" data-correct data-why="Deployment markeras FAILED och tjänsten går tillbaka till senaste lyckade revisionen.">Markerar den FAILED och backar till förra lyckade revisionen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">4. Veckan är slut, desired sätts till 0 och databasen stoppas. Vad kostar fortfarande?</p>
+  <div class="options">
+    <button class="opt" data-why="Stoppade tasks kostar inget, men lastbalanseraren kör kvar.">Ingenting, för allt som kördes är stoppat nu</button>
+    <button class="opt" data-correct data-why="Lastbalanseraren debiteras medan den kör, och en stoppad RDS tar betalt för lagring och backuper.">Lastbalanseraren, och databasens lagring och backuper</button>
+    <button class="opt" data-why="Tasks kostar medan de kör, och med desired 0 gör de inte det.">Tasks, för tjänsten finns kvar och kör dem</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Tjänsten håller desired count (här 2) tasks igång, ersätter en som dör och registrerar dem i målgruppen.</li>
+    <li>Rullande deployment: minst 100 % friska, högst 200 %. Nya tasks blir friska innan de gamla stoppas.</li>
+    <li>Draining med deregistration delay (standard 300 s, här 30 s) låter pågående anrop bli klara.</li>
+    <li>Grace period ignorerar hälsokontroller medan tasken startar. Circuit breaker backar till förra lyckade revisionen.</li>
+    <li>Lastbalanseraren kostar i vila. Desired 0 stoppar tasks. Stoppad RDS kostar lagring och backuper och startar efter 7 dagar.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service_definition_parameters.html">AWS: Service definition parameters</a>. Tjänsten: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_services.html">AWS: ECS services</a>. Rullande deployment: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-ecs.html">AWS: Rolling update</a>. Circuit breaker: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-circuit-breaker.html">AWS: Deployment circuit breaker</a>. Draining: <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html">AWS: Target groups</a>. Pris: <a href="https://aws.amazon.com/elasticloadbalancing/pricing/">AWS: ELB pricing</a>. Stoppad databas: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html">AWS: Stop an RDS instance</a>. Kursen säger att en stoppad RDS kostar 0, men AWS tar betalt för lagring och backuper, så AWS gäller. ALB- och Fargate-priser i eu-north-1 är inte bekräftade. Att 30 sekunders grace period räcker för Node är kursens påstående, inte kontrollerat mot AWS.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0119-lastbalanseraren.html">Förra: Lastbalanseraren framför containrarna</a>
+  <a href="../index.html">Alla lektioner</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>En task körs, och när den stoppar</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 118 · V45, 2 av 4 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 118 · V45, 2 av 4 i veckan</p>
+<h1>Vad är en task, och var syns felet när den stoppar?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Receptet från förra lektionen gör inget förrän en task startas från det. En task är en körande kopia av receptet, och den körs bara en gång. Den behöver en väg ut för att starta, och när den stoppar finns två ställen att läsa varför.
+</div>
+
+<section class="explain">
+<h2>Vad är en task?</h2>
+
+<p>En task startas från receptet, på samma sätt som <a href="0103-docker-run-taggar-och-portar.html"><code>docker run</code></a> startar en container från en image. Varje task får ett eget nätverkskort (ENI, elastic network interface) med en egen privat IP-adress, och en egen loggström i loggruppen.</p>
+
+<p>Tasken är engångs. Stoppar den startar ECS (Elastic Container Service) ingen ny. Det gör en tjänst, senare i veckan.</p>
+</section>
+
+<section class="explain">
+<h2>Hur når tasken imagen?</h2>
+
+<p>Innan koden startar måste tasken hämta imagen från ECR (Elastic Container Registry) och skicka loggar till CloudWatch. Det kräver en väg ut. I ett publikt subnät får tasken den genom Public IP, en publik adress på nätverkskortet. Saknas den går hämtningen i timeout och tasken stoppas med <code>CannotPullContainerError</code>.</p>
+
+<p>Vem som släpps in avgör <a href="0034-security-group.html">säkerhetsgruppen</a> på kortet, inte den publika adressen. Därför släpper databasen in tasken via dess säkerhetsgrupp och inte via adressen, som är ny vid varje start.</p>
+</section>
+
+<section class="explain">
+<h2>Var läser man felet?</h2>
+
+<p>En task går genom Provisioning (kortet skapas), Pending (väntar), Activating (imagen hämtas), Running och till sist Stopped. Stoppade tasks syns en timme, med filtret Stopped.</p>
+
+<p>Stopped reason visar fel hos ECS eller nätet. Loggen visar fel i koden.</p>
+
+<div class="picker">
+  <div class="picker-buttons">
+    <button class="chip" data-target="p-pull">CannotPullContainerError</button>
+    <button class="chip" data-target="p-pw">password authentication failed</button>
+    <button class="chip" data-target="p-stopp">Tasken stoppas</button>
+  </div>
+  <div class="picker-panel" id="p-pull">
+    <p>Läs <strong>Stopped reason</strong>. ECS kunde inte hämta imagen: adressen är fel, execution role saknar rätt eller vägen ut saknas. Koden hann aldrig starta, så felet står inte i loggen.</p>
+  </div>
+  <div class="picker-panel" id="p-pw">
+    <p>Läs <strong>loggen</strong>. Koden startade, men databasen Postgres avvisade lösenordet.</p>
+  </div>
+  <div class="picker-panel" id="p-stopp">
+    <p>ECS skickar samma <a href="0107-health-och-sigterm.html">SIGTERM</a> som <code>docker stop</code>, men Fargate väntar 30 sekunder, inte 10, innan SIGKILL.</p>
+  </div>
+</div>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Tasken ligger i ett publikt subnät och stoppas med <code>CannotPullContainerError</code> och "connection timed out". Vad saknas troligast?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Utan Public IP har tasken ingen väg ut till ECR, och hämtningen går i timeout.">En Public IP på tasken, så att den når ECR</button>
+    <button class="opt" data-why="Task role är kodens roll mot AWS, och koden har inte startat när imagen hämtas.">En task role som släpper in koden i ECR</button>
+    <button class="opt" data-why="Storleken påverkar inte om tasken kan nå ECR. En timeout betyder att vägen ut saknas.">Mer minne i receptet, så att imagen får plats</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Tasken stoppar. Loggen säger <code>password authentication failed</code>. Var ligger felet?</p>
+  <div class="options">
+    <button class="opt" data-why="Imagen hämtades och koden startade, annars hade loggen varit tom.">I hämtningen av imagen, så Stopped reason är rätt ställe</button>
+    <button class="opt" data-correct data-why="Koden körde och Postgres sa nej. Det är ett fel i appens inställningar eller kod.">I koden eller dess inställningar, och loggen visar det</button>
+    <button class="opt" data-why="Nätet fungerade, för koden nådde databasen och fick ett svar.">I säkerhetsgruppen, som stängde ute tasken</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. En task stoppas för hand. Vad händer sedan?</p>
+  <div class="options">
+    <button class="opt" data-why="En task är engångs. ECS startar inte om den.">ECS startar en ny task av samma recept</button>
+    <button class="opt" data-correct data-why="Tasken är engångs. Det är en tjänst som ersätter stoppade tasks.">Ingen ny task startar, om ingen tjänst finns</button>
+    <button class="opt" data-why="Tasken är engångs och kan inte startas igen från Stopped.">Tasken väntar i Stopped tills någon startar den</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>En task är en körande kopia av receptet, med egen privat IP, eget nätverkskort och egen loggström. Den är engångs.</li>
+    <li>I ett publikt subnät behöver tasken Public IP för att nå ECR och CloudWatch. Skyddet är säkerhetsgruppen.</li>
+    <li>Stegen är Provisioning, Pending, Activating, Running, Stopped. Stopped syns en timme.</li>
+    <li>Stopped reason: fel hos ECS eller nätet, som <code>CannotPullContainerError</code>. Loggen: fel i koden, som <code>password authentication failed</code>.</li>
+    <li>Vid stopp skickar ECS SIGTERM och väntar 30 sekunder på Fargate.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-lifecycle-explanation.html">AWS: Task lifecycle</a> (stegen, SIGTERM, stopptid). Nätverk: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-task-networking.html">AWS: Fargate task networking</a>. Hämtningsfel: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_cannot_pull_image.html">AWS: CannotPullContainerError</a>. Stoppade tasks: <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/stopped-task-errors.html">AWS: Stopped task errors</a>. Kursen förenklar stegen: den nämner inte Activating, men AWS gör det, och imagen hämtas där. Felet <code>password authentication failed</code> kommer från Postgres, inte från AWS, och är inte kontrollerat mot AWS dokumentation.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0117-ecs-och-task-definition.html">Förra: ECS och receptet för containern</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0119-lastbalanseraren.html">Nästa: Lastbalanseraren framför containrarna</a>
+</nav>
+
+</main>
+</body>
+</html>
