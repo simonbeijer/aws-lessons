@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventera och välj väg för varje del</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="fördjupning">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 121 · V46, 1 av 4 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 121 · V46, 1 av 4 i veckan</p>
+<h1>Hur väljer man väg för varje del?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Innan något flyttas listar man vad servern innehåller, i en inventering. Sedan får varje del sitt eget R, ett sätt att flytta just den. Utan listan gissar man, och en väg för hela servern passar ingen del.
+</div>
+
+<section class="explain">
+<h2>Vad är en inventering?</h2>
+
+<p>Servern i <a href="V46-start.html">veckans start</a> rymmer fem delar som inte vill flyttas på samma sätt. Därför börjar en flytt med en inventering, fyra frågor till servern. På hundratals servrar gör Application Discovery Service det automatiskt.</p>
+
+<ul>
+  <li><strong>Vad kör?</strong> Vilka processer lyssnar på vilka portar.</li>
+  <li><strong>Vem pratar med vem?</strong> Beroenden som appen inte visar.</li>
+  <li><strong>Hur mycket data?</strong> Det avgör verktyget.</li>
+  <li><strong>Var står adresserna?</strong> Det som ändras vid flytten.</li>
+</ul>
+
+<p>Sedan väljer man ett R per del. R:et är sättet att flytta just den delen. AWS har sju:</p>
+
+<ul>
+  <li><strong>Rehost</strong>: flytta som den är.</li>
+  <li><strong>Replatform</strong>: flytta och byt en del mot något AWS sköter, utan att ändra koden. Containrar utan kodändring räknas hit.</li>
+  <li><strong>Refactor</strong>: bygg om arkitekturen för molnet.</li>
+  <li><strong>Repurchase</strong>: byt mot en annan produkt, ofta en SaaS (Software as a Service), en färdig tjänst man hyr.</li>
+  <li><strong>Retire</strong>: stäng ner, för ingen behöver den.</li>
+  <li><strong>Retain</strong>: låt den stå kvar, kanske tills vidare.</li>
+  <li><strong>Relocate</strong>: flytta till annan VPC (Virtual Private Cloud), Region eller konto utan att ändra något.</li>
+</ul>
+</section>
+
+<section class="explain">
+<h2>Bokningens fem delar</h2>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Del</th><th>Vad inventeringen visar</th><th>R</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Databasen</td><td>PostgreSQL, 2 000 rader, 8 MB</td><td>Replatform: till RDS (Relational Database Service)</td></tr>
+    <tr><td>Filerna</td><td>20 filer, 96 kB</td><td>Replatform: till S3 (Simple Storage Service)</td></tr>
+    <tr><td>Appen</td><td>Node-process på port 8080, läser databas och filer</td><td>Rehost: kvar på servern</td></tr>
+    <tr><td>Cron-jobbet</td><td>Rapport klockan 02.00, läser databasen</td><td>Följer med: ligger kvar och pekar om</td></tr>
+    <tr><td>Konfigurationsfilen</td><td>Ett tiotal rader med alla adresser</td><td>Ändras, flyttas inte</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Appen är rehost, för ingenting i den ändras. Läggs den senare i en container utan kodändring är det replatform enligt AWS.</p>
+
+<p>Cron-jobbet är ett beroende till databasen som inte syns i appen, och sådant glöms lätt. Här läser det samma konfigurationsfil som appen. Därför blir flytten av databasen och filerna en ändring av några rader i filen, inte i koden, och rapporten fortsätter komma.</p>
+</section>
+
+<section class="explain">
+<h2>Vad avgör verktyget, och vad hittades?</h2>
+
+<p>8 MB data (44 MB på disk, mest PostgreSQL själv) och 20 små filer går att flytta med en dump, en kopia av hela databasen, på några sekunder. Nedtiden blir minuter. 200 GB hade krävt ett annat verktyg.</p>
+
+<p>Inventeringen hittar också:</p>
+
+<div class="box bad">
+  <span class="box-title">Tre fynd</span>
+  PostgreSQL lyssnar på 0.0.0.0, alla nätverksgränssnitt, så bara säkerhetsgruppen hindrar andra från att nå databasen. Lösenordet står i klartext i konfigurationsfilen. Servern har ingen identitet i AWS: ingen roll, inga nycklar, och AWS CLI svarar &quot;Unable to locate credentials&quot;.
+</div>
+
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Varför får varje del ett eget R i stället för ett för hela servern?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Ett R för alla hade tvingat databasen och appen åt samma håll, fast de har olika behov.">Delarna har olika behov, och ett R hade passat bara några</button>
+    <button class="opt" data-why="Tvärtom: R:en finns just för att delarna ska kunna flyttas olika.">AWS tillåter bara ett R per server</button>
+    <button class="opt" data-why="Inventeringen visar vad som finns, men R väljs efter vad varje del behöver.">Inventeringen räknar ut R automatiskt åt varje del</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Appen står kvar på servern och flyttas utan ändringar. Vilket R är det enligt AWS?</p>
+  <div class="options">
+    <button class="opt" data-why="Refactor innebär att arkitekturen byggs om, och här ändras ingenting.">Refactor, för den ska bli en container en dag</button>
+    <button class="opt" data-why="Retire betyder att något stängs ner för att ingen behöver det, och appen ska ju fortsätta köra.">Retire, för den gamla servern stängs så småningom</button>
+    <button class="opt" data-correct data-why="Rehost är att flytta något som det är, utan ändring.">Rehost, för appen flyttas utan ändringar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Databasen är 8 MB. Vad gör det för flytten?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Små mängder går att kopiera med en dump, så nedtiden blir minuter.">En dump räcker, och nedtiden blir bara minuter</button>
+    <button class="opt" data-why="Det gäller bara stora mängder, som 200 GB.">Den kräver ett särskilt verktyg för stora databaser</button>
+    <button class="opt" data-why="Datamängden avgör verktyget, inte om flytten är möjlig.">Den går inte att flytta utan lång nedtid</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">4. Cron-jobbet har databasadressen inskriven i sitt skript i stället för att läsa konfigurationsfilen. Vad händer efter flytten?</p>
+  <div class="options">
+    <button class="opt" data-why="Skriptet läser inte filen, så ändringen når det inte.">Det hittar den nya adressen av sig själv</button>
+    <button class="opt" data-correct data-why="Adressen i skriptet pekar på den gamla databasen, och ingen märker det direkt.">Rapporten slutar komma, och ingen märker det direkt</button>
+    <button class="opt" data-why="Cron startar skriptet som vanligt, men det når fel databas.">Cron slutar starta skriptet helt och hållet</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Inventering: vad kör, vem pratar med vem, hur mycket data, var står adresserna. Ett R per del.</li>
+    <li>AWS sju R: rehost, replatform, refactor, repurchase, retire, retain, relocate.</li>
+    <li>Bokningen: databas och filer replatform, appen rehost, cron-jobbet följer med, konfigurationsfilen ändras. Container utan kodändring är replatform enligt AWS.</li>
+    <li>8 MB och 20 filer: en dump räcker. Fynd: PostgreSQL på alla gränssnitt, lösenord i klartext, ingen identitet i AWS.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html">AWS: Migration strategies (the 7 Rs)</a>. Application Discovery Service: <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/migration-tools/discovery-app-discovery-service.html">AWS: Application Discovery Service</a>. Kursen kallar appen i container refactor, AWS replatform, så AWS gäller. Kursen placerar Application Discovery Service i assess-fasen, men AWS sida säger inget om fas, så det är inte bekräftat.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="V46-start.html">Förra: Start V46</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0122-databasen-till-rds.html">Nästa: Databasen till RDS</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start V46: flytten från källaren</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="start">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Start · V46</span>
+</nav>
+
+<p class="lesson-no">Start · V46</p>
+<h1>Veckan i en bild: flytten från källaren</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Bokningen är ett gammalt system där allt ligger på en enda server. Den här veckan flyttas databasen och filerna till tjänster som AWS sköter, och appen blir kvar på servern.
+</div>
+
+<section class="explain">
+<h2>Varför nu?</h2>
+
+<p>Veckorna före byggde något nytt, till exempel containrar i ECS (Elastic Container Service). Men de flesta företag har något som redan finns. Går servern sönder tar den databasen och filerna med sig. Efter flytten går servern att byta ut.</p>
+</section>
+
+<section class="explain">
+<h2>Bilden</h2>
+
+<svg viewBox="0 0 360 680" role="img" aria-label="Före: en server med app, databas, filer, cron-jobb och konfigurationsfil. Efter: servern har appen, cron-jobbet och en roll. Appen använder en databas i RDS och filer i S3." style="width:100%;max-width:420px;height:auto;margin:16px auto;display:block;font-size:15px">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker></defs>
+  <g fill="#111827" text-anchor="middle" font-weight="700">
+    <text x="180" y="22">Före</text>
+    <text x="180" y="272">Efter</text>
+  </g>
+  <rect x="30" y="34" width="300" height="190" rx="12" fill="#f3f4f6" stroke="#6b7280" stroke-width="2" stroke-dasharray="6 4"/>
+  <g fill="#fff" stroke="#2563eb" stroke-width="2">
+    <rect x="50" y="68" width="125" height="46" rx="8"/>
+    <rect x="185" y="68" width="125" height="46" rx="8"/>
+    <rect x="50" y="124" width="125" height="46" rx="8"/>
+    <rect x="185" y="124" width="125" height="46" rx="8"/>
+    <rect x="50" y="176" width="260" height="36" rx="8"/>
+    <rect x="30" y="284" width="190" height="164" rx="12" fill="#f3f4f6" stroke="#6b7280" stroke-dasharray="6 4"/>
+    <rect x="45" y="316" width="160" height="40" rx="8"/>
+    <rect x="45" y="360" width="160" height="36" rx="8"/>
+    <rect x="45" y="402" width="160" height="36" rx="8"/>
+    <rect x="30" y="520" width="150" height="60" rx="8"/>
+    <rect x="200" y="520" width="130" height="60" rx="8"/>
+  </g>
+  <g fill="#111827" text-anchor="middle">
+    <text x="112" y="96">App</text>
+    <text x="247" y="96">Databas</text>
+    <text x="112" y="152">Filer</text>
+    <text x="247" y="152">Cron-jobb</text>
+    <text x="180" y="199">Konfigurationsfil</text>
+    <text x="125" y="304" font-weight="700">Servern</text>
+    <text x="125" y="342">App</text>
+    <text x="125" y="383">Cron-jobb</text>
+    <text x="125" y="425">IAM-roll</text>
+    <text x="105" y="546" font-weight="700">RDS</text><text x="105" y="567">databasen</text>
+    <text x="265" y="546" font-weight="700">S3</text><text x="265" y="567">filerna</text>
+  </g>
+  <g stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#ah)">
+    <path d="M90,448 L100,518"/>
+    <path d="M160,448 L250,518"/>
+  </g>
+</svg>
+</section>
+
+<section class="explain">
+<h2>Delarna</h2>
+
+<dl>
+  <dt>Servern (EC2)</dt>
+  <dd>EC2 (Elastic Compute Cloud) är en dator du hyr hos AWS, en virtuell maskin. Den ersätter maskinen i källaren och kör appen.</dd>
+  <dt>RDS</dt>
+  <dd>RDS (Relational Database Service) är en databas som AWS driftar åt dig: backup, patchar och byte vid fel. Appen använder den som förut.</dd>
+  <dt>S3</dt>
+  <dd>S3 (Simple Storage Service) lagrar filer utan att någon server behövs. Här flyttar bekräftelserna dit.</dd>
+  <dt>IAM-rollen</dt>
+  <dd>IAM (Identity and Access Management) ger servern en roll: en identitet som AWS delar ut. Med den får appen använda S3 utan lösenord eller nyckel i en fil.</dd>
+  <dt>Konfigurationsfilen</dt>
+  <dd>Här står var databasen och filerna finns. Byts några rader i den pekar appen på RDS och S3 utan att koden ändras.</dd>
+  <dt>Cron-jobbet</dt>
+  <dd>Ett jobb som körs på schema. Här skriver det en rapport klockan 02.00 varje natt, och det följer med flytten eftersom det läser samma konfigurationsfil.</dd>
+  <dt>Cutover</dt>
+  <dd>Själva bytet: appen stoppas en stund, får nya adresser i konfigurationsfilen och startas igen. Den gamla platsen står kvar som reserv tills allt fungerar.</dd>
+  <dt>R:en</dt>
+  <dd>Sätten att flytta en del. Rehost: flytta som den är. Replatform: byt mot en tjänst AWS sköter, utan ny kod. Refactor: bygg om arkitekturen för molnet.</dd>
+  <dt>TCO</dt>
+  <dd>TCO (total cost of ownership) är hela kostnaden över tid: hårdvara, personal och driftstopp, inte bara inköpet.</dd>
+</dl>
+</section>
+
+<section class="explain">
+<h2>Veckans väg</h2>
+
+<ol>
+  <li><a href="0121-inventering-och-r-en.html">Inventera</a> servern och välj väg för varje del.</li>
+  <li><a href="0122-databasen-till-rds.html">Databasen</a> flyttas till RDS.</li>
+  <li><a href="0123-filerna-och-rollen.html">Filerna och rollen</a>: S3, IAM-rollen och cutover.</li>
+  <li><a href="0124-tco.html">TCO</a>: vad serverhallen egentligen kostar.</li>
+</ol>
+</section>
+
+<section class="explain">
+<h2>Efter veckan</h2>
+
+<p>Du kan peka ut varje del i bilden, säga vad den gör och vilket R den fick.</p>
+</section>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html">AWS: What is Amazon RDS?</a>.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0120-tjansten-och-deployment.html">Förra: Tjänsten och deployment</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0121-inventering-och-r-en.html">Nästa: Inventera och välj väg</a>
+</nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Databasen till RDS: kopiera, kontrollera, byt</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="fördjupning">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 122 · V46, 2 av 4 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 122 · V46, 2 av 4 i veckan</p>
+<h1>Hur flyttar man en databas utan att tappa data?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Att flytta databasen är en cutover: man stoppar skrivningarna, kopierar, bevisar att kopian är lika, och byter adress. Ordningen avgör om något tappas. Databasen är den del av <a href="0121-inventering-och-r-en.html">inventeringen</a> som går till RDS (Relational Database Service).
+</div>
+
+<section class="explain">
+<h2>Vad är en cutover?</h2>
+
+<p>En cutover är själva bytet, ögonblicket då appen slutar använda den gamla databasen och börjar använda den nya. Det som går fel är en bokning under kopieringen, eller ett byte innan kopian är kontrollerad. Därför är ordningen fast, och <em>nedtiden</em>, tiden appen är stoppad, börjar i första steget.</p>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Steg</th><th>Appen</th><th>Gamla databasen</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1. Frys skrivningarna: stoppa appen</td><td><span class="tag bad">nere, nedtiden börjar</span></td><td>orörd</td></tr>
+    <tr><td>2. Dumpa</td><td><span class="tag bad">nere</span></td><td>orörd</td></tr>
+    <tr><td>3. Läs in i RDS</td><td><span class="tag bad">nere</span></td><td>orörd</td></tr>
+    <tr><td>4. Kontrollera</td><td><span class="tag bad">nere</span></td><td>orörd</td></tr>
+    <tr><td>5. Byt tre rader, starta appen</td><td><span class="tag good">uppe, nedtiden slutar</span></td><td>orörd, rollback är enkel</td></tr>
+    <tr><td>6. Första nya skrivningen</td><td><span class="tag good">uppe</span></td><td><span class="tag note">rollbackfönstret stängs</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Rollback är att gå tillbaka till det gamla: tre rader tillbaka och en omstart, så länge den gamla databasen är orörd. Men första nya bokningen, nummer 2001, finns bara i RDS. Därifrån saknar båda sidor något.</p>
+</section>
+
+<section class="explain">
+<h2>Kopiera och kontrollera</h2>
+
+<p><code>pg_dump</code> skriver hela databasen som SQL (Structured Query Language): tabellen, raderna och sekvensen. En sekvens är räknaren som delar ut nästa id. Dumpen har en <code>setval</code>-rad som sätter den till 2000, så nästa bokning blir 2001. Utan den börjar räknaren om och krockar med gamla rader. <code>psql</code> läser in samma SQL i RDS. Läser man in två gånger blir det <code>ERROR: relation already exists</code>, så målet måste tömmas först.</p>
+
+<p>Sedan bevisar man att kopian är lika: samma fråga mot båda sidor ska ge samma svar.</p>
+
+<ul>
+  <li><strong>Radantal</strong> och <strong>högsta id</strong>: 2 000 och 2 000.</li>
+  <li><strong>Sekvensens värde</strong>: 2000.</li>
+  <li><strong>Checksumma</strong>: ett kort värde som räknas ut över allt innehåll.</li>
+</ul>
+
+<p>Checksumman täcker inte hur tecken och tider visas, så man gör också stickprov. Visas namn som Åsa Öberg hela är teckenkodningen rätt, och visas en tid en timme fel är tidszonen annorlunda.</p>
+</section>
+
+<section class="explain">
+<h2>Bytet och det som skiljer</h2>
+
+<p>Bytet är tre rader i konfigurationsfilen, inte kod: <code>DB_HOST</code> blir RDS-adressen, <code>DB_PASSWORD</code> det nya lösenordet, och <code>DB_SSL=true</code>. RDS kräver TLS (Transport Layer Security), en krypterad anslutning, som standard. Utan <code>DB_SSL=true</code> avvisas appen. Cron-jobbet läser samma fil och följer med utan att röras. Efteråt visar <code>/config</code> RDS-adressen och <code>/bookings/count</code> 2 000, och nattens rapport ska vara ett tal, inte ett fel.</p>
+
+<div class="box note">
+  <span class="box-title">labadmin är inte superuser</span>
+  I RDS behåller AWS rollen som superuser. labadmin kan därför inte skapa en databas åt en annan roll utan att först bli medlem i den.
+</div>
+
+<p>När nedtid inte går att acceptera finns DMS (Database Migration Service), som kopierar löpande medan appen kör.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Varför stoppas appen innan dumpen tas?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="En bokning som kommer in under kopieringen skulle saknas i RDS, och ingen skulle märka det.">Ingen ny bokning får komma in medan man kopierar</button>
+    <button class="opt" data-why="Dumpen går att ta medan appen kör, men kopian kan då sakna nya rader.">pg_dump går inte att köra när appen är igång</button>
+    <button class="opt" data-why="RDS tar emot data oavsett om gamla appen kör.">RDS tar inte emot data medan den gamla appen kör</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Radantal och checksumma stämmer, men en tid visas en timme fel. Vad är troligast?</p>
+  <div class="options">
+    <button class="opt" data-why="Då hade radantalet eller checksumman skilt sig.">Rader har försvunnit under kopieringen</button>
+    <button class="opt" data-correct data-why="Själva värdet är lika, men tidszonen avgör hur tiden visas.">Tidszonen skiljer mellan databaserna</button>
+    <button class="opt" data-why="Sekvensen styr bara id, inte tider.">Sekvensen följde inte med i dumpen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Appen har körts mot RDS i en timme och tagit emot nya bokningar. Varför är rollback inte längre enkel?</p>
+  <div class="options">
+    <button class="opt" data-why="Den gamla databasen finns kvar, men den saknar de nya bokningarna.">Den gamla databasen raderas när appen byter</button>
+    <button class="opt" data-correct data-why="Går man tillbaka tappar man allt som skrivits i RDS efter bytet.">De nya bokningarna finns bara i RDS</button>
+    <button class="opt" data-why="Konfigurationen går alltid att ändra tillbaka, men datan följer inte med.">Konfigurationsfilen går inte att ändra tillbaka</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">4. Hur kan cron-jobbet börja läsa från RDS utan att någon ändrar det?</p>
+  <div class="options">
+    <button class="opt" data-why="Cron hittar inte nya adresser själv.">Cron söker själv upp den nya databasen</button>
+    <button class="opt" data-why="Appen och cron är separata processer.">Appen skickar vidare sin anslutning till jobbet</button>
+    <button class="opt" data-correct data-why="Jobbet läser adressen ur samma fil som appen, så den nya adressen gäller också där.">Jobbet läser samma konfigurationsfil som appen</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Ordning: frys skrivningarna (nedtiden börjar), <code>pg_dump</code>, <code>psql</code>, kontrollera, byt, starta (nedtiden slutar).</li>
+    <li>Dumpen tar med sekvensens värde (<code>setval</code>), så nästa id blir 2001. Att läsa in två gånger ger fel.</li>
+    <li>Kontroll: radantal, högsta id, sekvens, checksumma, och stickprov på å, ä, ö och tidszon.</li>
+    <li>Byt <code>DB_HOST</code>, <code>DB_PASSWORD</code> och <code>DB_SSL=true</code>. Cron-jobbet följer med via samma fil.</li>
+    <li>labadmin är inte superuser i RDS. Rollback är enkel fram till första nya skrivningen. DMS när nedtid inte går.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.Roles.rds_superuser.html">AWS: rds_superuser</a>. TLS: <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/PostgreSQL.Concepts.General.SSL.html">AWS: SSL med RDS for PostgreSQL</a>. Dump: <a href="https://www.postgresql.org/docs/current/app-pgdump.html">PostgreSQL: pg_dump</a>. DMS: <a href="https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Introduction.HighLevelView.html">AWS: DMS</a>. Enligt AWS är TLS tvingande som standard från PostgreSQL 15 (<code>rds.force_ssl=1</code>) men går att stänga av, och är default av före version 15.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0121-inventering-och-r-en.html">Förra: Inventering och R:en</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0123-filerna-och-rollen.html">Nästa: Filerna och rollen</a>
+</nav>
+
+</main>
+</body>
+</html>

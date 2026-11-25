@@ -881,6 +881,47 @@
           "tag": "labb 2"
         }
       ]
+    },
+    {
+      "code": "v46",
+      "title": "V46 – Flytta det som redan finns",
+      "lessons": [
+        {
+          "nr": null,
+          "file": "V46-start.html",
+          "title": "Veckan i en bild: flytten från källaren",
+          "goal": "Före och efter i en bild, och vad varje del gör: servern, RDS, S3, IAM-rollen, konfigurationsfilen, cutover, sätten att flytta och TCO.",
+          "tag": ""
+        },
+        {
+          "nr": 121,
+          "file": "0121-inventering-och-r-en.html",
+          "title": "Hur väljer man väg för varje del?",
+          "goal": "Vad en inventering frågar och vad svaren avslöjar, sätten att flytta (R:en), och vilket R varje del av Bokningen får.",
+          "tag": "labb 1"
+        },
+        {
+          "nr": 122,
+          "file": "0122-databasen-till-rds.html",
+          "title": "Hur flyttar man en databas utan att tappa data?",
+          "goal": "Cutover i rätt ordning: frys, dumpa, läs in, kontrollera med radantal och checksumma, byt tre rader i konfigurationen, och hur länge rollback är enkel.",
+          "tag": "labb 2"
+        },
+        {
+          "nr": 123,
+          "file": "0123-filerna-och-rollen.html",
+          "title": "Hur får servern komma åt S3 utan nyckel?",
+          "goal": "Varför servern får en IAM-roll i stället för en nyckel, policyns två resurser, hur sync flyttar filerna, och varför servern sedan går att byta ut.",
+          "tag": "labb 3"
+        },
+        {
+          "nr": 124,
+          "file": "0124-tco.html",
+          "title": "Är molnet billigare? Räkna TCO",
+          "goal": "Vad TCO är, vilka poster som brukar glömmas, hur jämförelsen ändras när de läggs till, och varför svaret beror på vad man räknar med.",
+          "tag": "labb 4"
+        }
+      ]
     }
   ]
 }

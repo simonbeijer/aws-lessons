@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Filerna till S3 och en roll för servern</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="fördjupning">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 123 · V46, 3 av 4 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 123 · V46, 3 av 4 i veckan</p>
+<h1>Hur får servern komma åt S3 utan nyckel?</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  Servern får en IAM-roll, en identitet som AWS delar ut, i stället för en nyckel i en fil. Med den kan appen läsa och skriva filerna i S3. Efter <a href="0122-databasen-till-rds.html">databasen</a> är filerna det sista som måste finnas kvar om servern försvinner, och när de är flyttade går servern att byta ut.
+</div>
+
+<section class="explain">
+<h2>Varför en roll och inte en nyckel?</h2>
+
+<p>Servern har ingen identitet i AWS, så den kan inte använda S3. Det gamla sättet är en IAM-användare med nyckeln i en fil på servern. Då kan nyckeln läcka, den måste bytas, och den följer med varje kopia av disken.</p>
+
+<p>Med en roll finns ingen fil. Rollen sätts på instansen via en <em>instance profile</em>, behållaren som EC2 (Elastic Compute Cloud) fäster rollen med. Konsolen skapar den automatiskt när rollen görs för EC2. AWS CLI och SDK hämtar sedan själva tillfälliga uppgifter från instansens metadatatjänst, IMDS (Instance Metadata Service). Det är samma mönster som <a href="0117-ecs-och-task-definition.html">task role</a> i ECS, fast på en server.</p>
+
+<p>Frågan <code>aws sts get-caller-identity</code> (STS, Security Token Service) ger först <code>Unable to locate credentials</code>. Med rollen svarar den <code>assumed-role/v46-legacy-role</code>.</p>
+</section>
+
+<section class="explain">
+<h2>Vad får rollen göra?</h2>
+
+<p>Rollen får bara det policyn säger. Policyn har två resurser, eftersom S3 skiljer på bucketen och objekten i den:</p>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Resurs (ARN)</th><th>Rättighet</th><th>Gör det möjligt att</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>arn:aws:s3:::bucketen</code></td><td><code>s3:ListBucket</code></td><td>lista filerna</td></tr>
+    <tr><td><code>arn:aws:s3:::bucketen/*</code></td><td><code>s3:GetObject</code>, <code>s3:PutObject</code></td><td>läsa och skriva en fil</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Det vanligaste felet är att blanda ihop raderna, och det heter <code>AccessDenied</code> oavsett vilken som saknas. Utan raden utan <code>/*</code> går det inte att lista, utan raden med <code>/*</code> inte att läsa filerna.</p>
+</section>
+
+<section class="explain">
+<h2>Kopiera, kontrollera, byt</h2>
+
+<p><code>aws s3 sync</code> kopierar bara det som är nytt eller ändrat, och AWS dokumentation säger att den jämför storlek och ändringstid. Körs den en andra gång händer ingenting. Kontrollen gör man själv: <code>md5sum</code> på filen och <code>ETag</code> på objektet i S3 ska ge samma 32 tecken. ETag är objektets MD5-checksumma, men bara om filen laddats upp i ett stycke och inte krypterats med KMS (Key Management Service).</p>
+
+<p>Bytet är fjärde raden i konfigurationsfilen: <code>FILES_BUCKET</code> får bucketens namn. Appen kunde redan läsa från S3, så ingen kod ändras. Efteråt visar <code>/config</code> bucketen, <code>/files</code> listar filerna och en fil som inte finns ger 404.</p>
+</section>
+
+<section class="explain">
+<h2>Stäng det gamla</h2>
+
+<p>Sedan stänger man den lokala databasen och flyttar undan filkatalogen. Svarar appen ändå (<code>/bookings/count</code> ger 2 001 ur RDS) och visar <code>ss</code>, som listar öppna portar, att port 5432 är borta, använder ingenting dem.</p>
+
+
+<p>Servern kör nu bara appen. I morse hade en terminering raderat 2 000 bokningar och 20 filer. Nu startar man en ny med samma konfiguration, och inget går förlorat. Nästa steg kan vara en container, för en container får inte spara något viktigt på sin egen disk.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Någon kopierar serverns hela disk. Varför är en roll säkrare än en nyckel i en fil?</p>
+  <div class="options">
+    <button class="opt" data-correct data-why="Rollen har ingen fil på disken. Uppgifterna hämtas från metadatatjänsten och är tillfälliga.">Det finns ingen nyckel på disken att ta med sig</button>
+    <button class="opt" data-why="Nyckeln i filen kan alltid användas av den som hittar den.">Nyckeln i filen går inte att använda på en annan dator</button>
+    <button class="opt" data-why="En roll har behörigheter, och de är inte kryptering av disken.">Rollen krypterar hela disken åt servern</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Policyn saknar raden med <code>/*</code>. Vad händer?</p>
+  <div class="options">
+    <button class="opt" data-why="Listan kräver raden utan /*, och den finns kvar.">Servern kan inte lista filerna i bucketen</button>
+    <button class="opt" data-correct data-why="Att läsa och skriva är rättigheter på objekten, och objektens ARN slutar på /*.">Servern kan inte läsa eller skriva filerna</button>
+    <button class="opt" data-why="Det blir AccessDenied, inte NoSuchBucket. Bucketen finns.">Felet blir att bucketen inte finns</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Varför händer ingenting när <code>sync</code> körs en andra gång?</p>
+  <div class="options">
+    <button class="opt" data-why="Sync kan köras igen, den kopierar bara det som skiljer.">Sync går bara att köra en gång per bucket</button>
+    <button class="opt" data-correct data-why="Filerna är oförändrade, så det finns inget att kopiera.">Storlek och ändringstid är lika, så inget skiljer</button>
+    <button class="opt" data-why="Sync tar inte bort något utan flaggan --delete.">Sync raderar filerna i bucketen och börjar om</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">4. Varför går servern nu att byta ut?</p>
+  <div class="options">
+    <button class="opt" data-why="Servern kostar lika mycket som förut. Det som ändrats är var datan ligger.">Den blir billigare än den var</button>
+    <button class="opt" data-why="Appen ligger kvar på servern och är inte en container än.">Appen har redan flyttats in i en container</button>
+    <button class="opt" data-correct data-why="Databasen ligger i RDS och filerna i S3, så terminerar man servern förlorar man ingenting.">Allt med tillstånd ligger utanför servern</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>Roll i stället för nyckel: instance profile på instansen, tillfälliga uppgifter från IMDS, ingen fil.</li>
+    <li>Policy med två resurser: bucketen (utan <code>/*</code>) för <code>s3:ListBucket</code>, objekten (med <code>/*</code>) för <code>s3:GetObject</code> och <code>s3:PutObject</code>. Annars <code>AccessDenied</code>.</li>
+    <li><code>aws s3 sync</code> kopierar bara det som skiljer. ETag jämförs med <code>md5sum</code> för hand.</li>
+    <li>Fjärde raden <code>FILES_BUCKET</code>, noll rader kod. Lokala databasen stängs för att bevisa att inget använder den.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html">AWS: IAM-roller för EC2</a>. Uppgifter: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-metadata-security-credentials.html">AWS: säkerhetsuppgifter i metadatatjänsten</a>. Policy: <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-with-s3-policy-actions.html">AWS: S3-policyåtgärder</a>. Sync: <a href="https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html">AWS CLI: s3 sync</a>. ETag: <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_Object.html">AWS: Object</a>. Kursmaterialet säger att sync jämför MD5 för varje fil, men AWS dokumentation säger storlek och ändringstid. ETag-kontrollen är ett extra steg man gör själv.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0122-databasen-till-rds.html">Förra: Databasen till RDS</a>
+  <a href="../index.html">Alla lektioner</a>
+  <a href="0124-tco.html">Nästa: Räkna TCO</a>
+</nav>
+
+</main>
+</body>
+</html>

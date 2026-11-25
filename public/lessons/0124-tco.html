@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Är molnet billigare? Räkna TCO</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<script src="../assets/lesson.js"></script>
+</head>
+<body>
+<main data-storlek="vanlig">
+
+<nav class="topnav">
+  <a href="../index.html">Alla lektioner</a>
+  <span>Lektion 124 · V46, 4 av 4 i veckan</span>
+</nav>
+
+<p class="lesson-no">Lektion 124 · V46, 4 av 4 i veckan</p>
+<h1>Är molnet billigare? Räkna TCO</h1>
+
+<div class="kort">
+  <strong>Kort sagt</strong>
+  TCO (total cost of ownership) är hela kostnaden över tid, inte bara det som står på en offert eller faktura. Nu när <a href="0123-filerna-och-rollen.html">flytten är klar</a> går det att jämföra rättvist, och svaret beror på vilka poster man räknar med.
+</div>
+
+<section class="explain">
+<h2>Varför är frågan fel?</h2>
+
+<p>Verkstaden AB, ett företag med 40 anställda, väljer mellan egen serverhall och moln. IT-chefen jämförde nya servrar för 450 000 kr, avskrivna på fem år (90 000 kr om året), med 14 000 kr i månaden i molnet. Det var en post på hallens sida. Därför räknar man över tre år och lägger till posterna en i taget:</p>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Tre år, kr</th><th>Serverhall</th><th>Moln</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>IT-chefens räkning</td><td>270 000</td><td>504 000</td></tr>
+    <tr><td>+ el, lokal, backup (molnet: verklig räkning)</td><td>470 700</td><td>508 620</td></tr>
+    <tr><td>+ personal</td><td>1 064 700</td><td>706 620</td></tr>
+    <tr><td>+ nedtid</td><td>1 304 700</td><td>754 620</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Hallen vinner tills personalen räknas in. Siffrorna är påhittade.</p>
+</section>
+
+<section class="explain">
+<h2>Vilka poster glöms?</h2>
+
+<p>Personalen är störst: 56 % av hallens kostnad utan nedtid, eftersom teknikern lägger 30 % av sin tid på hallen. Hårdvaran, det IT-chefen räknade, är bara 25 %. Nedtid räknas sällan alls. Tio timmar utan bokning à 8 000 kr är 80 000 kr om året.</p>
+
+<p>Molnet har poster utanför AWS-fakturan. Av 235 000 kr om året är cirka 29 000 kr AWS. Affärssystemet ERP (Enterprise Resource Planning) köps som SaaS (Software as a Service, leverantörens färdiga program mot avgift) och kostar 140 400 kr. Personal är 66 000 kr. Besparingen kommer inte från att AWS är billigt, utan från att teknikern slutar byta diskar.</p>
+</section>
+
+<section class="explain">
+<h2>Vad gör AWS Pricing Calculator?</h2>
+
+<p>Ett webbverktyg på calculator.aws, utan konto, som uppskattar AWS-avgifterna för det du matar in. Det är en uppskattning, utan skatt. Personal, SaaS och nedtid måste du lägga till själv.</p>
+</section>
+
+<h2>Quiz</h2>
+
+<div class="quiz-q">
+  <p class="q">1. Vad ändrar jämförelsen mest när alla poster räknas?</p>
+  <div class="options">
+    <button class="opt" data-why="Hårdvaran är bara 25 % av hallens kostnad, och den fanns redan med.">Att hårdvaran blir dyrare</button>
+    <button class="opt" data-correct data-why="Personalen är 594 000 kr på tre år i hallen mot 198 000 kr i molnet.">Att personalen räknas in</button>
+    <button class="opt" data-why="AWS-fakturan är en liten del av molnets kostnad.">Att AWS-fakturan höjs</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">2. Varför visar AWS Pricing Calculator inte hela molnets TCO?</p>
+  <div class="options">
+    <button class="opt" data-why="Det är inte kalkylatorn som kräver konto, den går att använda utan.">Den kräver ett konto för att räkna</button>
+    <button class="opt" data-correct data-why="Den uppskattar AWS-avgifter. Personal, SaaS och nedtid lägger du till.">Den räknar bara det du matar in från AWS</button>
+    <button class="opt" data-why="Priserna är uppskattningar, men det är inte skälet till att posterna saknas.">Den visar bara exakta priser i dollar</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<div class="quiz-q">
+  <p class="q">3. Flytten blev billigare för Verkstaden. Varför är det inte en regel för alla företag?</p>
+  <div class="options">
+    <button class="opt" data-why="Posterna finns hos alla, men deras storlek skiljer.">Andra företag har ingen personal som kostar</button>
+    <button class="opt" data-correct data-why="Svaret beror på vad man räknar med, och ett annat företag har andra siffror.">Posternas storlek skiljer mellan företag</button>
+    <button class="opt" data-why="AWS-priserna är desamma, men det är inte det som avgör.">AWS tar olika pris av olika företag</button>
+  </div>
+  <p class="feedback" aria-live="polite"></p>
+</div>
+
+<h2>Sammanfattning</h2>
+
+<div class="summary">
+  <ul>
+    <li>TCO är hela kostnaden över tid, här tre år.</li>
+    <li>Personalen är störst (56 %), hårdvaran bara 25 %. El, kyla, lokal och nedtid glöms.</li>
+    <li>AWS-fakturan är cirka 29 000 av molnets 235 000 kr per år.</li>
+    <li>AWS Pricing Calculator uppskattar bara AWS-avgifterna. Svaret beror på vad man räknar med.</li>
+  </ul>
+</div>
+
+<h2>Källor</h2>
+
+<p>Huvudkälla: <a href="https://docs.aws.amazon.com/pricing-calculator/latest/userguide/what-is-pricing-calculator.html">AWS: Vad är AWS Pricing Calculator</a>. Begränsningar: <a href="https://aws.amazon.com/aws-cost-management/aws-pricing-calculator/faqs/">AWS Pricing Calculator: vanliga frågor</a>. Siffrorna i tabellen är påhittade och kommer från kursens exempel. Kursen avrundar molnets summor till 706 600 och 754 600 kr, här står de exakta 706 620 och 754 620. Tre års horisont och 10 kr per USD är kursens val, inte AWS.</p>
+
+<p class="ask">Är något oklart? Fråga mig, så förklarar jag.</p>
+
+<nav class="bottomnav">
+  <a href="0123-filerna-och-rollen.html">Förra: Filerna till S3 och en roll</a>
+  <a href="../index.html">Alla lektioner</a>
+</nav>
+
+</main>
+</body>
+</html>
